@@ -1,11 +1,22 @@
 package xyz.idaoteng.lesson1;
 
 public class MusicMetaInfo {
+    private String filename;
     private String artist;
     private String title;
     private String album;
     private String genre;
     private String track;
+    private String bitrate;
+    private String length;
+
+    public String getFilename() {
+        return filename;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
+    }
 
     public String getArtist() {
         return artist;
@@ -45,5 +56,21 @@ public class MusicMetaInfo {
 
     public void setTrack(String track) {
         this.track = track;
+    }
+
+    public String getBitrate() {
+        return bitrate;
+    }
+
+    public void setBitrate(String bitrate) {
+        this.bitrate = bitrate;
+    }
+
+    public String getLength() {
+        return length;
+    }
+
+    public void setLength(String length) {
+        this.length = length;
     }
 }
