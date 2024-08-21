@@ -1,0 +1,53 @@
+package xyz.idaoteng.audiotag;
+
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
+import xyz.idaoteng.audiotag.component.Aside;
+import xyz.idaoteng.audiotag.component.Center;
+import xyz.idaoteng.audiotag.component.Head;
+
+import java.io.InputStream;
+import java.util.logging.LogManager;
+
+public class StartUp extends Application {
+    private static Stage stage;
+
+    @Override
+    public void start(Stage primaryStage) {
+        StartUp.stage = primaryStage;
+
+        BorderPane root = new BorderPane();
+        root.setTop(Head.getHead());
+        root.setCenter(Center.getCenter());
+        root.setRight(Aside.getAside());
+
+        Scene scene = new Scene(root, 1131, 580);
+        primaryStage.setScene(scene);
+        primaryStage.setTitle("音乐信息编辑器");
+        primaryStage.setMinHeight(300);
+        primaryStage.setMinWidth(450);
+        primaryStage.show();
+    }
+
+    @Override
+    public void stop() {
+        Session.saveSession();
+    }
+
+    public static Stage getPrimaryStage() {
+        return stage;
+    }
+
+    public static void main(String[] args) {
+        LogManager logManager = LogManager.getLogManager();
+        try (InputStream input = StartUp.class.getResourceAsStream("log.properties")) {
+            logManager.readConfiguration(input);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        launch(args);
+    }
+}

@@ -1,14 +1,38 @@
-package xyz.idaoteng.lesson1;
+package xyz.idaoteng.audiotag;
 
-public class MusicMetaInfo {
+public class AudioMetaData {
+    private String absolutePath;
     private String filename;
-    private String artist;
-    private String title;
-    private String album;
-    private String genre;
-    private String track;
+    private String artist = "";
+    private String title = "";
+    private String album = "";
+    private String genre = "";
+    private String track = "";
     private String bitrate;
     private String length;
+    private byte[] cover;
+
+    public enum Editable {
+        ARTIST, TITLE, ALBUM, GENRE, TRACK
+    }
+
+    public void set(Editable type, String value) {
+        switch (type) {
+            case ARTIST -> this.artist = value;
+            case TITLE -> this.title = value;
+            case ALBUM -> this.album = value;
+            case GENRE -> this.genre = value;
+            case TRACK -> this.track = value;
+        }
+    }
+
+    public String getAbsolutePath() {
+        return absolutePath;
+    }
+
+    public void setAbsolutePath(String absolutePath) {
+        this.absolutePath = absolutePath;
+    }
 
     public String getFilename() {
         return filename;
@@ -72,5 +96,13 @@ public class MusicMetaInfo {
 
     public void setLength(String length) {
         this.length = length;
+    }
+
+    public byte[] getCover() {
+        return cover;
+    }
+
+    public void setCover(byte[] cover) {
+        this.cover = cover;
     }
 }
