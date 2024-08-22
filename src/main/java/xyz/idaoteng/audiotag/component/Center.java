@@ -150,11 +150,16 @@ public class Center {
     }
 
     public static void updateTableView(List<AudioMetaData> dataList) {
-        Aside.showBlank();
-        recordeUpdate(dataList);
-        TABLE_VIEW.getItems().clear();
-        TABLE_VIEW.getItems().addAll(dataList);
-        TABLE_VIEW.refresh();
+        if (dataList == null) {
+            recordeUpdate(TABLE_VIEW.getItems());
+            TABLE_VIEW.refresh();
+        } else {
+            Aside.showBlank();
+            recordeUpdate(dataList);
+            TABLE_VIEW.getItems().clear();
+            TABLE_VIEW.getItems().addAll(dataList);
+            TABLE_VIEW.refresh();
+        }
     }
 
     private static void recordeUpdate(List<AudioMetaData> dataList) {

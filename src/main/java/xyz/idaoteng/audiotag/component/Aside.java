@@ -187,6 +187,7 @@ public class Aside {
             MetaDataWriter.write(originalMetaData);
 
             showMetaData(originalMetaData);
+            Center.updateTableView(null);
             Center.selectItem(originalMetaData);
         });
 
