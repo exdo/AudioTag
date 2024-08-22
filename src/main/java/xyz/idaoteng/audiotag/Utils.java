@@ -9,8 +9,8 @@ import java.io.File;
 import java.io.IOException;
 
 public class Utils {
-    public static String getExtension(final File f) {
-        final String name = f.getName().toLowerCase();
+    public static String getExtension(final File file) {
+        final String name = file.getName().toLowerCase();
         final int i = name.lastIndexOf(".");
         if (i == -1) {
             return "";

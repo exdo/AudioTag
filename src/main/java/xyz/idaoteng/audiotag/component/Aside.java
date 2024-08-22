@@ -11,36 +11,43 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import xyz.idaoteng.audiotag.*;
-import xyz.idaoteng.audiotag.AudioMetaData.Editable;
+import xyz.idaoteng.audiotag.AudioMetaData;
+import xyz.idaoteng.audiotag.Session;
+import xyz.idaoteng.audiotag.StartUp;
+import xyz.idaoteng.audiotag.Utils;
 import xyz.idaoteng.audiotag.core.MetaDataWriter;
 
-import java.io.*;
-import java.util.HashMap;
-import java.util.Set;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.InputStream;
 
 public class Aside {
     private static final VBox ASIDE = new VBox(5);
     private static final ComboBox<String> TITLE_COMBO_BOX = new ComboBox<>();
     private static final ComboBox<String> ARTIST_COMBO_BOX = new ComboBox<>();
     private static final ComboBox<String> ALBUM_COMBO_BOX = new ComboBox<>();
+    private static final ComboBox<String> DATE_COMBO_BOX = new ComboBox<>();
     private static final ComboBox<String> GENRE_COMBO_BOX = new ComboBox<>();
     private static final ComboBox<String> TRACK_COMBO_BOX = new ComboBox<>();
+    private static final ComboBox<String> COMMENT_COMBO_BOX = new ComboBox<>();
     private static final HBox COVER_PANEL = new HBox();
-    private static final HBox CONFIRM_BOX = new HBox(30);
+    private static final Button CHANGE_COVER_BUTTON = new Button("更换");
+    private static final Button EXTRACT_COVER_BUTTON = new Button("提取");
+    private static final Button DELETE_COVER_BUTTON = new Button("删除");
+    private static final Button CONFIRM_BUTTON = new Button("确认更改");
+    private static final Button CANCEL_BUTTON = new Button("取消");
+    private static final HBox CONFIRM_BOX = new HBox();
 
-    private static AudioMetaData META_DATA_DISPLAYED = null;
-    private static boolean metaDataChanged = false;
-    private static final HashMap<Editable, String> EDITABLE_DATA_TABLE = new HashMap<>();
+    private static AudioMetaData originalMetaData = null;
+    private static AudioMetaData metaDataDisplayed = null;
 
     private static final ByteArrayOutputStream DEFAULT_COVER = new ByteArrayOutputStream();
 
     private static final FileChooser.ExtensionFilter COVER_EXTENSION_FILTER;
 
-    private static byte[] newCoverBytes = null;
-
     private enum ComboBoxType {
-        TITLE, ARTIST, ALBUM, GENRE, TRACK
+        TITLE, ARTIST, ALBUM, DATE, GENRE, TRACK, COMMENT
     }
 
     static {
@@ -59,34 +66,32 @@ public class Aside {
         ASIDE.setStyle("-fx-border-style: solid; -fx-border-color: #cccccc; -fx-border-width: 1 0 0 1");
 
         Label titleLabel = new Label("标题");
-        TITLE_COMBO_BOX.setMinWidth(240);
-        TITLE_COMBO_BOX.setEditable(true);
-        configComboBoxAction(ComboBoxType.TITLE, TITLE_COMBO_BOX);
+        configComboBox(ComboBoxType.TITLE, TITLE_COMBO_BOX, true);
 
         Label artistLabel = new Label("艺术家");
-        ARTIST_COMBO_BOX.setMinWidth(240);
-        ARTIST_COMBO_BOX.setEditable(true);
-        configComboBoxAction(ComboBoxType.ARTIST, ARTIST_COMBO_BOX);
+        configComboBox(ComboBoxType.ARTIST, ARTIST_COMBO_BOX, true);
 
         Label albumLabel = new Label("专辑");
-        ALBUM_COMBO_BOX.setMinWidth(240);
-        ALBUM_COMBO_BOX.setEditable(true);
-        configComboBoxAction(ComboBoxType.ALBUM, ALBUM_COMBO_BOX);
+        configComboBox(ComboBoxType.ALBUM, ALBUM_COMBO_BOX, true);
+
+        Label dateLabel = new Label("出版日期");
+        configComboBox(ComboBoxType.DATE, DATE_COMBO_BOX, true);
 
         Label genreLabel = new Label("流派");
-        GENRE_COMBO_BOX.setEditable(true);
-        GENRE_COMBO_BOX.getItems().addAll(CommonMusicGenres.getGenres());
-        configComboBoxAction(ComboBoxType.GENRE, GENRE_COMBO_BOX);
+        GENRE_COMBO_BOX.getItems().addAll(Session.getAlternativeGenres());
+        configComboBox(ComboBoxType.GENRE, GENRE_COMBO_BOX, false);
         VBox genrePanel = new VBox(5);
         genrePanel.setMinWidth(155);
         genrePanel.getChildren().addAll(genreLabel, GENRE_COMBO_BOX);
 
         Label trackLabel = new Label("音轨序号");
-        TRACK_COMBO_BOX.setEditable(true);
         TRACK_COMBO_BOX.getItems().addAll("1", "2", "3", "4", "5", "6", "7", "8", "9", "10");
-        configComboBoxAction(ComboBoxType.TRACK, TRACK_COMBO_BOX);
+        configComboBox(ComboBoxType.TRACK, TRACK_COMBO_BOX, false);
         VBox trackPanel = new VBox(5);
         trackPanel.getChildren().addAll(trackLabel, TRACK_COMBO_BOX);
+
+        Label commentLabel = new Label("备注");
+        configComboBox(ComboBoxType.COMMENT, COMMENT_COMBO_BOX, true);
 
         HBox genreAndTrack = new HBox(10);
         genreAndTrack.setMaxWidth(240);
@@ -98,136 +103,131 @@ public class Aside {
         COVER_PANEL.setMinHeight(200);
         COVER_PANEL.setMinWidth(200);
         COVER_PANEL.setStyle("-fx-border-style: solid; -fx-border-color: #cccccc; -fx-border-width: 1 1 1 1");
-        setDefaultCover();
         configCoverPanelAction();
 
         VBox coverOptions = new VBox(15);
-        Button changeCoverButton = new Button("更换");
-        Button extractCoverButton = new Button("提取");
-        Button deleteCoverButton = new Button("删除");
         coverOptions.setAlignment(Pos.CENTER);
-        coverOptions.getChildren().addAll(changeCoverButton, extractCoverButton, deleteCoverButton);
-        configCoverOptionsAction(changeCoverButton, extractCoverButton, deleteCoverButton);
+        coverOptions.getChildren().addAll(CHANGE_COVER_BUTTON, EXTRACT_COVER_BUTTON, DELETE_COVER_BUTTON);
+        configCoverOptionsAction();
 
         HBox coverPanelAndOptions = new HBox(3);
         coverPanelAndOptions.getChildren().addAll(COVER_PANEL, coverOptions);
 
         initConfirmBox();
 
+        ASIDE.setMinWidth(265);
+        ASIDE.setMaxWidth(265);
         ASIDE.getChildren().addAll(titleLabel, TITLE_COMBO_BOX, artistLabel, ARTIST_COMBO_BOX, albumLabel,
-                ALBUM_COMBO_BOX, genreAndTrack, coverLabel, coverPanelAndOptions, CONFIRM_BOX);
+                ALBUM_COMBO_BOX, dateLabel, DATE_COMBO_BOX, genreAndTrack, commentLabel, COMMENT_COMBO_BOX,
+                coverLabel, coverPanelAndOptions, CONFIRM_BOX);
 
-        initEditableData();
+        showBlank();
     }
 
-    private static void configCoverOptionsAction(Button changeButton, Button extractButton, Button deleteButton) {
-        changeButton.setOnAction(event -> updateCover(false));
+    private static void configCoverOptionsAction() {
+        CHANGE_COVER_BUTTON.setOnAction(event -> updateCoverAction(false));
 
-        extractButton.setOnAction(event -> {
-            if (META_DATA_DISPLAYED != null) {
+        EXTRACT_COVER_BUTTON.setOnAction(event -> {
+            if (originalMetaData != null) {
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.setTitle("保存封面");
                 fileChooser.getExtensionFilters().addAll(COVER_EXTENSION_FILTER);
                 File file = fileChooser.showSaveDialog(StartUp.getPrimaryStage());
                 if (file != null) {
-                    Utils.saveCover(META_DATA_DISPLAYED.getCover(), file);
+                    Utils.saveCover(originalMetaData.getCover(), file);
                 }
             }
         });
 
-        deleteButton.setOnAction(event -> updateCover(true));
+        DELETE_COVER_BUTTON.setOnAction(event -> updateCoverAction(true));
     }
 
     private static void configCoverPanelAction() {
         COVER_PANEL.setOnMouseClicked(event -> {
+            if (metaDataDisplayed == null) return;
+
             if (event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 1) {
-                updateCover(false);
+                updateCoverAction(false);
             }
         });
     }
 
-    private static void updateCover(boolean delete) {
+    private static void updateCoverAction(boolean delete) {
+        if (originalMetaData == null) return;
+
         if (delete) {
             setDefaultCover();
-            newCoverBytes = new byte[0];
-            return;
+            CONFIRM_BOX.setVisible(true);
+        } else {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("选择封面");
+            fileChooser.getExtensionFilters().addAll(COVER_EXTENSION_FILTER);
+            File file = fileChooser.showOpenDialog(StartUp.getPrimaryStage());
+            if (file != null) {
+                setCover(Utils.retouchCover(file));
+                CONFIRM_BOX.setVisible(true);
+            }
         }
-
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("选择封面");
-        fileChooser.getExtensionFilters().addAll(COVER_EXTENSION_FILTER);
-        File file = fileChooser.showOpenDialog(StartUp.getPrimaryStage());
-        if (file != null) {
-            newCoverBytes = Utils.retouchCover(file);
-            setCover(newCoverBytes);
-            metaDataChanged = true;
-        }
-    }
-
-    private static void initEditableData() {
-        EDITABLE_DATA_TABLE.put(Editable.TITLE, null);
-        EDITABLE_DATA_TABLE.put(Editable.ARTIST, null);
-        EDITABLE_DATA_TABLE.put(Editable.ALBUM, null);
-        EDITABLE_DATA_TABLE.put(Editable.GENRE, null);
-        EDITABLE_DATA_TABLE.put(Editable.TRACK, null);
-        newCoverBytes = null;
     }
 
     private static void initConfirmBox() {
-        Button confirmButton = new Button("确认");
-        confirmButton.setOnAction(event -> {
-            if (!metaDataChanged || META_DATA_DISPLAYED == null) return;
+        CONFIRM_BUTTON.setOnAction(event -> {
+            if (originalMetaData == null || metaDataDisplayed == null) return;
 
-            Set<Editable> keys = EDITABLE_DATA_TABLE.keySet();
-            keys.forEach(key -> {
-                String newValue = EDITABLE_DATA_TABLE.get(key);
-                if (newValue != null) {
-                    META_DATA_DISPLAYED.set(key, newValue);
-                }
-            });
+            exchangeEditableValue(metaDataDisplayed, originalMetaData);
 
-            if (newCoverBytes != null) {
-                if (newCoverBytes.length == 0) {
-                    META_DATA_DISPLAYED.setCover(null);
-                } else {
-                    META_DATA_DISPLAYED.setCover(newCoverBytes);
-                }
-            }
-            MetaDataWriter.write(META_DATA_DISPLAYED);
-            Center.getTableView().refresh();
-            metaDataChanged = false;
+            MetaDataWriter.write(originalMetaData);
+
+            showMetaData(originalMetaData);
+            Center.selectItem(originalMetaData);
         });
 
-        Button cancelButton = new Button("取消");
-        cancelButton.setOnAction(event -> {
-            if (META_DATA_DISPLAYED == null) return;
+        CANCEL_BUTTON.setOnAction(event -> {
+            if (originalMetaData == null || metaDataDisplayed == null) return;
 
-            TITLE_COMBO_BOX.setValue(META_DATA_DISPLAYED.getTitle());
-            ARTIST_COMBO_BOX.setValue(META_DATA_DISPLAYED.getArtist());
-            ALBUM_COMBO_BOX.setValue(META_DATA_DISPLAYED.getAlbum());
-            GENRE_COMBO_BOX.setValue(META_DATA_DISPLAYED.getGenre());
-            TRACK_COMBO_BOX.setValue(META_DATA_DISPLAYED.getTrack());
-            setCover(META_DATA_DISPLAYED.getCover());
-            initEditableData();
-            metaDataChanged = false;
+            showMetaData(originalMetaData);
         });
 
         CONFIRM_BOX.setAlignment(Pos.CENTER);
-        CONFIRM_BOX.getChildren().addAll(confirmButton, cancelButton);
+        CONFIRM_BOX.setSpacing(50);
+        CONFIRM_BOX.setPadding(new Insets(20, 0, 0, 0));
+        CONFIRM_BOX.getChildren().addAll(CONFIRM_BUTTON, CANCEL_BUTTON);
+        CONFIRM_BOX.setVisible(false);
     }
 
-    private static void configComboBoxAction(ComboBoxType type, ComboBox<String> comboBox) {
+    private static void exchangeEditableValue(AudioMetaData from, AudioMetaData to) {
+        to.setTitle(from.getTitle());
+        to.setArtist(from.getArtist());
+        to.setAlbum(from.getAlbum());
+        to.setDate(from.getDate());
+        to.setGenre(from.getGenre());
+        to.setTrack(from.getTrack());
+        to.setComment(from.getComment());
+        to.setCover(from.getCover());
+    }
+
+    private static void configComboBox(ComboBoxType type, ComboBox<String> comboBox, boolean defaultSize) {
+        if (defaultSize) {
+            comboBox.setMinWidth(240);
+            comboBox.setMaxWidth(240);
+        }
+
+        comboBox.setEditable(true);
+
         comboBox.setOnAction(event -> {
             String newValue = comboBox.getValue();
             if (newValue != null) {
                 switch (type) {
-                    case TITLE -> EDITABLE_DATA_TABLE.put(Editable.TITLE, newValue);
-                    case ARTIST -> EDITABLE_DATA_TABLE.put(Editable.ARTIST, newValue);
-                    case ALBUM -> EDITABLE_DATA_TABLE.put(Editable.ALBUM, newValue);
-                    case GENRE -> EDITABLE_DATA_TABLE.put(Editable.GENRE, newValue);
-                    case TRACK -> EDITABLE_DATA_TABLE.put(Editable.TRACK, newValue);
+                    case TITLE -> metaDataDisplayed.setTitle(newValue);
+                    case ARTIST -> metaDataDisplayed.setArtist(newValue);
+                    case ALBUM -> metaDataDisplayed.setAlbum(newValue);
+                    case DATE -> metaDataDisplayed.setDate(newValue);
+                    case GENRE -> metaDataDisplayed.setGenre(newValue);
+                    case TRACK -> metaDataDisplayed.setTrack(newValue);
+                    case COMMENT -> metaDataDisplayed.setComment(newValue);
                 }
-                metaDataChanged = true;
+
+                CONFIRM_BOX.setVisible(true);
             }
         });
     }
@@ -240,6 +240,14 @@ public class Aside {
         cover.setImage(new Image(new ByteArrayInputStream(DEFAULT_COVER.toByteArray())));
         COVER_PANEL.setAlignment(Pos.CENTER);
         COVER_PANEL.getChildren().add(cover);
+
+        if (metaDataDisplayed != null) {
+            metaDataDisplayed.setCover(null);
+        }
+
+        CHANGE_COVER_BUTTON.setDisable(originalMetaData == null);
+        EXTRACT_COVER_BUTTON.setDisable(true);
+        DELETE_COVER_BUTTON.setDisable(true);
     }
 
     private static void setCover(byte[] coverBytes) {
@@ -249,30 +257,75 @@ public class Aside {
         cover.setFitHeight(200);
         cover.setImage(new Image(new ByteArrayInputStream(coverBytes)));
         COVER_PANEL.getChildren().add(cover);
+
+        metaDataDisplayed.setCover(coverBytes);
+
+        CHANGE_COVER_BUTTON.setDisable(false);
+        EXTRACT_COVER_BUTTON.setDisable(false);
+        DELETE_COVER_BUTTON.setDisable(false);
     }
 
-    public static void showMetaData(AudioMetaData metaData) {
-        initEditableData();
-        META_DATA_DISPLAYED = metaData;
-        metaDataChanged = false;
+    public static void showMetaData(AudioMetaData original) {
+        originalMetaData = original;
+        metaDataDisplayed = new AudioMetaData();
+        exchangeEditableValue(original, metaDataDisplayed);
 
-        TITLE_COMBO_BOX.setValue(metaData.getTitle());
+        TITLE_COMBO_BOX.setDisable(false);
+        ARTIST_COMBO_BOX.setDisable(false);
+        ALBUM_COMBO_BOX.setDisable(false);
+        DATE_COMBO_BOX.setDisable(false);
+        GENRE_COMBO_BOX.setDisable(false);
+        TRACK_COMBO_BOX.setDisable(false);
+        COMMENT_COMBO_BOX.setDisable(false);
 
-        ARTIST_COMBO_BOX.setValue(metaData.getArtist());
-        ARTIST_COMBO_BOX.getItems().addAll(Head.getAlternativeArtists());
+        TITLE_COMBO_BOX.getItems().clear();
+        TITLE_COMBO_BOX.setValue(original.getTitle());
+        TITLE_COMBO_BOX.getItems().add("");
 
-        ALBUM_COMBO_BOX.setValue(metaData.getAlbum());
-        ALBUM_COMBO_BOX.getItems().addAll(Head.getAlternativeAlbums());
+        ARTIST_COMBO_BOX.getItems().clear();
+        ARTIST_COMBO_BOX.setValue(original.getArtist());
+        ARTIST_COMBO_BOX.getItems().addAll(Center.getAlternativeArtists());
 
-        GENRE_COMBO_BOX.setValue(metaData.getGenre());
+        ALBUM_COMBO_BOX.getItems().clear();
+        ALBUM_COMBO_BOX.setValue(original.getAlbum());
+        ALBUM_COMBO_BOX.getItems().addAll(Center.getAlternativeAlbums());
 
-        TRACK_COMBO_BOX.setValue(metaData.getTrack());
+        DATE_COMBO_BOX.getItems().clear();
+        DATE_COMBO_BOX.setValue(original.getDate());
+        DATE_COMBO_BOX.getItems().add("");
 
-        if (metaData.getCover() != null) {
-            setCover(metaData.getCover());
+        GENRE_COMBO_BOX.getItems().clear();
+        GENRE_COMBO_BOX.setValue(original.getGenre());
+        GENRE_COMBO_BOX.getItems().addAll(Session.getAlternativeGenres());
+
+        TRACK_COMBO_BOX.setValue(original.getTrack());
+
+        COMMENT_COMBO_BOX.getItems().clear();
+        COMMENT_COMBO_BOX.setValue(original.getComment());
+        COMMENT_COMBO_BOX.getItems().add("");
+
+        if (original.getCover() != null) {
+            setCover(original.getCover());
         } else {
             setDefaultCover();
         }
+
+        CONFIRM_BOX.setVisible(false);
+    }
+
+    public static void showBlank() {
+        originalMetaData = null;
+        CONFIRM_BOX.setVisible(false);
+
+        TITLE_COMBO_BOX.setDisable(true);
+        ARTIST_COMBO_BOX.setDisable(true);
+        ALBUM_COMBO_BOX.setDisable(true);
+        DATE_COMBO_BOX.setDisable(true);
+        GENRE_COMBO_BOX.setDisable(true);
+        TRACK_COMBO_BOX.setDisable(true);
+        COMMENT_COMBO_BOX.setDisable(true);
+
+        setDefaultCover();
     }
 
     public static VBox getAside() {

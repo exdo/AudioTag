@@ -38,8 +38,11 @@ public class MetaDataReader {
             audioMetaData.setTitle(tag.getFirst(FieldKey.TITLE));
             audioMetaData.setArtist(tag.getFirst(FieldKey.ARTIST));
             audioMetaData.setAlbum(tag.getFirst(FieldKey.ALBUM));
+            audioMetaData.setDate(tag.getFirst(FieldKey.YEAR));
             audioMetaData.setGenre(tag.getFirst(FieldKey.GENRE));
             audioMetaData.setTrack(tag.getFirst(FieldKey.TRACK));
+            String comment = tag.getFirst(FieldKey.COMMENT);
+            audioMetaData.setComment(comment.replaceAll("[\\r\\n]+", " "));
             audioMetaData.setCover(tag.getFirstArtwork() != null ? tag.getFirstArtwork().getBinaryData() : null);
         }
 
@@ -54,25 +57,45 @@ public class MetaDataReader {
         return audioMetaData;
     }
 
-    public static List<AudioMetaData> readDirectory(File directory) {
-        return getAudioMetaData(directory);
-    }
-
-    private static List<AudioMetaData> readSubfolders(File directory) {
-        return getAudioMetaData(directory);
+    public static List<AudioMetaData> readDirectory(File directory, boolean includeSubfolders) {
+        if (includeSubfolders) {
+            return getAudioMetaDataRecursively(directory);
+        } else {
+            return getAudioMetaData(directory);
+        }
     }
 
     private static List<AudioMetaData> getAudioMetaData(File directory) {
         List<AudioMetaData> dataList = new ArrayList<>();
+        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(directory.toPath())) {
+            for (Path path : directoryStream) {
+                File file = path.toFile();
+                if (SupportedFileTypes.isSupported(file)) {
+                    dataList.add(readFile(file));
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("读取目录失败：" + directory.getAbsolutePath());
+            e.printStackTrace();
+        }
+        return dataList;
+    }
+
+    private static List<AudioMetaData> readSubfolders(File directory) {
+        return getAudioMetaDataRecursively(directory);
+    }
+
+    private static List<AudioMetaData> getAudioMetaDataRecursively(File directory) {
+        List<AudioMetaData> dataList = new ArrayList<>();
         Path dirPath = directory.toPath();
         try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(dirPath)) {
             for (Path path : directoryStream) {
-                File theFile = path.toFile();
-                if (theFile.isDirectory()) {
-                    dataList.addAll(readSubfolders(theFile));
+                File file = path.toFile();
+                if (file.isDirectory()) {
+                    dataList.addAll(readSubfolders(file));
                 } else {
-                    if (SupportedFileTypes.isSupported(theFile)) {
-                        dataList.add(readFile(theFile));
+                    if (SupportedFileTypes.isSupported(file)) {
+                        dataList.add(readFile(file));
                     }
                 }
             }

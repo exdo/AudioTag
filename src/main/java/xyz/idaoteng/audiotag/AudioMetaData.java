@@ -6,25 +6,13 @@ public class AudioMetaData {
     private String artist = "";
     private String title = "";
     private String album = "";
+    private String date = "";
     private String genre = "";
     private String track = "";
+    private String comment = "";
     private String bitrate;
     private String length;
     private byte[] cover;
-
-    public enum Editable {
-        ARTIST, TITLE, ALBUM, GENRE, TRACK
-    }
-
-    public void set(Editable type, String value) {
-        switch (type) {
-            case ARTIST -> this.artist = value;
-            case TITLE -> this.title = value;
-            case ALBUM -> this.album = value;
-            case GENRE -> this.genre = value;
-            case TRACK -> this.track = value;
-        }
-    }
 
     public String getAbsolutePath() {
         return absolutePath;
@@ -66,6 +54,14 @@ public class AudioMetaData {
         this.album = album;
     }
 
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
     public String getGenre() {
         return genre;
     }
@@ -80,6 +76,14 @@ public class AudioMetaData {
 
     public void setTrack(String track) {
         this.track = track;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
     public String getBitrate() {

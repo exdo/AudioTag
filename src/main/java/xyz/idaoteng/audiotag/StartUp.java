@@ -23,7 +23,7 @@ public class StartUp extends Application {
         root.setCenter(Center.getCenter());
         root.setRight(Aside.getAside());
 
-        Scene scene = new Scene(root, 1131, 580);
+        Scene scene = new Scene(root, 1131, 650);
         primaryStage.setScene(scene);
         primaryStage.setTitle("音乐信息编辑器");
         primaryStage.setMinHeight(300);

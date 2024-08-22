@@ -8,11 +8,12 @@ import java.util.Collections;
 import java.util.List;
 
 public class Session {
-    private static String LAST_SELECTED_FILE_PARENT_PATH;
-    private static String LAST_SELECTED_DIRECTORY_PATH;
-    private static String NEED_REFRESH_DIRECTORY_PATH;
+    private static String lastSelectedFileParentPath;
+    private static String lastSelectedDirectoryPath;
 
-    private static final List<String> CURRENT_TABLEVIEW_CONTENT = new ArrayList<>();
+    private static final List<String> CURRENT_TABLEVIEW_CONTENT_PATHS = new ArrayList<>();
+
+    private static final ArrayList<String> ALTERNATIVE_GENRES = new ArrayList<>();
 
     static {
         readHistorySession();
@@ -22,20 +23,33 @@ public class Session {
         String historyFilePath = Session.class.getResource("session.history").getPath();
         try {
             BufferedReader reader = new BufferedReader(new FileReader(historyFilePath, StandardCharsets.UTF_8));
-            String lastSelectedFileParentPath = reader.readLine();
-            LAST_SELECTED_FILE_PARENT_PATH = processPath(lastSelectedFileParentPath);
 
             String lastSelectedDirectoryPath = reader.readLine();
-            LAST_SELECTED_DIRECTORY_PATH = processPath(lastSelectedDirectoryPath);
+            Session.lastSelectedDirectoryPath = processPath(lastSelectedDirectoryPath);
 
-            String needRefreshDirectoryPath = reader.readLine();
-            NEED_REFRESH_DIRECTORY_PATH = processPath(needRefreshDirectoryPath);
+            String lastSelectedFileParentPath = reader.readLine();
+            Session.lastSelectedFileParentPath = processPath(lastSelectedFileParentPath);
 
             String currentTableViewContent = reader.readLine();
-            CURRENT_TABLEVIEW_CONTENT.addAll(processPaths(currentTableViewContent));
+            CURRENT_TABLEVIEW_CONTENT_PATHS.addAll(processPaths(currentTableViewContent));
+
+            String alternativeGenres = reader.readLine();
+            processGenres(alternativeGenres);
+
             reader.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private static void processGenres(String alternativeGenres) {
+        alternativeGenres = alternativeGenres.substring(alternativeGenres.lastIndexOf('=') + 1);
+        if (!"".equals(alternativeGenres)) {
+            if (alternativeGenres.contains(",")) {
+                ALTERNATIVE_GENRES.addAll(List.of(alternativeGenres.split(",")));
+            } else {
+                ALTERNATIVE_GENRES.add(alternativeGenres);
+            }
         }
     }
 
@@ -62,50 +76,50 @@ public class Session {
     }
 
     public static String getLastSelectedFileParentPath() {
-        return LAST_SELECTED_FILE_PARENT_PATH;
+        return lastSelectedFileParentPath;
     }
 
     public static void setLastSelectedFileParentPath(String path) {
-        LAST_SELECTED_FILE_PARENT_PATH = path;
+        lastSelectedFileParentPath = path;
     }
 
     public static String getLastSelectedDirectoryPath() {
-        return LAST_SELECTED_DIRECTORY_PATH;
+        return lastSelectedDirectoryPath;
     }
 
     public static void setLastSelectedDirectoryPath(String path) {
-        LAST_SELECTED_DIRECTORY_PATH = path;
+        lastSelectedDirectoryPath = path;
     }
 
-    public static void setCurrentTableViewContent(List<String> absolutePaths) {
-        CURRENT_TABLEVIEW_CONTENT.clear();
-        CURRENT_TABLEVIEW_CONTENT.addAll(absolutePaths);
+    public static void setCurrentTableViewContentPaths(List<String> absolutePaths) {
+        CURRENT_TABLEVIEW_CONTENT_PATHS.clear();
+        CURRENT_TABLEVIEW_CONTENT_PATHS.addAll(absolutePaths);
     }
 
-    public static List<String> getCurrentTableViewContent() {
-        return CURRENT_TABLEVIEW_CONTENT;
+    public static List<String> getCurrentTableViewContentPaths() {
+        return CURRENT_TABLEVIEW_CONTENT_PATHS;
+    }
+
+    public static void addGenre(String genre) {
+        ALTERNATIVE_GENRES.add(genre);
+    }
+
+    public static List<String> getAlternativeGenres() {
+        return ALTERNATIVE_GENRES;
     }
 
     public static void saveSession() {
         String historyFilePath = Session.class.getResource("session.history").getPath();
         try (FileOutputStream outputStream = new FileOutputStream(historyFilePath)) {
             PrintWriter writer = new PrintWriter(outputStream);
-            writer.println("LAST_SELECTED_DIRECTORY_PATH=" + LAST_SELECTED_DIRECTORY_PATH);
-            writer.println("LAST_SELECTED_FILE_PARENT_PATH=" + LAST_SELECTED_FILE_PARENT_PATH);
-            writer.println("NEED_REFRESH_DIRECTORY_PATH=" + NEED_REFRESH_DIRECTORY_PATH);
-            writer.println("CURRENT_TABLEVIEW_CONTENT=" + String.join(",", CURRENT_TABLEVIEW_CONTENT));
+            writer.println("last_selected_directory_path=" + lastSelectedDirectoryPath);
+            writer.println("last_selected_file_parent_path" + lastSelectedFileParentPath);
+            writer.println("current_tableview_content_paths=" + String.join(",", CURRENT_TABLEVIEW_CONTENT_PATHS));
+            writer.println("alternative_genres=" + String.join(",", ALTERNATIVE_GENRES));
             writer.flush();
             writer.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public static String getNeedRefreshDirectoryPath() {
-        return NEED_REFRESH_DIRECTORY_PATH;
-    }
-
-    public static void setNeedRefreshDirectoryPath(String needRefreshDirectoryPath) {
-        NEED_REFRESH_DIRECTORY_PATH = needRefreshDirectoryPath;
     }
 }
