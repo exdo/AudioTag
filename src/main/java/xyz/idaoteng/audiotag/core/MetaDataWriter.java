@@ -5,12 +5,18 @@ import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.tag.FieldDataInvalidException;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
+import org.jaudiotagger.tag.TagOptionSingleton;
 import org.jaudiotagger.tag.images.StandardArtwork;
+import org.jaudiotagger.tag.reference.ID3V2Version;
 import xyz.idaoteng.audiotag.AudioMetaData;
 
 import java.io.File;
 
 public class MetaDataWriter {
+    static {
+        TagOptionSingleton.getInstance().setID3V2Version(ID3V2Version.ID3_V24);
+    }
+
     public static void write(AudioMetaData metaData) {
         File file = new File(metaData.getAbsolutePath());
         AudioFile audioFile;

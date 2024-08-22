@@ -12,7 +12,7 @@ public class AudioMetaData {
     private String comment = "";
     private String bitrate;
     private String length;
-    private byte[] cover;
+    private byte[] cover = null;
 
     public String getAbsolutePath() {
         return absolutePath;
