@@ -131,10 +131,14 @@ public class Aside {
             if (originalMetaData != null) {
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.setTitle("保存封面");
+                String path = Session.getLastSelectedImageSavingPath();
+                fileChooser.setInitialDirectory(new File(path));
                 fileChooser.getExtensionFilters().addAll(COVER_EXTENSION_FILTER);
                 File file = fileChooser.showSaveDialog(StartUp.getPrimaryStage());
                 if (file != null) {
                     Utils.saveCover(originalMetaData.getCover(), file);
+                    String folderPath = file.toPath().getParent().toAbsolutePath().toString();
+                    Session.setLastSelectedImageSavingPath(folderPath);
                 }
             }
         });
@@ -161,11 +165,15 @@ public class Aside {
         } else {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("选择封面");
+            String path = Session.getFolderPathOfTheLastSelectedImage();
+            fileChooser.setInitialDirectory(new File(path));
             fileChooser.getExtensionFilters().addAll(COVER_EXTENSION_FILTER);
             File file = fileChooser.showOpenDialog(StartUp.getPrimaryStage());
             if (file != null) {
                 setCover(Utils.retouchCover(file));
                 CONFIRM_BOX.setVisible(true);
+                String folderPath = file.toPath().getParent().toAbsolutePath().toString();
+                Session.setFolderPathOfTheLastSelectedImage(folderPath);
             }
         }
     }

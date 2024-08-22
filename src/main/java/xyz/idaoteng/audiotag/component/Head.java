@@ -71,25 +71,25 @@ public class Head {
     private static void configSelectDirectoryButtonAction() {
         SELECT_FOLDER_WITH_CHILDREN.setOnAction(event -> {
             DirectoryChooser directoryChooser = new DirectoryChooser();
-            directoryChooser.setInitialDirectory(new File(Session.getLastSelectedDirectoryPath()));
+            directoryChooser.setInitialDirectory(new File(Session.getPathToTheLastSelectedFolder()));
             directoryChooser.setTitle("选择文件夹（含子文件夹）");
             File dir = directoryChooser.showDialog(StartUp.getPrimaryStage());
             if (dir != null) {
                 List<AudioMetaData> audioMetaData = MetaDataReader.readDirectory(dir, true);
                 Center.updateTableView(audioMetaData);
-                Session.setLastSelectedDirectoryPath(dir.getAbsolutePath());
+                Session.setPathToTheLastSelectedFolder(dir.getAbsolutePath());
             }
         });
 
         SELECT_FOLDER_WITHOUT_CHILDREN.setOnAction(event -> {
             DirectoryChooser directoryChooser = new DirectoryChooser();
-            directoryChooser.setInitialDirectory(new File(Session.getLastSelectedDirectoryPath()));
+            directoryChooser.setInitialDirectory(new File(Session.getPathToTheLastSelectedFolder()));
             directoryChooser.setTitle("选择文件夹（不含子文件夹）");
             File dir = directoryChooser.showDialog(StartUp.getPrimaryStage());
             if (dir != null) {
                 List<AudioMetaData> audioMetaData = MetaDataReader.readDirectory(dir, false);
                 Center.updateTableView(audioMetaData);
-                Session.setLastSelectedDirectoryPath(dir.getAbsolutePath());
+                Session.setPathToTheLastSelectedFolder(dir.getAbsolutePath());
             }
         });
     }
@@ -97,7 +97,7 @@ public class Head {
     private static void configSelectFileButtonAction() {
         SELECT_FILE_BUTTON.setOnAction(event -> {
             FileChooser fileChooser = new FileChooser();
-            fileChooser.setInitialDirectory(new File(Session.getLastSelectedFileParentPath()));
+            fileChooser.setInitialDirectory(new File(Session.getFolderPathOfTheLastSelectedFile()));
             fileChooser.getExtensionFilters().addAll(EXTENSION_FILTER);
             fileChooser.setTitle("选择应音频文件（多选）");
             List<File> files = fileChooser.showOpenMultipleDialog(StartUp.getPrimaryStage());
@@ -105,8 +105,8 @@ public class Head {
                 List<AudioMetaData> dataList = new ArrayList<>(files.size());
                 files.forEach(file -> dataList.add(MetaDataReader.readFile(file)));
                 Center.updateTableView(dataList);
-                String lastSelectedFileParentPath = files.get(0).toPath().getParent().toString();
-                Session.setLastSelectedFileParentPath(lastSelectedFileParentPath);
+                String folderPath = files.get(0).toPath().getParent().toAbsolutePath().toString();
+                Session.setFolderPathOfTheLastSelectedFile(folderPath);
             }
         });
     }

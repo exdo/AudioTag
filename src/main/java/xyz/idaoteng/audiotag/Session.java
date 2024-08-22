@@ -8,8 +8,10 @@ import java.util.Collections;
 import java.util.List;
 
 public class Session {
-    private static String lastSelectedFileParentPath;
-    private static String lastSelectedDirectoryPath;
+    private static String folderPathOfTheLastSelectedFile;
+    private static String pathToTheLastSelectedFolder;
+    private static String folderPathOfTheLastSelectedImage;
+    private static String lastSelectedImageSavingPath;
 
     private static final List<String> CURRENT_TABLEVIEW_CONTENT_PATHS = new ArrayList<>();
 
@@ -24,17 +26,23 @@ public class Session {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(historyFilePath, StandardCharsets.UTF_8));
 
-            String lastSelectedDirectoryPath = reader.readLine();
-            Session.lastSelectedDirectoryPath = processPath(lastSelectedDirectoryPath);
+            String line1 = reader.readLine();
+            Session.pathToTheLastSelectedFolder = processPath(line1);
 
-            String lastSelectedFileParentPath = reader.readLine();
-            Session.lastSelectedFileParentPath = processPath(lastSelectedFileParentPath);
+            String line2 = reader.readLine();
+            Session.folderPathOfTheLastSelectedFile = processPath(line2);
 
-            String currentTableViewContent = reader.readLine();
-            CURRENT_TABLEVIEW_CONTENT_PATHS.addAll(processPaths(currentTableViewContent));
+            String line3 = reader.readLine();
+            Session.folderPathOfTheLastSelectedImage = processPath(line3);
 
-            String alternativeGenres = reader.readLine();
-            processGenres(alternativeGenres);
+            String line4 = reader.readLine();
+            Session.lastSelectedImageSavingPath = processPath(line4);
+
+            String line5 = reader.readLine();
+            CURRENT_TABLEVIEW_CONTENT_PATHS.addAll(processPaths(line5));
+
+            String line6 = reader.readLine();
+            processGenres(line6);
 
             reader.close();
         } catch (IOException e) {
@@ -42,53 +50,69 @@ public class Session {
         }
     }
 
-    private static void processGenres(String alternativeGenres) {
-        alternativeGenres = alternativeGenres.substring(alternativeGenres.lastIndexOf('=') + 1);
-        if (!"".equals(alternativeGenres)) {
-            if (alternativeGenres.contains(",")) {
-                ALTERNATIVE_GENRES.addAll(List.of(alternativeGenres.split(",")));
+    private static void processGenres(String line) {
+        line = line.substring(line.lastIndexOf('=') + 1);
+        if (!"".equals(line)) {
+            if (line.contains(",")) {
+                ALTERNATIVE_GENRES.addAll(List.of(line.split(",")));
             } else {
-                ALTERNATIVE_GENRES.add(alternativeGenres);
+                ALTERNATIVE_GENRES.add(line);
             }
         }
     }
 
-    private static List<String> processPaths(String currentTableViewContent) {
-        currentTableViewContent = currentTableViewContent.substring(currentTableViewContent.lastIndexOf('=') + 1);
-        if ("".equals(currentTableViewContent)) {
+    private static List<String> processPaths(String line) {
+        line = line.substring(line.lastIndexOf('=') + 1);
+        if ("".equals(line)) {
             return Collections.emptyList();
         } else {
-            return Arrays.stream(currentTableViewContent.split(",")).filter(path -> new File(path).exists()).toList();
+            return Arrays.stream(line.split(",")).filter(path -> new File(path).exists()).toList();
         }
     }
 
-    private static String processPath(String path) {
-        path = path.substring(path.lastIndexOf('=') + 1);
-        if ("".equals(path)) {
+    private static String processPath(String line) {
+        line = line.substring(line.lastIndexOf('=') + 1);
+        if ("".equals(line)) {
             return System.getProperty("user.home");
         } else {
-            if (new File(path).isDirectory()) {
-                return path;
+            if (new File(line).isDirectory()) {
+                return line;
             } else {
                 return System.getProperty("user.home");
             }
         }
     }
 
-    public static String getLastSelectedFileParentPath() {
-        return lastSelectedFileParentPath;
+    public static String getFolderPathOfTheLastSelectedFile() {
+        return folderPathOfTheLastSelectedFile;
     }
 
-    public static void setLastSelectedFileParentPath(String path) {
-        lastSelectedFileParentPath = path;
+    public static void setFolderPathOfTheLastSelectedFile(String path) {
+        folderPathOfTheLastSelectedFile = path;
     }
 
-    public static String getLastSelectedDirectoryPath() {
-        return lastSelectedDirectoryPath;
+    public static String getPathToTheLastSelectedFolder() {
+        return pathToTheLastSelectedFolder;
     }
 
-    public static void setLastSelectedDirectoryPath(String path) {
-        lastSelectedDirectoryPath = path;
+    public static void setPathToTheLastSelectedFolder(String path) {
+        pathToTheLastSelectedFolder = path;
+    }
+
+    public static String getFolderPathOfTheLastSelectedImage() {
+        return folderPathOfTheLastSelectedImage;
+    }
+
+    public static void setFolderPathOfTheLastSelectedImage(String path) {
+        folderPathOfTheLastSelectedImage = path;
+    }
+
+    public static String getLastSelectedImageSavingPath() {
+        return lastSelectedImageSavingPath;
+    }
+
+    public static void setLastSelectedImageSavingPath(String path) {
+        lastSelectedImageSavingPath = path;
     }
 
     public static void setCurrentTableViewContentPaths(List<String> absolutePaths) {
@@ -112,8 +136,10 @@ public class Session {
         String historyFilePath = Session.class.getResource("session.history").getPath();
         try (FileOutputStream outputStream = new FileOutputStream(historyFilePath)) {
             PrintWriter writer = new PrintWriter(outputStream);
-            writer.println("last_selected_directory_path=" + lastSelectedDirectoryPath);
-            writer.println("last_selected_file_parent_path" + lastSelectedFileParentPath);
+            writer.println("folder_path_of_the_last_selected_file=" + folderPathOfTheLastSelectedFile);
+            writer.println("path_to_the_last_selected_folder=" + pathToTheLastSelectedFolder);
+            writer.println("folder_path_of_the_last_selected_image=" + folderPathOfTheLastSelectedImage);
+            writer.println("last_selected_image_saving_path=" + lastSelectedImageSavingPath);
             writer.println("current_tableview_content_paths=" + String.join(",", CURRENT_TABLEVIEW_CONTENT_PATHS));
             writer.println("alternative_genres=" + String.join(",", ALTERNATIVE_GENRES));
             writer.flush();
