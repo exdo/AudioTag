@@ -120,6 +120,7 @@ public class Center {
             }
         });
 
+        /* TODO
         TABLE_VIEW.setOnMousePressed(event -> {
             if (event.isSecondaryButtonDown()) {
                 SELECTED_AUDIO_META_DATA.clear();
@@ -131,9 +132,13 @@ public class Center {
                 }
             }
         });
+         */
 
-        double layoutX = TABLE_VIEW.getLayoutX();
         TABLE_VIEW.setOnDragEntered(event -> {
+
+        });
+
+        TABLE_VIEW.setOnMouseDragOver(event -> {
 
         });
 
