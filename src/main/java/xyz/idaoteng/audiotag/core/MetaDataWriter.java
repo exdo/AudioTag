@@ -26,18 +26,19 @@ public class MetaDataWriter {
 
         Tag tag = audioFile.createDefaultTag();
         try {
-            tag.setField(FieldKey.TITLE, metaData.getTitle().trim());
-            tag.setField(FieldKey.ARTIST, metaData.getArtist().trim());
-            tag.setField(FieldKey.ALBUM, metaData.getAlbum().trim());
-            tag.setField(FieldKey.YEAR, metaData.getDate().trim());
-            tag.setField(FieldKey.GENRE, metaData.getGenre().trim());
-            tag.setField(FieldKey.TRACK, metaData.getTrack().trim());
-            tag.setField(FieldKey.COMMENT, metaData.getComment().trim());
+            tag.setField(FieldKey.TITLE, metaData.getTitle());
+            tag.setField(FieldKey.ARTIST, metaData.getArtist());
+            tag.setField(FieldKey.ALBUM, metaData.getAlbum());
+            tag.setField(FieldKey.YEAR, metaData.getDate());
+            tag.setField(FieldKey.GENRE, metaData.getGenre());
+            tag.setField(FieldKey.TRACK, metaData.getTrack());
+            tag.setField(FieldKey.COMMENT, metaData.getComment());
             if (metaData.getCover() != null) {
                 tag.setField(generateArtwork(metaData.getCover()));
             }
             audioFile.setTag(tag);
         } catch (FieldDataInvalidException e) {
+            e.printStackTrace();
             throw new RuntimeException(e.getMessage());
         }
 
