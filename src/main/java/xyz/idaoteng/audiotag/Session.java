@@ -27,16 +27,16 @@ public class Session {
             BufferedReader reader = new BufferedReader(new FileReader(historyFilePath, StandardCharsets.UTF_8));
 
             String line1 = reader.readLine();
-            Session.pathToTheLastSelectedFolder = processPath(line1);
+            folderPathOfTheLastSelectedFile = processPath(line1);
 
             String line2 = reader.readLine();
-            Session.folderPathOfTheLastSelectedFile = processPath(line2);
+            pathToTheLastSelectedFolder = processPath(line2);
 
             String line3 = reader.readLine();
-            Session.folderPathOfTheLastSelectedImage = processPath(line3);
+            folderPathOfTheLastSelectedImage = processPath(line3);
 
             String line4 = reader.readLine();
-            Session.lastSelectedImageSavingPath = processPath(line4);
+            lastSelectedImageSavingPath = processPath(line4);
 
             String line5 = reader.readLine();
             CURRENT_TABLEVIEW_CONTENT_PATHS.addAll(processPaths(line5));
