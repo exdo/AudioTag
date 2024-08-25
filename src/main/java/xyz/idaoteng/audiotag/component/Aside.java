@@ -323,6 +323,7 @@ public class Aside {
     }
 
     public static void showBlank() {
+        showMetaData(new AudioMetaData());
         originalMetaData = null;
         CONFIRM_BOX.setVisible(false);
 

@@ -8,6 +8,9 @@ import java.util.Collections;
 import java.util.List;
 
 public class Session {
+    private static final String PATH_SEPARATOR = "&#&";
+    private static final String GENRE_SEPARATOR = "&@&";
+
     private static String folderPathOfTheLastSelectedFile;
     private static String pathToTheLastSelectedFolder;
     private static String folderPathOfTheLastSelectedImage;
@@ -51,9 +54,9 @@ public class Session {
     }
 
     private static void processGenres(String line) {
-        line = line.substring(line.lastIndexOf('=') + 1);
+        line = line.substring(line.indexOf('=') + 1);
         if (!"".equals(line)) {
-            if (line.contains(",")) {
+            if (line.contains(GENRE_SEPARATOR)) {
                 ALTERNATIVE_GENRES.addAll(List.of(line.split(",")));
             } else {
                 ALTERNATIVE_GENRES.add(line);
@@ -62,16 +65,16 @@ public class Session {
     }
 
     private static List<String> processPaths(String line) {
-        line = line.substring(line.lastIndexOf('=') + 1);
+        line = line.substring(line.indexOf('=') + 1);
         if ("".equals(line)) {
             return Collections.emptyList();
         } else {
-            return Arrays.stream(line.split(",")).filter(path -> new File(path).exists()).toList();
+            return Arrays.stream(line.split(PATH_SEPARATOR)).filter(path -> new File(path).exists()).toList();
         }
     }
 
     private static String processPath(String line) {
-        line = line.substring(line.lastIndexOf('=') + 1);
+        line = line.substring(line.indexOf('=') + 1);
         if ("".equals(line)) {
             return System.getProperty("user.home");
         } else {
@@ -140,8 +143,8 @@ public class Session {
             writer.println("path_to_the_last_selected_folder=" + pathToTheLastSelectedFolder);
             writer.println("folder_path_of_the_last_selected_image=" + folderPathOfTheLastSelectedImage);
             writer.println("last_selected_image_saving_path=" + lastSelectedImageSavingPath);
-            writer.println("current_tableview_content_paths=" + String.join(",", CURRENT_TABLEVIEW_CONTENT_PATHS));
-            writer.println("alternative_genres=" + String.join(",", ALTERNATIVE_GENRES));
+            writer.println("current_tableview_content_paths=" + String.join(PATH_SEPARATOR, CURRENT_TABLEVIEW_CONTENT_PATHS));
+            writer.println("alternative_genres=" + String.join(GENRE_SEPARATOR, ALTERNATIVE_GENRES));
             writer.flush();
             writer.close();
         } catch (IOException e) {
