@@ -72,7 +72,8 @@ public class Aside {
         GENRE_COMBO_BOX.getItems().addAll(Session.getAlternativeGenres());
         configComboBox(ComboBoxType.GENRE, GENRE_COMBO_BOX, false);
         VBox genrePanel = new VBox(5);
-        genrePanel.setMinWidth(155);
+        genrePanel.setMinWidth(165);
+        genrePanel.setMaxWidth(165);
         genrePanel.getChildren().addAll(genreLabel, GENRE_COMBO_BOX);
 
         Label trackLabel = new Label("音轨序号");
@@ -81,12 +82,12 @@ public class Aside {
         VBox trackPanel = new VBox(5);
         trackPanel.getChildren().addAll(trackLabel, TRACK_COMBO_BOX);
 
-        Label commentLabel = new Label("备注");
-        configComboBox(ComboBoxType.COMMENT, COMMENT_COMBO_BOX, true);
-
         HBox genreAndTrack = new HBox(10);
         genreAndTrack.setMaxWidth(240);
         genreAndTrack.getChildren().addAll(genrePanel, trackPanel);
+
+        Label commentLabel = new Label("备注");
+        configComboBox(ComboBoxType.COMMENT, COMMENT_COMBO_BOX, true);
 
         Label coverLabel = new Label("封面");
         COVER_PANEL.setMaxHeight(200);

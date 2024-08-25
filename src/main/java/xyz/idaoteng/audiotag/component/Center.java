@@ -11,13 +11,15 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import xyz.idaoteng.audiotag.AudioMetaData;
 import xyz.idaoteng.audiotag.Session;
-import xyz.idaoteng.audiotag.Utils;
 import xyz.idaoteng.audiotag.core.MetaDataReader;
+import xyz.idaoteng.audiotag.dialog.Delete;
+import xyz.idaoteng.audiotag.dialog.Rename;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class Center {
     private static final TableView<AudioMetaData> TABLE_VIEW = new TableView<>();
@@ -122,14 +124,31 @@ public class Center {
     }
 
     private static void configContextMenu() {
-        configRenameMenuItemActionHandle();
+        RENAME_MENU_ITEM.setOnAction(event -> Rename.show(TABLE_VIEW.getSelectionModel().getSelectedItem()));
+
         MenuItem selectAll = new MenuItem("全选");
         selectAll.setOnAction(event -> TABLE_VIEW.getSelectionModel().selectAll());
+
         MenuItem renameBaseOnTags = new MenuItem("根据标签重命名");
         MenuItem addTagsBaseOnFilename = new MenuItem("基于文件名添加标签");
+
         MenuItem deleteFromTable = new MenuItem("从表格中移除");
+        deleteFromTable.setOnAction(event -> {
+            List<AudioMetaData> selectedItems = TABLE_VIEW.getSelectionModel().getSelectedItems();
+            TABLE_VIEW.getItems().removeAll(selectedItems);
+            updateTableView(null);
+        });
+
         MenuItem deleteFile = new MenuItem("删除选中的文件");
+        deleteFile.setOnAction(event -> {
+            List<AudioMetaData> succeed = Delete.show(TABLE_VIEW.getSelectionModel().getSelectedItems());
+            TABLE_VIEW.getItems().removeAll(succeed);
+            updateTableView(null);
+        });
+
         MenuItem cancel = new MenuItem("取消");
+        cancel.setOnAction(event -> TABLE_VIEW.getSelectionModel().clearSelection());
+
         CONTEXT_MENU.getItems().add(selectAll);
         CONTEXT_MENU.getItems().add(RENAME_MENU_ITEM);
         CONTEXT_MENU.getItems().add(renameBaseOnTags);
@@ -137,43 +156,6 @@ public class Center {
         CONTEXT_MENU.getItems().add(deleteFromTable);
         CONTEXT_MENU.getItems().add(deleteFile);
         CONTEXT_MENU.getItems().add(cancel);
-    }
-
-    private static void configRenameMenuItemActionHandle() {
-        RENAME_MENU_ITEM.setOnAction(event -> {
-            AudioMetaData metaData = TABLE_VIEW.getSelectionModel().getSelectedItem();
-            TextInputDialog dialog = new TextInputDialog();
-            dialog.setTitle("确认重命名");
-            dialog.setHeaderText("原文件名：" + metaData.getFilename());
-            dialog.setContentText("新文件名：");
-            dialog.setGraphic(Utils.getRenameIcon());
-            Optional<String> newName = dialog.showAndWait();
-            if (newName.isPresent()) {
-                if (!newName.get().equals(metaData.getFilename())) {
-                    File originalFile = new File(metaData.getAbsolutePath());
-                    String newFilename = newName.get() + "."  + Utils.getExtension(originalFile);
-                    File newFile = new File(originalFile.getParentFile(), newFilename);
-                    if (newFile.exists()) {
-                        Alert alert = new Alert(Alert.AlertType.ERROR);
-                        alert.setTitle("错误");
-                        alert.setHeaderText("文件已存在");
-                        alert.setContentText("文件名：" + newFilename);
-                    } else {
-                        try {
-                            Files.move(originalFile.toPath(), newFile.toPath());
-                            metaData.setAbsolutePath(newFile.getAbsolutePath());
-                            metaData.setFilename(newFilename);
-                            updateTableView(null);
-                        } catch (IOException e) {
-                            Alert alert = new Alert(Alert.AlertType.ERROR);
-                            alert.setTitle("错误");
-                            alert.setHeaderText("文件重命名失败");
-                            alert.setContentText("文件名：" + newName.get());
-                        }
-                    }
-                }
-            }
-        });
     }
 
     // 用于记录右键菜单是否被打开，以便在合适的时机将其关闭

@@ -1,5 +1,6 @@
 package xyz.idaoteng.audiotag;
 
+import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import net.coobird.thumbnailator.Thumbnails;
@@ -10,6 +11,8 @@ import java.io.*;
 public class Utils {
     private static final ByteArrayOutputStream DEFAULT_COVER = new ByteArrayOutputStream();
     private static final ByteArrayOutputStream RENAME_ICON = new ByteArrayOutputStream();
+    private static final ByteArrayOutputStream DELETE_ICON = new ByteArrayOutputStream();
+    private static final ByteArrayOutputStream ERROR_ICON = new ByteArrayOutputStream();
 
     static {
         // 将默认封面图片加载到内存中
@@ -27,6 +30,22 @@ public class Utils {
         } catch (Exception e) {
             throw new RuntimeException("无法加载重命名图标");
         }
+
+        // 将删除图标加载到内存中
+        try (InputStream inputStream = Utils.class.getResourceAsStream("delete.png")) {
+            if (inputStream == null) throw new RuntimeException("无法加载删除图标");
+            inputStream.transferTo(DELETE_ICON);
+        } catch (Exception e) {
+            throw new RuntimeException("无法加载删除图标");
+        }
+
+        // 将错误图标加载到内存中
+        try (InputStream inputStream = Utils.class.getResourceAsStream("error.png")) {
+            if (inputStream == null) throw new RuntimeException("无法加载错误图标");
+            inputStream.transferTo(ERROR_ICON);
+        } catch (Exception e) {
+            throw new RuntimeException("无法加载错误图标");
+        }
     }
 
     public static ImageView getDefaultCover() {
@@ -39,20 +58,46 @@ public class Utils {
 
     public static ImageView getRenameIcon() {
         ImageView icon = new ImageView();
-        icon.setFitWidth(16);
-        icon.setFitHeight(16);
+        icon.setFitWidth(30);
+        icon.setFitHeight(30);
         icon.setImage(new Image(new ByteArrayInputStream(RENAME_ICON.toByteArray())));
         return icon;
     }
 
-    public static String getExtension(final File file) {
-        final String name = file.getName().toLowerCase();
-        final int i = name.lastIndexOf(".");
+    public static ImageView getDeleteIcon() {
+        ImageView icon = new ImageView();
+        icon.setFitWidth(35);
+        icon.setFitHeight(35);
+        icon.setImage(new Image(new ByteArrayInputStream(DELETE_ICON.toByteArray())));
+        return icon;
+    }
+
+    public static Alert generateBasicErrorAlert(String headText) {
+        ImageView icon = new ImageView();
+        icon.setFitWidth(35);
+        icon.setFitHeight(35);
+        icon.setImage(new Image(new ByteArrayInputStream(ERROR_ICON.toByteArray())));
+
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("错误");
+        alert.setGraphic(icon);
+        alert.setHeaderText(headText);
+        return alert;
+    }
+
+    public static String getExtension(File file) {
+        String name = file.getName().toLowerCase();
+        int i = name.lastIndexOf('.');
         if (i == -1) {
             return "";
         }
 
         return name.substring(i + 1);
+    }
+
+    public static String getFilenameWithoutExtension(final File file) {
+        int i = file.getName().lastIndexOf('.');
+        return i == -1 ? file.getName() : file.getName().substring(0, i);
     }
 
     public static String secondsToMinutes(int seconds) {

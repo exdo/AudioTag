@@ -57,7 +57,7 @@ public class Session {
         line = line.substring(line.indexOf('=') + 1);
         if (!"".equals(line)) {
             if (line.contains(GENRE_SEPARATOR)) {
-                ALTERNATIVE_GENRES.addAll(List.of(line.split(",")));
+                ALTERNATIVE_GENRES.addAll(List.of(line.split(GENRE_SEPARATOR)));
             } else {
                 ALTERNATIVE_GENRES.add(line);
             }
