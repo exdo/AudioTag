@@ -42,14 +42,14 @@ public class Head {
         SeparatorMenuItem separator = new SeparatorMenuItem();
         menuButton.getItems().addAll(SELECT_FOLDER_WITH_CHILDREN, separator, SELECT_FOLDER_WITHOUT_CHILDREN);
 
-        configSelectFileButtonAction();
-        configSelectDirectoryButtonAction();
-        configRefreshButtonAction();
+        configSelectFileButtonActionHandle();
+        configSelectDirectoryButtonActionHandle();
+        configRefreshButtonActionHandle();
 
         HEAD.getChildren().addAll(SELECT_FILE_BUTTON, menuButton, REFRESH_BUTTON);
     }
 
-    private static void configRefreshButtonAction() {
+    private static void configRefreshButtonActionHandle() {
         REFRESH_BUTTON.setOnAction(event -> {
             List<String> current = Session.getCurrentTableViewContentPaths();
             List<AudioMetaData> refreshed = new ArrayList<>(current.size());
@@ -68,7 +68,7 @@ public class Head {
          });
     }
 
-    private static void configSelectDirectoryButtonAction() {
+    private static void configSelectDirectoryButtonActionHandle() {
         SELECT_FOLDER_WITH_CHILDREN.setOnAction(event -> {
             DirectoryChooser directoryChooser = new DirectoryChooser();
             directoryChooser.setInitialDirectory(new File(Session.getPathToTheLastSelectedFolder()));
@@ -94,7 +94,7 @@ public class Head {
         });
     }
 
-    private static void configSelectFileButtonAction() {
+    private static void configSelectFileButtonActionHandle() {
         SELECT_FILE_BUTTON.setOnAction(event -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setInitialDirectory(new File(Session.getFolderPathOfTheLastSelectedFile()));
@@ -105,7 +105,7 @@ public class Head {
                 List<AudioMetaData> dataList = new ArrayList<>(files.size());
                 files.forEach(file -> dataList.add(MetaDataReader.readFile(file)));
                 Center.updateTableView(dataList);
-                String folderPath = files.get(0).toPath().getParent().toAbsolutePath().toString();
+                String folderPath = files.get(0).getParentFile().getAbsolutePath();
                 Session.setFolderPathOfTheLastSelectedFile(folderPath);
             }
         });

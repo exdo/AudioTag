@@ -14,6 +14,7 @@ import java.io.File;
 
 public class MetaDataWriter {
     static {
+        // 默认使用ID3v2.4
         TagOptionSingleton.getInstance().setID3V2Version(ID3V2Version.ID3_V24);
     }
 

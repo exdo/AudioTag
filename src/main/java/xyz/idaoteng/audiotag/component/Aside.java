@@ -18,9 +18,7 @@ import xyz.idaoteng.audiotag.Utils;
 import xyz.idaoteng.audiotag.core.MetaDataWriter;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.InputStream;
 
 public class Aside {
     private static final VBox ASIDE = new VBox(5);
@@ -42,29 +40,22 @@ public class Aside {
     private static AudioMetaData originalMetaData = null;
     private static AudioMetaData metaDataDisplayed = null;
 
-    private static final ByteArrayOutputStream DEFAULT_COVER = new ByteArrayOutputStream();
-
     private static final FileChooser.ExtensionFilter COVER_EXTENSION_FILTER;
 
     private enum ComboBoxType {
         TITLE, ARTIST, ALBUM, DATE, GENRE, TRACK, COMMENT
     }
 
+    // 初始化侧边栏
     static {
-        try (InputStream inputStream = Session.class.getResourceAsStream("cover.png")) {
-            if (inputStream == null) throw new RuntimeException("无法加载默认封面图片");
-            inputStream.transferTo(DEFAULT_COVER);
-        } catch (Exception e) {
-            throw new RuntimeException("无法加载默认封面图片");
-        }
-
+        // 封面文件类型过滤器
         String[] imageExtensions = new String[]{"*.jpg", "*.jpeg", "*.png", "*.bmp", "*.webp"};
         COVER_EXTENSION_FILTER = new FileChooser.ExtensionFilter("图片文件", imageExtensions);
-
+        // 设置侧边栏样式
         ASIDE.setMinWidth(250);
         ASIDE.setPadding(new Insets(10, 10, 10, 10));
         ASIDE.setStyle("-fx-border-style: solid; -fx-border-color: #cccccc; -fx-border-width: 1 0 0 1");
-
+        // 配置侧边栏组件（渲染效果与书写顺序一致）
         Label titleLabel = new Label("标题");
         configComboBox(ComboBoxType.TITLE, TITLE_COMBO_BOX, true);
 
@@ -108,7 +99,7 @@ public class Aside {
         VBox coverOptions = new VBox(15);
         coverOptions.setAlignment(Pos.CENTER);
         coverOptions.getChildren().addAll(CHANGE_COVER_BUTTON, EXTRACT_COVER_BUTTON, DELETE_COVER_BUTTON);
-        configCoverOptionsAction();
+        configCoverOptionActionHandle();
 
         HBox coverPanelAndOptions = new HBox(3);
         coverPanelAndOptions.getChildren().addAll(COVER_PANEL, coverOptions);
@@ -124,7 +115,7 @@ public class Aside {
         showBlank();
     }
 
-    private static void configCoverOptionsAction() {
+    private static void configCoverOptionActionHandle() {
         CHANGE_COVER_BUTTON.setOnAction(event -> updateCoverAction(false));
 
         EXTRACT_COVER_BUTTON.setOnAction(event -> {
@@ -137,8 +128,7 @@ public class Aside {
                 File file = fileChooser.showSaveDialog(StartUp.getPrimaryStage());
                 if (file != null) {
                     Utils.saveCover(originalMetaData.getCover(), file);
-                    String folderPath = file.toPath().getParent().toAbsolutePath().toString();
-                    Session.setLastSelectedImageSavingPath(folderPath);
+                    Session.setLastSelectedImageSavingPath(file.getParentFile().getAbsolutePath());
                 }
             }
         });
@@ -172,8 +162,7 @@ public class Aside {
             if (file != null) {
                 setCover(Utils.retouchCover(file));
                 CONFIRM_BOX.setVisible(true);
-                String folderPath = file.toPath().getParent().toAbsolutePath().toString();
-                Session.setFolderPathOfTheLastSelectedImage(folderPath);
+                Session.setFolderPathOfTheLastSelectedImage(file.getParentFile().getAbsolutePath());
             }
         }
     }
@@ -243,12 +232,8 @@ public class Aside {
 
     private static void setDefaultCover() {
         COVER_PANEL.getChildren().clear();
-        ImageView cover = new ImageView();
-        cover.setFitWidth(90);
-        cover.setFitHeight(90);
-        cover.setImage(new Image(new ByteArrayInputStream(DEFAULT_COVER.toByteArray())));
         COVER_PANEL.setAlignment(Pos.CENTER);
-        COVER_PANEL.getChildren().add(cover);
+        COVER_PANEL.getChildren().add(Utils.getDefaultCover());
 
         if (metaDataDisplayed != null) {
             metaDataDisplayed.setCover(null);

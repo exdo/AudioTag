@@ -11,9 +11,12 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import xyz.idaoteng.audiotag.AudioMetaData;
 import xyz.idaoteng.audiotag.Session;
+import xyz.idaoteng.audiotag.Utils;
 import xyz.idaoteng.audiotag.core.MetaDataReader;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.*;
 
 public class Center {
@@ -119,7 +122,9 @@ public class Center {
     }
 
     private static void configContextMenu() {
+        configRenameMenuItemActionHandle();
         MenuItem selectAll = new MenuItem("全选");
+        selectAll.setOnAction(event -> TABLE_VIEW.getSelectionModel().selectAll());
         MenuItem renameBaseOnTags = new MenuItem("根据标签重命名");
         MenuItem addTagsBaseOnFilename = new MenuItem("基于文件名添加标签");
         MenuItem deleteFromTable = new MenuItem("从表格中移除");
@@ -132,6 +137,43 @@ public class Center {
         CONTEXT_MENU.getItems().add(deleteFromTable);
         CONTEXT_MENU.getItems().add(deleteFile);
         CONTEXT_MENU.getItems().add(cancel);
+    }
+
+    private static void configRenameMenuItemActionHandle() {
+        RENAME_MENU_ITEM.setOnAction(event -> {
+            AudioMetaData metaData = TABLE_VIEW.getSelectionModel().getSelectedItem();
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle("确认重命名");
+            dialog.setHeaderText("原文件名：" + metaData.getFilename());
+            dialog.setContentText("新文件名：");
+            dialog.setGraphic(Utils.getRenameIcon());
+            Optional<String> newName = dialog.showAndWait();
+            if (newName.isPresent()) {
+                if (!newName.get().equals(metaData.getFilename())) {
+                    File originalFile = new File(metaData.getAbsolutePath());
+                    String newFilename = newName.get() + "."  + Utils.getExtension(originalFile);
+                    File newFile = new File(originalFile.getParentFile(), newFilename);
+                    if (newFile.exists()) {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("错误");
+                        alert.setHeaderText("文件已存在");
+                        alert.setContentText("文件名：" + newFilename);
+                    } else {
+                        try {
+                            Files.move(originalFile.toPath(), newFile.toPath());
+                            metaData.setAbsolutePath(newFile.getAbsolutePath());
+                            metaData.setFilename(newFilename);
+                            updateTableView(null);
+                        } catch (IOException e) {
+                            Alert alert = new Alert(Alert.AlertType.ERROR);
+                            alert.setTitle("错误");
+                            alert.setHeaderText("文件重命名失败");
+                            alert.setContentText("文件名：" + newName.get());
+                        }
+                    }
+                }
+            }
+        });
     }
 
     // 用于记录右键菜单是否被打开，以便在合适的时机将其关闭
@@ -270,8 +312,6 @@ public class Center {
         if (itemIndex > 0) { // 非空白处右键单击
             // 在侧边栏中显示该行数据
             Aside.showMetaData(TABLE_VIEW.getItems().get(itemIndex - 1));
-            // 添加该行为被选中
-            TABLE_VIEW.getSelectionModel().selectIndices(itemIndex - 1);
 
             List<AudioMetaData> selectedItems = TABLE_VIEW.getSelectionModel().getSelectedItems();
             RENAME_MENU_ITEM.setDisable(selectedItems.size() != 1); // 重命名菜单项只在选中一个时可用
@@ -310,25 +350,39 @@ public class Center {
         indexWhenDragStart = null;
     }
 
+    // 根据鼠标位置计算出该位置对应的实际行号
+    // 如果有对应的行，返回的行号大于0（行号从1开始）
+    // 否则返回 ABOVE_VIEWPORT（-1） 或 BLOW_VIEWPORT（-2） 或 IN_VIEWPORT_BLANK（0）
+    // currentY：鼠标位置的 y 坐标（通过 event.getY() 得到的值）
     private static int getItemIndex(double currentY) {
+        // 视口底部的 y 坐标
         double upperLimitY = TABLE_VIEW.getHeight() - horizontalScrollBarHeight;
+        // 当鼠标位于视口上方，返回 ABOVE_VIEWPORT
         if (currentY <= tableHeadRowHeight) {
             return ABOVE_VIEWPORT;
         }
-
+        // 当鼠标位于视口下方，返回 BLOW_VIEWPORT
         if (currentY >= upperLimitY) {
             return BLOW_VIEWPORT;
         }
 
+        // 内容的实际高度（以内容的顶部为原点，越向下，高度值递增，行号递增）
         double contentHeight = ROW_HEIGHT * TABLE_VIEW.getItems().size();
-        if (verticalScrollBar.isVisible()) {
+        if (verticalScrollBar.isVisible()) { // 垂直滚动条可见时行高的计算方式
+            // 除视口外的高度 = 表头的高度 + 水平滚动条的高度
+            // 视口的高度 = 表格的高度 - 除视口外的高度
             double viewportHeight = TABLE_VIEW.getHeight() - heightOutsideContentSection;
+            // 最大偏移量 = 内容的实际高度 - 视口的高度
             double maxOffset = contentHeight - viewportHeight;
+            // 偏移量 = 最大偏移量 * 滚动条的偏移比例
             double proportion = verticalScrollBar.getValue() / verticalScrollBar.getMax();
             double offset = maxOffset * proportion;
+            // total: 鼠标相对于内容的实际高度
             double total = offset + (currentY - tableHeadRowHeight);
+            // 行号 = 鼠标相对于内容的实际高度 / 行高 （向上取整）
             return (int)Math.ceil(total / ROW_HEIGHT);
         } else {
+            // 垂直滚动条不可见时行高的计算方式
             double validY = contentHeight + tableHeadRowHeight;
             if (currentY > validY) {
                 return IN_VIEWPORT_BLANK;
@@ -346,6 +400,7 @@ public class Center {
     }
 
     public static void updateTableView(List<AudioMetaData> dataList) {
+        // 如果 dataList 为 null，则刷新当前表格
         if (dataList == null) {
             recordeUpdate(TABLE_VIEW.getItems());
             TABLE_VIEW.refresh();
@@ -413,6 +468,7 @@ public class Center {
     }
 
     public static void confirmHeadRowHeight() {
+        // 表头的高度需要 skin 已经渲染完毕时才能获取
         TableViewSkin<?> skin = (TableViewSkin<?>) TABLE_VIEW.getSkin();
         ObservableList<Node> childrenList = skin.getChildren();
         for (Node node : childrenList) {
@@ -421,6 +477,7 @@ public class Center {
             }
         }
 
+        // 完成其余组件的配置
         getAndConfigScrollBar();
         configActionHandleAfterTableShowed();
     }
