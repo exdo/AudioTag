@@ -1,5 +1,6 @@
 package xyz.idaoteng.audiotag.component;
 
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
@@ -7,13 +8,11 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.skin.TableHeaderRow;
 import javafx.scene.control.skin.TableViewSkin;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.*;
 import xyz.idaoteng.audiotag.AudioMetaData;
 import xyz.idaoteng.audiotag.Session;
 import xyz.idaoteng.audiotag.core.MetaDataReader;
-import xyz.idaoteng.audiotag.dialog.Delete;
-import xyz.idaoteng.audiotag.dialog.Rename;
+import xyz.idaoteng.audiotag.dialog.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -32,10 +31,18 @@ public class Center {
     private static final int IN_VIEWPORT_BLANK = 0;
     private static final double ROW_HEIGHT = 25;
     private static final ContextMenu CONTEXT_MENU = new ContextMenu();
+    public static final  MenuItem ENABLE_DRAG_ROW_MENU_ITEM = new MenuItem("允许拖拽行");
+    private static RadioButton enableDragRowRadioButton = null;
     private static final MenuItem RENAME_MENU_ITEM = new MenuItem("重命名");
 
     private static final HashSet<String> ALTERNATIVE_ARTISTS = new HashSet<>();
     private static final HashSet<String> ALTERNATIVE_ALBUMS = new HashSet<>();
+
+    private static boolean disableDragRow = true;
+    public static final String ALLOW = "允许拖拽行";
+    public static final String BAN = "禁止拖拽行";
+
+    private static final DataFormat DATA_FORMAT = new DataFormat("application/x-java-serialized-object");
 
     // 初始化表格
     static {
@@ -52,6 +59,9 @@ public class Center {
             TableRow<AudioMetaData> row = new TableRow<>();
             row.setMinHeight(ROW_HEIGHT);
             row.setMaxHeight(ROW_HEIGHT);
+
+            makeRowDraggable(row);
+
             return row;
         });
 
@@ -65,6 +75,59 @@ public class Center {
 
         // 初始化内容。在 Session 中记录了上次所展示的内容
         initContent();
+    }
+
+    private static void makeRowDraggable(TableRow<AudioMetaData> row) {
+        //拖拽-检测
+        row.setOnDragDetected(event -> {
+            if (disableDragRow) return;
+
+            if (!row.isEmpty()) {
+                Integer index = row.getIndex();
+                Dragboard db = row.startDragAndDrop(TransferMode.MOVE);
+                db.setDragView(row.snapshot(null, null));
+                ClipboardContent cc = new ClipboardContent();
+                cc.put(DATA_FORMAT, index);
+                db.setContent(cc);
+                event.consume();
+            }
+        });
+        //释放-验证
+        row.setOnDragOver(event -> {
+            if (disableDragRow) return;
+
+            Dragboard db = event.getDragboard();
+            if (db.hasContent(DATA_FORMAT)) {
+                if (row.getIndex() != (Integer) db.getContent(DATA_FORMAT)) {
+                    event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+                    event.consume();
+                }
+            }
+        });
+        //释放-执行
+        row.setOnDragDropped(event -> {
+            if (disableDragRow) return;
+
+            Dragboard db = event.getDragboard();
+            if (db.hasContent(DATA_FORMAT)) {
+                int draggedIndex = (Integer) db.getContent(DATA_FORMAT);
+                AudioMetaData draggedMetaData = TABLE_VIEW.getItems().remove(draggedIndex);
+
+                int dropIndex;
+                if (row.isEmpty()) {
+                    dropIndex = TABLE_VIEW.getItems().size();
+                } else {
+                    dropIndex = row.getIndex();
+                }
+
+                TABLE_VIEW.getItems().add(dropIndex, draggedMetaData);
+
+                event.setDropCompleted(true);
+                TABLE_VIEW.getSelectionModel().clearSelection();
+                TABLE_VIEW.getSelectionModel().select(dropIndex);
+                event.consume();
+            }
+        });
     }
 
     private static void createColumn() {
@@ -124,38 +187,98 @@ public class Center {
     }
 
     private static void configContextMenu() {
+        MenuItem selectAll = new MenuItem("全选");
+        selectAll.setOnAction(event -> selectAll());
+
         RENAME_MENU_ITEM.setOnAction(event -> Rename.show(TABLE_VIEW.getSelectionModel().getSelectedItem()));
 
-        MenuItem selectAll = new MenuItem("全选");
-        selectAll.setOnAction(event -> TABLE_VIEW.getSelectionModel().selectAll());
+        ENABLE_DRAG_ROW_MENU_ITEM.setOnAction(event -> {
+            switch (ENABLE_DRAG_ROW_MENU_ITEM.getText()) {
+                case ALLOW -> {
+                    enableDragRow(true);
+                    enableDragRowRadioButton.setSelected(true);
+                    ENABLE_DRAG_ROW_MENU_ITEM.setText(BAN);
+                }
+                case BAN -> {
+                    enableDragRow(false);
+                    enableDragRowRadioButton.setSelected(false);
+                    ENABLE_DRAG_ROW_MENU_ITEM.setText(ALLOW);
+                }
+            }
+        });
 
         MenuItem renameBaseOnTags = new MenuItem("根据标签重命名");
+        renameBaseOnTags.setOnAction(event -> renameBaseOnTags());
+
         MenuItem addTagsBaseOnFilename = new MenuItem("基于文件名添加标签");
+        addTagsBaseOnFilename.setOnAction(event -> addTagBaseOnFilename());
 
         MenuItem deleteFromTable = new MenuItem("从表格中移除");
-        deleteFromTable.setOnAction(event -> {
-            List<AudioMetaData> selectedItems = TABLE_VIEW.getSelectionModel().getSelectedItems();
-            TABLE_VIEW.getItems().removeAll(selectedItems);
-            updateTableView(null);
-        });
+        deleteFromTable.setOnAction(event -> removeSelectedItems());
 
-        MenuItem deleteFile = new MenuItem("删除选中的文件");
-        deleteFile.setOnAction(event -> {
-            List<AudioMetaData> succeed = Delete.show(TABLE_VIEW.getSelectionModel().getSelectedItems());
-            TABLE_VIEW.getItems().removeAll(succeed);
-            updateTableView(null);
-        });
+        MenuItem deleteFile = new MenuItem("删除文件");
+        deleteFile.setOnAction(event -> deleteSelectedItems());
 
         MenuItem cancel = new MenuItem("取消");
         cancel.setOnAction(event -> TABLE_VIEW.getSelectionModel().clearSelection());
 
         CONTEXT_MENU.getItems().add(selectAll);
+        CONTEXT_MENU.getItems().add(ENABLE_DRAG_ROW_MENU_ITEM);
         CONTEXT_MENU.getItems().add(RENAME_MENU_ITEM);
         CONTEXT_MENU.getItems().add(renameBaseOnTags);
         CONTEXT_MENU.getItems().add(addTagsBaseOnFilename);
         CONTEXT_MENU.getItems().add(deleteFromTable);
         CONTEXT_MENU.getItems().add(deleteFile);
         CONTEXT_MENU.getItems().add(cancel);
+    }
+
+    public static void selectAll() {
+        TABLE_VIEW.getSelectionModel().selectAll();
+    }
+
+    public static void removeSelectedItems() {
+        List<AudioMetaData> selectedItems = TABLE_VIEW.getSelectionModel().getSelectedItems();
+
+        if (selectedItems.isEmpty()) {
+            NoRowsSelected.show();
+        }
+
+        TABLE_VIEW.getItems().removeAll(selectedItems);
+        updateTableView(null);
+    }
+
+    public static void deleteSelectedItems() {
+        List<AudioMetaData> selectedItems = TABLE_VIEW.getSelectionModel().getSelectedItems();
+
+        if (selectedItems.isEmpty()) {
+            boolean cancel = NoRowsSelected.show();
+            if (cancel) return;
+        }
+
+        List<AudioMetaData> succeed = Delete.show(selectedItems);
+        TABLE_VIEW.getItems().removeAll(succeed);
+        updateTableView(null);
+    }
+
+    public static void renameBaseOnTags() {
+        List<AudioMetaData> selectedItems = TABLE_VIEW.getSelectionModel().getSelectedItems();
+
+        if (selectedItems.isEmpty()) {
+            boolean cancel = NoRowsSelected.show();
+            if (cancel) return;
+        }
+
+        RenameBaseOnTag.show(selectedItems);
+    }
+
+    public static void addTagBaseOnFilename() {
+        List<AudioMetaData> selectedItems = TABLE_VIEW.getSelectionModel().getSelectedItems();
+
+        if (selectedItems.isEmpty()) {
+            boolean cancel = NoRowsSelected.show();
+            if (cancel) return;
+        }
+        AddTagBaseOnFilename.show(TABLE_VIEW.getSelectionModel().getSelectedItems());
     }
 
     // 用于记录右键菜单是否被打开，以便在合适的时机将其关闭
@@ -294,9 +417,6 @@ public class Center {
         if (itemIndex > 0) { // 非空白处右键单击
             // 在侧边栏中显示该行数据
             Aside.showMetaData(TABLE_VIEW.getItems().get(itemIndex - 1));
-
-            List<AudioMetaData> selectedItems = TABLE_VIEW.getSelectionModel().getSelectedItems();
-            RENAME_MENU_ITEM.setDisable(selectedItems.size() != 1); // 重命名菜单项只在选中一个时可用
             // 显示右键菜单
             CONTEXT_MENU.show(TABLE_VIEW, event.getScreenX(), event.getScreenY());
             contextMenuOpened = true;
@@ -478,5 +598,34 @@ public class Center {
                 }
             }
         }
+    }
+
+    public static void takeOverRenameButton(Button rename) {
+        rename.setDisable(true);
+        ObservableList<AudioMetaData> items = TABLE_VIEW.getSelectionModel().getSelectedItems();
+        items.addListener((ListChangeListener<AudioMetaData>) c -> {
+            // 重命名只在选中一个时可用
+            RENAME_MENU_ITEM.setDisable(c.getList().size() != 1);
+            rename.setDisable(c.getList().size() != 1);
+        });
+        rename.setOnAction(event -> Rename.show(TABLE_VIEW.getSelectionModel().getSelectedItem()));
+    }
+
+    private static void enableDragRow(boolean enable) {
+        disableDragRow = !enable;
+    }
+
+    public static void takeOverEnableDragRow(RadioButton radioButton) {
+        enableDragRowRadioButton = radioButton;
+        enableDragRowRadioButton.setOnAction(event -> {
+            boolean enable = enableDragRowRadioButton.isSelected();
+            if (enable) {
+                enableDragRow(true);
+                ENABLE_DRAG_ROW_MENU_ITEM.setText(BAN);
+            } else {
+                enableDragRow(false);
+                ENABLE_DRAG_ROW_MENU_ITEM.setText(ALLOW);
+            }
+        });
     }
 }

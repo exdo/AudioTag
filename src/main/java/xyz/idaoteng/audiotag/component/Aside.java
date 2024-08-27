@@ -11,10 +11,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import xyz.idaoteng.audiotag.AudioMetaData;
-import xyz.idaoteng.audiotag.Session;
-import xyz.idaoteng.audiotag.StartUp;
-import xyz.idaoteng.audiotag.Utils;
+import xyz.idaoteng.audiotag.*;
 import xyz.idaoteng.audiotag.core.MetaDataWriter;
 
 import java.io.ByteArrayInputStream;
@@ -234,7 +231,7 @@ public class Aside {
     private static void setDefaultCover() {
         COVER_PANEL.getChildren().clear();
         COVER_PANEL.setAlignment(Pos.CENTER);
-        COVER_PANEL.getChildren().add(Utils.getDefaultCover());
+        COVER_PANEL.getChildren().add(ImageInApp.getDefaultCover());
 
         if (metaDataDisplayed != null) {
             metaDataDisplayed.setCover(null);

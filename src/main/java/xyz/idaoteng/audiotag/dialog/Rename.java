@@ -3,6 +3,7 @@ package xyz.idaoteng.audiotag.dialog;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextInputDialog;
 import xyz.idaoteng.audiotag.AudioMetaData;
+import xyz.idaoteng.audiotag.ImageInApp;
 import xyz.idaoteng.audiotag.Utils;
 import xyz.idaoteng.audiotag.component.Center;
 
@@ -15,11 +16,13 @@ public class Rename {
     public static void show(AudioMetaData metaData) {
         File originalFile = new File(metaData.getAbsolutePath());
         String filenameWithoutExtension = Utils.getFilenameWithoutExtension(originalFile);
+
         TextInputDialog dialog = new TextInputDialog(filenameWithoutExtension);
         dialog.setTitle("确认重命名");
         dialog.setHeaderText("原文件名：" + filenameWithoutExtension);
         dialog.setContentText("新文件名：");
-        dialog.setGraphic(Utils.getRenameIcon());
+        dialog.setGraphic(ImageInApp.getRenameIcon());
+
         Optional<String> newName = dialog.showAndWait();
         if (newName.isPresent()) {
             if (!newName.get().equals(metaData.getFilename())) {
@@ -32,6 +35,7 @@ public class Rename {
                 } else {
                     try {
                         Files.move(originalFile.toPath(), newFile.toPath());
+
                         metaData.setAbsolutePath(newFile.getAbsolutePath());
                         metaData.setFilename(newFilename);
                         Center.updateTableView(null);

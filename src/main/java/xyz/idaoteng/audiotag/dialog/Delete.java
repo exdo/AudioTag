@@ -3,6 +3,7 @@ package xyz.idaoteng.audiotag.dialog;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import xyz.idaoteng.audiotag.AudioMetaData;
+import xyz.idaoteng.audiotag.ImageInApp;
 import xyz.idaoteng.audiotag.Utils;
 
 import java.io.File;
@@ -14,7 +15,7 @@ public class Delete {
     public static List<AudioMetaData> show(List<AudioMetaData> dataList) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("确认删除文件");
-        alert.setGraphic(Utils.getDeleteIcon());
+        alert.setGraphic(ImageInApp.getDeleteIcon());
         alert.setHeaderText("确认删除所有选中的文件？\n注意：文件会直接删除而不是移至回收站");
         List<String> paths = dataList.stream().map(AudioMetaData::getAbsolutePath).toList();
         alert.setContentText(String.join("\n", paths));
@@ -37,9 +38,7 @@ public class Delete {
         }
 
         if (!failed.isEmpty()) {
-            alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("删除失败");
-            alert.setHeaderText("以下文件删除失败");
+            alert = Utils.generateBasicErrorAlert("以下文件删除失败");
             alert.setContentText(String.join("\n", failed));
             alert.show();
         }

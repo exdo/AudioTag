@@ -33,13 +33,27 @@ public class MetaDataWriter {
 
         Tag tag = audioFile.createDefaultTag();
         try {
-            tag.setField(FieldKey.TITLE, metaData.getTitle());
-            tag.setField(FieldKey.ARTIST, metaData.getArtist());
-            tag.setField(FieldKey.ALBUM, metaData.getAlbum());
-            tag.setField(FieldKey.YEAR, metaData.getDate());
-            tag.setField(FieldKey.GENRE, metaData.getGenre());
-            tag.setField(FieldKey.TRACK, metaData.getTrack());
-            tag.setField(FieldKey.COMMENT, metaData.getComment());
+            if (!"".equals(metaData.getTitle())) {
+                tag.setField(FieldKey.TITLE, metaData.getTitle());
+            }
+            if (!"".equals(metaData.getArtist())) {
+                tag.setField(FieldKey.ARTIST, metaData.getArtist());
+            }
+            if (!"".equals(metaData.getAlbum())) {
+                tag.setField(FieldKey.ALBUM, metaData.getAlbum());
+            }
+            if (!"".equals(metaData.getDate())) {
+                tag.setField(FieldKey.YEAR, metaData.getDate());
+            }
+            if (!"".equals(metaData.getGenre())) {
+                tag.setField(FieldKey.GENRE, metaData.getGenre());
+            }
+            if (!"".equals(metaData.getTrack())) {
+                tag.setField(FieldKey.TRACK, metaData.getTrack());
+            }
+            if (!"".equals(metaData.getComment())) {
+                tag.setField(FieldKey.COMMENT, metaData.getComment());
+            }
             if (metaData.getCover() != null) {
                 tag.setField(generateArtwork(metaData.getCover()));
             }

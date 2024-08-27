@@ -38,15 +38,39 @@ public class Head {
             throw new RuntimeException(e);
         }
 
+        configSelectFileButtonActionHandle();
+
         MenuButton menuButton  = new MenuButton("选择文件夹");
         SeparatorMenuItem separator = new SeparatorMenuItem();
         menuButton.getItems().addAll(SELECT_FOLDER_WITH_CHILDREN, separator, SELECT_FOLDER_WITHOUT_CHILDREN);
-
-        configSelectFileButtonActionHandle();
         configSelectDirectoryButtonActionHandle();
+
         configRefreshButtonActionHandle();
 
-        HEAD.getChildren().addAll(SELECT_FILE_BUTTON, menuButton, REFRESH_BUTTON);
+        Button selectAll = new Button("全选");
+        selectAll.setOnAction(event -> Center.selectAll());
+
+        Button renameBaseOnTag = new Button("根据标签重命名");
+        renameBaseOnTag.setOnAction(event -> Center.renameBaseOnTags());
+
+        Button addTag = new Button("基于文件名添加标签");
+        addTag.setOnAction(event -> Center.addTagBaseOnFilename());
+
+        Button remove = new Button("从表格中移除");
+        remove.setOnAction(event -> Center.removeSelectedItems());
+
+        Button delete = new Button("删除文件");
+        delete.setOnAction(event -> Center.deleteSelectedItems());
+
+        Button rename = new Button("重命名");
+        Center.takeOverRenameButton(rename);
+
+        RadioButton enableDragRow = new RadioButton("允许拖拽行");
+        enableDragRow.setPadding(new Insets(4, 0, 0, 0));
+        Center.takeOverEnableDragRow(enableDragRow);
+
+        HEAD.getChildren().addAll(SELECT_FILE_BUTTON, menuButton, REFRESH_BUTTON, selectAll,
+                renameBaseOnTag, addTag, remove, delete, rename, enableDragRow);
     }
 
     private static void configRefreshButtonActionHandle() {

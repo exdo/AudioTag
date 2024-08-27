@@ -27,7 +27,7 @@ public class StartUp extends Application {
         primaryStage.setScene(scene);
         primaryStage.setTitle("音乐信息编辑器");
         primaryStage.setMinHeight(root.getHeight());
-        primaryStage.setMinWidth(550);
+        primaryStage.setMinWidth(835);
         primaryStage.show();
 
         Center.confirmHeadRowHeight();
