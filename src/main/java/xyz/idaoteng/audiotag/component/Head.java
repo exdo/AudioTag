@@ -7,7 +7,7 @@ import javafx.scene.layout.HBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
-import xyz.idaoteng.audiotag.AudioMetaData;
+import xyz.idaoteng.audiotag.bean.AudioMetaData;
 import xyz.idaoteng.audiotag.Session;
 import xyz.idaoteng.audiotag.StartUp;
 import xyz.idaoteng.audiotag.core.MetaDataReader;

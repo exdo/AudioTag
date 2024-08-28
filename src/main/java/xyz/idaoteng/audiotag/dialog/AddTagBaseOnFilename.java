@@ -9,7 +9,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import xyz.idaoteng.audiotag.AudioMetaData;
+import xyz.idaoteng.audiotag.bean.AudioMetaData;
 import xyz.idaoteng.audiotag.component.Center;
 
 import java.util.ArrayList;
@@ -25,9 +25,6 @@ public class AddTagBaseOnFilename{
     private static final List<AudioMetaData> DATA_LIST = new ArrayList<>();
 
     static {
-        STAGE.initModality(Modality.APPLICATION_MODAL);
-        STAGE.setTitle("基于文件名添加标签");
-
         VBox body = new VBox();
         body.setPadding(new Insets(15, 30, 10, 30));
         body.setSpacing(10);
@@ -63,6 +60,8 @@ public class AddTagBaseOnFilename{
         body.getChildren().addAll(model, templateAndMenuButton, strategy,
                 SKIP_RADIO_BUTTON, rewrite, confirmAndCancel);
 
+        STAGE.initModality(Modality.APPLICATION_MODAL);
+        STAGE.setTitle("基于文件名添加标签");
         Scene scene = new Scene(body, 500, 200);
         STAGE.setResizable(false);
         STAGE.setScene(scene);

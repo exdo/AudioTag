@@ -9,7 +9,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.skin.TableHeaderRow;
 import javafx.scene.control.skin.TableViewSkin;
 import javafx.scene.input.*;
-import xyz.idaoteng.audiotag.AudioMetaData;
+import xyz.idaoteng.audiotag.bean.AudioMetaData;
 import xyz.idaoteng.audiotag.Session;
 import xyz.idaoteng.audiotag.core.MetaDataReader;
 import xyz.idaoteng.audiotag.dialog.*;
@@ -269,6 +269,7 @@ public class Center {
         }
 
         RenameBaseOnTag.show(selectedItems);
+        updateTableView(null);
     }
 
     public static void addTagBaseOnFilename() {
@@ -278,7 +279,9 @@ public class Center {
             boolean cancel = NoRowsSelected.show();
             if (cancel) return;
         }
+
         AddTagBaseOnFilename.show(TABLE_VIEW.getSelectionModel().getSelectedItems());
+        updateTableView(null);
     }
 
     // 用于记录右键菜单是否被打开，以便在合适的时机将其关闭

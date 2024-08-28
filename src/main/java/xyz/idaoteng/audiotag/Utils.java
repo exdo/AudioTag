@@ -28,7 +28,7 @@ public class Utils {
         return name.substring(i + 1);
     }
 
-    public static String getFilenameWithoutExtension(final File file) {
+    public static String getFilenameWithoutExtension(File file) {
         int i = file.getName().lastIndexOf('.');
         return i == -1 ? file.getName() : file.getName().substring(0, i);
     }

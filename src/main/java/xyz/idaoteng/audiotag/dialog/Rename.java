@@ -2,9 +2,9 @@ package xyz.idaoteng.audiotag.dialog;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextInputDialog;
-import xyz.idaoteng.audiotag.AudioMetaData;
 import xyz.idaoteng.audiotag.ImageInApp;
 import xyz.idaoteng.audiotag.Utils;
+import xyz.idaoteng.audiotag.bean.AudioMetaData;
 import xyz.idaoteng.audiotag.component.Center;
 
 import java.io.File;

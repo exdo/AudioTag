@@ -8,7 +8,7 @@ import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.TagOptionSingleton;
 import org.jaudiotagger.tag.images.StandardArtwork;
 import org.jaudiotagger.tag.reference.ID3V2Version;
-import xyz.idaoteng.audiotag.AudioMetaData;
+import xyz.idaoteng.audiotag.bean.AudioMetaData;
 
 import java.io.File;
 

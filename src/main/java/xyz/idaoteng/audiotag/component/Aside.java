@@ -12,6 +12,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import xyz.idaoteng.audiotag.*;
+import xyz.idaoteng.audiotag.bean.AudioMetaData;
 import xyz.idaoteng.audiotag.core.MetaDataWriter;
 
 import java.io.ByteArrayInputStream;

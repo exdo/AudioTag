@@ -1,4 +1,4 @@
-package xyz.idaoteng.audiotag;
+package xyz.idaoteng.audiotag.bean;
 
 public class AudioMetaData implements Cloneable {
     private String absolutePath;
@@ -13,8 +13,6 @@ public class AudioMetaData implements Cloneable {
     private String bitrate;
     private String length;
     private byte[] cover = null;
-
-    private AudioMetaData backup = null;
 
     public String getAbsolutePath() {
         return absolutePath;
@@ -110,35 +108,5 @@ public class AudioMetaData implements Cloneable {
 
     public void setCover(byte[] cover) {
         this.cover = cover;
-    }
-
-    public void backup() {
-        this.backup = clone();
-    }
-
-    public void restore() {
-        if (this.backup != null) {
-            this.absolutePath = backup.absolutePath;
-            this.filename = backup.filename;
-            this.artist = backup.artist;
-            this.title = backup.title;
-            this.album = backup.album;
-            this.date = backup.date;
-            this.genre = backup.genre;
-            this.track = backup.track;
-        }
-    }
-
-    public void clearBackup() {
-        this.backup = null;
-    }
-
-    @Override
-    public AudioMetaData clone() {
-        try {
-            return (AudioMetaData) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError();
-        }
     }
 }

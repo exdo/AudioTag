@@ -9,13 +9,12 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import xyz.idaoteng.audiotag.AudioMetaData;
 import xyz.idaoteng.audiotag.Utils;
+import xyz.idaoteng.audiotag.bean.AudioMetaData;
+import xyz.idaoteng.audiotag.bean.Filename;
 import xyz.idaoteng.audiotag.component.Center;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -84,52 +83,28 @@ public class RenameBaseOnTag {
                 alert.show();
             } else {
                 boolean skip = GIVE_UP_RADIO_BUTTON.isSelected();
-                List<String> failed = new ArrayList<>(DATA_LIST.size());
+                List<Filename> previewList = new ArrayList<>(DATA_LIST.size());
                 for (AudioMetaData data : DATA_LIST) {
                     String newFilename = parseTemplate(template, data, skip);
-                    File newFile = rename(data, newFilename);
-
-                    if (newFile != null) {
-                        data.setFilename(newFile.getName());
-                        data.setAbsolutePath(newFile.getAbsolutePath());
-                    }
-
-                    if (newFile == null && !skip) {
-                        failed.add(data.getAbsolutePath());
+                    if (newFilename != null) {
+                        previewList.add(new Filename(data, buildNewFile(data, newFilename)));
                     }
                 }
 
-                if (failed.isEmpty()) {
-                    STAGE.close();
-                } else {
-                    STAGE.close();
-                    Alert alert = Utils.generateBasicErrorAlert("以下文件重命名失败");
-                    alert.setContentText(String.join("\n", failed));
-                    alert.show();
+                if (!previewList.isEmpty()) {
+                    Preview.show(previewList);
                 }
+
+                STAGE.close();
             }
 
             Center.updateTableView(null);
         });
     }
 
-    private static File rename(AudioMetaData data, String newFilename) {
-        if (newFilename == null) return null;
-
+    private static File buildNewFile(AudioMetaData data, String newFilename) {
         File originalFile = new File(data.getAbsolutePath());
-
-        if (Utils.getFilenameWithoutExtension(originalFile).equals(newFilename)) {
-            return originalFile;
-        }
-
-        String ext = Utils.getExtension(originalFile);
-        File newFile = new File(originalFile.getParentFile(), newFilename + "." + ext);
-        try {
-            Files.move(originalFile.toPath(), newFile.toPath());
-            return newFile;
-        } catch (IOException e) {
-            return null;
-        }
+        return new File(originalFile.getParentFile(), newFilename);
     }
 
     public static String parseTemplate(String template, AudioMetaData data, boolean skipWhenEmpty) {
@@ -162,6 +137,8 @@ public class RenameBaseOnTag {
             }
         }
 
+        String ext = Utils.getExtension(new File(data.getAbsolutePath()));
+        sb.append('.').append(ext);
         return sb.toString();
     }
 
