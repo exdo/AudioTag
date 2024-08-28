@@ -322,6 +322,10 @@ public class Aside {
         setDefaultCover();
     }
 
+    public static void refresh() {
+        showMetaData(originalMetaData);
+    }
+
     public static VBox getAside() {
         return ASIDE;
     }

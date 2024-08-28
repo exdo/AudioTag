@@ -1,5 +1,6 @@
 package xyz.idaoteng.audiotag.component;
 
+import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
@@ -9,16 +10,17 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.skin.TableHeaderRow;
 import javafx.scene.control.skin.TableViewSkin;
 import javafx.scene.input.*;
-import xyz.idaoteng.audiotag.bean.AudioMetaData;
 import xyz.idaoteng.audiotag.Session;
+import xyz.idaoteng.audiotag.bean.AudioMetaData;
 import xyz.idaoteng.audiotag.core.MetaDataReader;
+import xyz.idaoteng.audiotag.core.MetaDataWriter;
 import xyz.idaoteng.audiotag.dialog.*;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class Center {
     private static final TableView<AudioMetaData> TABLE_VIEW = new TableView<>();
@@ -219,6 +221,18 @@ public class Center {
         MenuItem deleteFile = new MenuItem("删除文件");
         deleteFile.setOnAction(event -> deleteSelectedItems());
 
+        MenuItem addOrder = new MenuItem("从上至下依次添加序号");
+        addOrder.setOnAction(event -> addOrder());
+
+        MenuItem packageToAlbum = new MenuItem("设置成同一专辑");
+        packageToAlbum.setOnAction(event -> packageToAlbum());
+
+        MenuItem addCoverForSameAlbum = new MenuItem("为同一专辑添加同一封面");
+        addCoverForSameAlbum.setOnAction(event -> addCoverForSameAlbum());
+
+        MenuItem addArtistForSameAlbum = new MenuItem("为同一专辑添加同一艺术家");
+        addArtistForSameAlbum.setOnAction(event -> addArtistForSameAlbum());
+
         MenuItem cancel = new MenuItem("取消");
         cancel.setOnAction(event -> TABLE_VIEW.getSelectionModel().clearSelection());
 
@@ -229,6 +243,10 @@ public class Center {
         CONTEXT_MENU.getItems().add(addTagsBaseOnFilename);
         CONTEXT_MENU.getItems().add(deleteFromTable);
         CONTEXT_MENU.getItems().add(deleteFile);
+        CONTEXT_MENU.getItems().add(addOrder);
+        CONTEXT_MENU.getItems().add(packageToAlbum);
+        CONTEXT_MENU.getItems().add(addCoverForSameAlbum);
+        CONTEXT_MENU.getItems().add(addArtistForSameAlbum);
         CONTEXT_MENU.getItems().add(cancel);
     }
 
@@ -240,7 +258,11 @@ public class Center {
         List<AudioMetaData> selectedItems = TABLE_VIEW.getSelectionModel().getSelectedItems();
 
         if (selectedItems.isEmpty()) {
-            NoRowsSelected.show();
+            boolean cancel = NoRowsSelected.show();
+            if (!cancel) {
+                TABLE_VIEW.getItems().clear();
+            }
+            return;
         }
 
         TABLE_VIEW.getItems().removeAll(selectedItems);
@@ -252,7 +274,11 @@ public class Center {
 
         if (selectedItems.isEmpty()) {
             boolean cancel = NoRowsSelected.show();
-            if (cancel) return;
+            if (cancel) {
+                return;
+            } else {
+                selectedItems = TABLE_VIEW.getItems();
+            }
         }
 
         List<AudioMetaData> succeed = Delete.show(selectedItems);
@@ -265,7 +291,11 @@ public class Center {
 
         if (selectedItems.isEmpty()) {
             boolean cancel = NoRowsSelected.show();
-            if (cancel) return;
+            if (cancel) {
+                return;
+            } else {
+                selectedItems = TABLE_VIEW.getItems();
+            }
         }
 
         RenameBaseOnTag.show(selectedItems);
@@ -277,10 +307,14 @@ public class Center {
 
         if (selectedItems.isEmpty()) {
             boolean cancel = NoRowsSelected.show();
-            if (cancel) return;
+            if (cancel) {
+                return;
+            } else {
+                selectedItems = TABLE_VIEW.getItems();
+            }
         }
 
-        AddTagBaseOnFilename.show(TABLE_VIEW.getSelectionModel().getSelectedItems());
+        AddTagBaseOnFilename.show(selectedItems);
         updateTableView(null);
     }
 
@@ -291,7 +325,7 @@ public class Center {
     private static boolean mouseDragged = false;
     // 起始行号：鼠标按下时的行号
     private static Integer indexWhenDragStart = null;
-    // 鼠标拖动结束时最后被选中的行的行号
+    // 鼠标拖动结束时最后被选中的行的行号，对应行的内容将展示在侧边栏
     private static Integer indexOfLastSelectedRow = null;
     public static void configActionHandleAfterTableShowed() {
         TABLE_VIEW.setOnMouseClicked(event -> {
@@ -317,6 +351,42 @@ public class Center {
         });
 
         TABLE_VIEW.setOnMouseDragged(Center::handlerMouseDragged);
+
+        TABLE_VIEW.setOnMouseReleased(event -> stopScrollBarControlThread());
+    }
+
+    private static ScheduledExecutorService executorService;
+    private static boolean moveScrollBarUp;
+    public static void startScrollBarControlThread() {
+        if (executorService != null) return;
+
+        executorService = Executors.newSingleThreadScheduledExecutor();
+        executorService.scheduleAtFixedRate(() -> Platform.runLater(() -> {
+            int indexWhenDragged;
+            if (moveScrollBarUp) {
+                verticalScrollBar.decrement();
+                // 获取行号时将鼠标的位置调整为视口顶部偏下一点点
+                indexWhenDragged = getItemIndex(tableHeadRowHeight + 0.1);
+            } else {
+                verticalScrollBar.increment();
+                // 获取行号时将鼠标的位置调整为视口底部偏上一点点
+                double upperLimitY = TABLE_VIEW.getHeight() - horizontalScrollBarHeight;
+                indexWhenDragged = getItemIndex(upperLimitY - 0.1);
+            }
+            // 当有滚动条时，经过上面的调整，框选动作总是从某一行开始到某一行结束
+            int start = Math.min(indexWhenDragStart, indexWhenDragged);
+            int end = Math.max(indexWhenDragStart, indexWhenDragged);
+            selectIndices(start, end);
+
+            Aside.showMetaData(TABLE_VIEW.getItems().get(indexWhenDragged - 1));
+        }), 0, 50, TimeUnit.MILLISECONDS);
+    }
+
+    public static void stopScrollBarControlThread() {
+        if (executorService != null) {
+            executorService.shutdownNow();
+            executorService = null;
+        }
     }
 
     // 实现框选功能
@@ -336,23 +406,36 @@ public class Center {
                 verticalScrollBar.increment();
                 // 获取行号时将鼠标的位置调整为视口底部偏上一点点
                 indexWhenDragged = getItemIndex(upperLimitY - 0.1);
+                // 如果鼠标在视口下方按下鼠标不动，则接着自动向下滚动
+                moveScrollBarUp = false;
+                startScrollBarControlThread();
             } else if (event.getY() <= tableHeadRowHeight) {
                 // tableHeadRowHeight等同于视口顶部的 y 坐标
                 // 鼠标拖动到位于视口上方时，自动向上滚动
                 verticalScrollBar.decrement();
                 // 获取行号时将鼠标的位置调整为视口顶部偏下一点点
                 indexWhenDragged = getItemIndex(tableHeadRowHeight + 0.1);
+                // 如果鼠标在视口上方按下鼠标不动，则接着自动向上滚动
+                moveScrollBarUp = true;
+                startScrollBarControlThread();
             } else {
-                // 出现了滚动条，但鼠标没有拖动到视口外面，直接获取鼠标位置对应的行号
+                // 出现了滚动条，但鼠标没有拖动到视口外面，
+                // 此时鼠标的位置必定对应着某一行，
+                // 故此直接获取鼠标位置对应的行号
                 indexWhenDragged = getItemIndex(event.getY());
+                // 此时鼠标已经回到了视口中，应当停止滚动条自动滚动
+                stopScrollBarControlThread();
             }
-            // 当有滚动条时，经过上面的调整，框选动作总是从某一行开始到某一行结束
             int start = Math.min(indexWhenDragStart, indexWhenDragged);
             int end = Math.max(indexWhenDragStart, indexWhenDragged);
             selectIndices(start, end);
-            indexOfLastSelectedRow = indexWhenDragged;
+
+            // 此时最后选中的行号是鼠标拖动到的行号
+            Aside.showMetaData(TABLE_VIEW.getItems().get(indexWhenDragged - 1));
         } else {
-            // 实际内容高度没有超过视口的高度，直接获取鼠标位置对应的行号
+            // 实际内容高度没有超过视口的高度，
+            // 此时鼠标的位置可能在某一行上，也可能在视口内的空白处，也可能在视口外面
+            // 下面会进行分类讨论
             indexWhenDragged = getItemIndex(event.getY());
 
             // 从某一行开始
@@ -362,6 +445,7 @@ public class Center {
                     int start = Math.min(indexWhenDragStart, indexWhenDragged);
                     int end = Math.max(indexWhenDragStart, indexWhenDragged);
                     selectIndices(start, end);
+                    // 此时最后选中的行号是鼠标拖动到的行号
                     indexOfLastSelectedRow = indexWhenDragged;
                 }
                 // 到视口空白处或视口下方结束
@@ -369,6 +453,7 @@ public class Center {
                     int start = indexWhenDragStart;
                     int end = TABLE_VIEW.getItems().size();
                     selectIndices(start, end);
+                    // 此时最后选中的行号固定就是表格的最后一行
                     indexOfLastSelectedRow = end;
                 }
                 // 到视口上方结束
@@ -376,16 +461,18 @@ public class Center {
                     int start = 1;
                     int end = indexWhenDragStart;
                     selectIndices(start, end);
+                    // 此时最后选中的行号固定就是表格的第一行
                     indexOfLastSelectedRow = 1;
                 }
             }
 
-            // 从视口空白处开始
+            // 从视口空白处开始（空白处必然在在视口下部）
             if (indexWhenDragStart == IN_VIEWPORT_BLANK) {
                 // 到某一行结束
                 if (indexWhenDragged > 0) {
                     int end = TABLE_VIEW.getItems().size();
                     selectIndices(indexWhenDragged, end);
+                    // 此时最后选中的行号是鼠标拖动到的行号
                     indexOfLastSelectedRow = indexWhenDragged;
                 }
                 // 到视口空白处或视口下方结束
@@ -393,18 +480,19 @@ public class Center {
                     TABLE_VIEW.getSelectionModel().clearSelection();
                     indexOfLastSelectedRow = null;
                 }
-                // 到视口上方结束
+                // 到视口上方结束（全选）
                 if (indexWhenDragged == ABOVE_VIEWPORT) {
                     TABLE_VIEW.getSelectionModel().selectAll();
                     indexOfLastSelectedRow = 1;
                 }
             }
-        }
 
-        if (indexOfLastSelectedRow != null) {
-            Aside.showMetaData(TABLE_VIEW.getItems().get(indexOfLastSelectedRow - 1));
+            if (indexOfLastSelectedRow != null) {
+                Aside.showMetaData(TABLE_VIEW.getItems().get(indexOfLastSelectedRow - 1));
+            }
+            // 重置变量
+            indexOfLastSelectedRow = null;
         }
-        indexOfLastSelectedRow = null;
     }
 
     // 选中指定范围内的行
@@ -630,5 +718,106 @@ public class Center {
                 ENABLE_DRAG_ROW_MENU_ITEM.setText(ALLOW);
             }
         });
+    }
+
+    public static void addOrder() {
+        List<AudioMetaData> selectedItems = TABLE_VIEW.getSelectionModel().getSelectedItems();
+
+        if (selectedItems.isEmpty()) {
+            boolean cancel = NoRowsSelected.show();
+            if (cancel) {
+                return;
+            } else {
+                selectedItems = TABLE_VIEW.getItems();
+            }
+        }
+
+        for (int i = 0; i < selectedItems.size(); i++) {
+            selectedItems.get(i).setTrack(String.valueOf(i + 1));
+        }
+        Aside.refresh();
+        updateTableView(null);
+    }
+
+    public static void packageToAlbum() {
+        List<AudioMetaData> selectedItems = TABLE_VIEW.getSelectionModel().getSelectedItems();
+
+        if (selectedItems.isEmpty()) {
+            boolean cancel = NoRowsSelected.show();
+            if (cancel) return;
+        }
+
+        String albumName = PackageToAlbum.show();
+        if (albumName == null) return;
+
+        for (AudioMetaData selectedItem : selectedItems) {
+            selectedItem.setAlbum(albumName);
+            MetaDataWriter.write(selectedItem);
+        }
+        Aside.refresh();
+        updateTableView(null);
+    }
+
+    public static void addCoverForSameAlbum() {
+        List<AudioMetaData> selectedItems = TABLE_VIEW.getSelectionModel().getSelectedItems();
+
+        if (selectedItems.isEmpty()) {
+            boolean cancel = NoRowsSelected.show();
+            if (cancel) {
+                return;
+            } else {
+                selectedItems = TABLE_VIEW.getItems();
+            }
+        }
+
+        HashMap<String, byte[]> albumCovers = new HashMap<>();
+        for (AudioMetaData selectedItem : selectedItems) {
+            String album = selectedItem.getAlbum();
+            byte[] cover = selectedItem.getCover();
+            if (album != null && cover != null) {
+                albumCovers.put(album, cover);
+            }
+        }
+
+        for (AudioMetaData selectedItem : selectedItems) {
+            String album = selectedItem.getAlbum();
+            if (album != null) {
+                selectedItem.setCover(albumCovers.get(album));
+                MetaDataWriter.write(selectedItem);
+            }
+        }
+        Aside.refresh();
+        updateTableView(null);
+    }
+
+    public static void addArtistForSameAlbum() {
+        List<AudioMetaData> selectedItems = TABLE_VIEW.getSelectionModel().getSelectedItems();
+
+        if (selectedItems.isEmpty()) {
+            boolean cancel = NoRowsSelected.show();
+            if (cancel) {
+                return;
+            } else {
+                selectedItems = TABLE_VIEW.getItems();
+            }
+        }
+
+        HashMap<String, String> albumArtist = new HashMap<>();
+        for (AudioMetaData selectedItem : selectedItems) {
+            String album = selectedItem.getAlbum();
+            String artist = selectedItem.getArtist();
+            if (album != null && artist != null) {
+                albumArtist.put(album, artist);
+            }
+        }
+
+        for (AudioMetaData selectedItem : selectedItems) {
+            String album = selectedItem.getAlbum();
+            if (album != null) {
+                selectedItem.setArtist(albumArtist.get(album));
+            }
+        }
+        Aside.refresh();
+        updateTableView(null);
     }
 }

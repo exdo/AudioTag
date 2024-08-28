@@ -14,6 +14,7 @@ public class ImageInApp {
     public static final ByteArrayOutputStream ERROR_ICON = new ByteArrayOutputStream();
     public static final ByteArrayOutputStream SELECT_ALL_ICON = new ByteArrayOutputStream();
     public static final ByteArrayOutputStream CLEAR_ICON = new ByteArrayOutputStream();
+    public static final ByteArrayOutputStream ALBUM_ICON = new ByteArrayOutputStream();
 
     static {
         try (InputStream inputStream = ImageInApp.class.getResourceAsStream("cover.png")) {
@@ -56,6 +57,13 @@ public class ImageInApp {
             inputStream.transferTo(CLEAR_ICON);
         } catch (Exception e) {
             throw new RuntimeException("无法加载清空图标");
+        }
+
+        try (InputStream inputStream = ImageInApp.class.getResourceAsStream("album.png")) {
+            if (inputStream == null) throw new RuntimeException("无法加载专辑图标");
+            inputStream.transferTo(ALBUM_ICON);
+        } catch (Exception e) {
+            throw new RuntimeException("无法加载专辑图标");
         }
     }
 
@@ -104,6 +112,14 @@ public class ImageInApp {
         icon.setFitWidth(20);
         icon.setFitHeight(20);
         icon.setImage(new Image(new ByteArrayInputStream(CLEAR_ICON.toByteArray())));
+        return icon;
+    }
+
+    public static ImageView getAlbumIcon() {
+        ImageView icon = new ImageView();
+        icon.setFitWidth(25);
+        icon.setFitHeight(25);
+        icon.setImage(new Image(new ByteArrayInputStream(ALBUM_ICON.toByteArray())));
         return icon;
     }
 }

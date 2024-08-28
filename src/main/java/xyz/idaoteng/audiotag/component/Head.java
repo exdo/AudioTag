@@ -65,12 +65,27 @@ public class Head {
         Button rename = new Button("重命名");
         Center.takeOverRenameButton(rename);
 
+        MenuButton other = new MenuButton("其他");
+        MenuItem addOrder = new MenuItem("从上至下依次添加序号");
+        addOrder.setOnAction(event -> Center.addOrder());
+
+        MenuItem packageToAlbum = new MenuItem("设置成同一专辑");
+        packageToAlbum.setOnAction(event -> Center.packageToAlbum());
+
+        MenuItem addCoverForSameAlbum = new MenuItem("为同一专辑添加同一封面");
+        addCoverForSameAlbum.setOnAction(event -> Center.addCoverForSameAlbum());
+
+        MenuItem addArtistForSameAlbum = new MenuItem("为同一专辑添加同一艺术家");
+        addArtistForSameAlbum.setOnAction(event -> Center.addArtistForSameAlbum());
+
+        other.getItems().addAll(addOrder, packageToAlbum, addCoverForSameAlbum, addArtistForSameAlbum);
+
         RadioButton enableDragRow = new RadioButton("允许拖拽行");
         enableDragRow.setPadding(new Insets(4, 0, 0, 0));
         Center.takeOverEnableDragRow(enableDragRow);
 
         HEAD.getChildren().addAll(SELECT_FILE_BUTTON, menuButton, REFRESH_BUTTON, selectAll,
-                renameBaseOnTag, addTag, remove, delete, rename, enableDragRow);
+                renameBaseOnTag, addTag, remove, delete, rename, other, enableDragRow);
     }
 
     private static void configRefreshButtonActionHandle() {

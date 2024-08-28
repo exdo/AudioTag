@@ -14,6 +14,7 @@ import javafx.stage.Stage;
 import xyz.idaoteng.audiotag.Utils;
 import xyz.idaoteng.audiotag.bean.AudioMetaData;
 import xyz.idaoteng.audiotag.bean.Filename;
+import xyz.idaoteng.audiotag.component.Center;
 
 import java.io.File;
 import java.io.IOException;
@@ -81,9 +82,14 @@ public class Preview {
                     AudioMetaData metaData = f.getMetaData();
                     if (!rename(metaData, f.getFile())) {
                         failedPaths.add(metaData.getAbsolutePath());
+                    } else {
+                        metaData.setFilename(f.getNewName());
+                        metaData.setAbsolutePath(f.getFile().getAbsolutePath());
                     }
                 }
             }
+
+            Center.updateTableView(null);
 
             if (!failedPaths.isEmpty()) {
                 Alert alert = Utils.generateBasicErrorAlert("以下文件重命名失败");

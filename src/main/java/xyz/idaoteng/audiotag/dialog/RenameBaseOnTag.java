@@ -12,7 +12,6 @@ import javafx.stage.Stage;
 import xyz.idaoteng.audiotag.Utils;
 import xyz.idaoteng.audiotag.bean.AudioMetaData;
 import xyz.idaoteng.audiotag.bean.Filename;
-import xyz.idaoteng.audiotag.component.Center;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -97,8 +96,6 @@ public class RenameBaseOnTag {
 
                 STAGE.close();
             }
-
-            Center.updateTableView(null);
         });
     }
 
