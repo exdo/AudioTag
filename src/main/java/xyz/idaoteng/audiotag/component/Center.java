@@ -406,6 +406,11 @@ public class Center {
                 verticalScrollBar.increment();
                 // 获取行号时将鼠标的位置调整为视口底部偏上一点点
                 indexWhenDragged = getItemIndex(upperLimitY - 0.1);
+                int start = Math.min(indexWhenDragStart, indexWhenDragged);
+                int end = Math.max(indexWhenDragStart, indexWhenDragged);
+                selectIndices(start, end);
+                // 此时最后选中的行号是鼠标拖动到的行号
+                Aside.showMetaData(TABLE_VIEW.getItems().get(indexWhenDragged - 1));
                 // 如果鼠标在视口下方按下鼠标不动，则接着自动向下滚动
                 moveScrollBarUp = false;
                 startScrollBarControlThread();
@@ -415,6 +420,11 @@ public class Center {
                 verticalScrollBar.decrement();
                 // 获取行号时将鼠标的位置调整为视口顶部偏下一点点
                 indexWhenDragged = getItemIndex(tableHeadRowHeight + 0.1);
+                int start = Math.min(indexWhenDragStart, indexWhenDragged);
+                int end = Math.max(indexWhenDragStart, indexWhenDragged);
+                selectIndices(start, end);
+                // 此时最后选中的行号是鼠标拖动到的行号
+                Aside.showMetaData(TABLE_VIEW.getItems().get(indexWhenDragged - 1));
                 // 如果鼠标在视口上方按下鼠标不动，则接着自动向上滚动
                 moveScrollBarUp = true;
                 startScrollBarControlThread();
@@ -425,13 +435,12 @@ public class Center {
                 indexWhenDragged = getItemIndex(event.getY());
                 // 此时鼠标已经回到了视口中，应当停止滚动条自动滚动
                 stopScrollBarControlThread();
+                int start = Math.min(indexWhenDragStart, indexWhenDragged);
+                int end = Math.max(indexWhenDragStart, indexWhenDragged);
+                selectIndices(start, end);
+                // 此时最后选中的行号是鼠标拖动到的行号
+                Aside.showMetaData(TABLE_VIEW.getItems().get(indexWhenDragged - 1));
             }
-            int start = Math.min(indexWhenDragStart, indexWhenDragged);
-            int end = Math.max(indexWhenDragStart, indexWhenDragged);
-            selectIndices(start, end);
-
-            // 此时最后选中的行号是鼠标拖动到的行号
-            Aside.showMetaData(TABLE_VIEW.getItems().get(indexWhenDragged - 1));
         } else {
             // 实际内容高度没有超过视口的高度，
             // 此时鼠标的位置可能在某一行上，也可能在视口内的空白处，也可能在视口外面
