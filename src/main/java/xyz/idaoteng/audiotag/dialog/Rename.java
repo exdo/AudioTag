@@ -15,7 +15,7 @@ import java.util.Optional;
 public class Rename {
     public static void show(AudioMetaData metaData) {
         File originalFile = new File(metaData.getAbsolutePath());
-        String filenameWithoutExtension = Utils.getFilenameWithoutExtension(originalFile);
+        String filenameWithoutExtension = Utils.getFilenameWithoutExtension(metaData.getFilename());
 
         TextInputDialog dialog = new TextInputDialog(filenameWithoutExtension);
         dialog.setTitle("确认重命名");

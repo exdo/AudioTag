@@ -23,14 +23,18 @@ public class Utils {
         int i = name.lastIndexOf('.');
         if (i == -1) {
             return "";
+        } else {
+            return name.substring(i + 1);
         }
-
-        return name.substring(i + 1);
     }
 
-    public static String getFilenameWithoutExtension(File file) {
-        int i = file.getName().lastIndexOf('.');
-        return i == -1 ? file.getName() : file.getName().substring(0, i);
+    public static String getFilenameWithoutExtension(String filename) {
+        int i = filename.lastIndexOf('.');
+        if (i == -1) {
+            return filename;
+        } else {
+            return filename.substring(0, i);
+        }
     }
 
     public static String secondsToMinutes(int seconds) {
