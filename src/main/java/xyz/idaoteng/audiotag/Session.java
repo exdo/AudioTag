@@ -25,32 +25,39 @@ public class Session {
     }
 
     private static void readHistorySession() {
-        String historyFilePath = Session.class.getResource("session.history").getPath();
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(historyFilePath, StandardCharsets.UTF_8));
+        try (InputStream history = Session.class.getResourceAsStream("session.history")) {
+            if (history == null) {
+                throw new RuntimeException("找不到历史会话文件");
+            }
+            try {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(history, StandardCharsets.UTF_8));
 
-            String line1 = reader.readLine();
-            folderPathOfTheLastSelectedFile = processPath(line1);
+                String line1 = reader.readLine();
+                folderPathOfTheLastSelectedFile = processPath(line1);
 
-            String line2 = reader.readLine();
-            pathToTheLastSelectedFolder = processPath(line2);
+                String line2 = reader.readLine();
+                pathToTheLastSelectedFolder = processPath(line2);
 
-            String line3 = reader.readLine();
-            folderPathOfTheLastSelectedImage = processPath(line3);
+                String line3 = reader.readLine();
+                folderPathOfTheLastSelectedImage = processPath(line3);
 
-            String line4 = reader.readLine();
-            lastSelectedImageSavingPath = processPath(line4);
+                String line4 = reader.readLine();
+                lastSelectedImageSavingPath = processPath(line4);
 
-            String line5 = reader.readLine();
-            CURRENT_TABLEVIEW_CONTENT_PATHS.addAll(processPaths(line5));
+                String line5 = reader.readLine();
+                CURRENT_TABLEVIEW_CONTENT_PATHS.addAll(processPaths(line5));
 
-            String line6 = reader.readLine();
-            processGenres(line6);
+                String line6 = reader.readLine();
+                processGenres(line6);
 
-            reader.close();
+                reader.close();
+            } catch (IOException e) {
+                throw new RuntimeException("读取历史会话失败");
+            }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("找不到历史会话文件");
         }
+
     }
 
     private static void processGenres(String line) {

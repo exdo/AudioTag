@@ -46,8 +46,9 @@ public class StartUp extends Application {
         LogManager logManager = LogManager.getLogManager();
         try (InputStream input = StartUp.class.getResourceAsStream("log.properties")) {
             logManager.readConfiguration(input);
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (Exception e) {
+            System.out.println("读取日志配置失败");
+            e.printStackTrace();
         }
 
         launch(args);

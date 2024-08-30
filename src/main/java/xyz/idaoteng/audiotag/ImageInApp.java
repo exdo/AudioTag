@@ -117,8 +117,8 @@ public class ImageInApp {
 
     public static ImageView getAlbumIcon() {
         ImageView icon = new ImageView();
-        icon.setFitWidth(25);
-        icon.setFitHeight(25);
+        icon.setFitWidth(35);
+        icon.setFitHeight(35);
         icon.setImage(new Image(new ByteArrayInputStream(ALBUM_ICON.toByteArray())));
         return icon;
     }

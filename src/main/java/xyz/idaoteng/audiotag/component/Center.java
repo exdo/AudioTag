@@ -379,7 +379,7 @@ public class Center {
             selectIndices(start, end);
 
             Aside.showMetaData(TABLE_VIEW.getItems().get(indexWhenDragged - 1));
-        }), 0, 50, TimeUnit.MILLISECONDS);
+        }), 0, 80, TimeUnit.MILLISECONDS); // 每隔50毫秒执行一次
     }
 
     public static void stopScrollBarControlThread() {
@@ -430,11 +430,11 @@ public class Center {
                 startScrollBarControlThread();
             } else {
                 // 出现了滚动条，但鼠标没有拖动到视口外面，
+                // 此时鼠标已经回到了视口中，应当停止滚动条自动滚动
+                stopScrollBarControlThread();
                 // 此时鼠标的位置必定对应着某一行，
                 // 故此直接获取鼠标位置对应的行号
                 indexWhenDragged = getItemIndex(event.getY());
-                // 此时鼠标已经回到了视口中，应当停止滚动条自动滚动
-                stopScrollBarControlThread();
                 int start = Math.min(indexWhenDragStart, indexWhenDragged);
                 int end = Math.max(indexWhenDragStart, indexWhenDragged);
                 selectIndices(start, end);
@@ -554,7 +554,9 @@ public class Center {
 
     // 根据鼠标位置计算出该位置对应的实际行号
     // 如果有对应的行，返回的行号大于0（行号从1开始）
-    // 否则返回 ABOVE_VIEWPORT（-1） 或 BLOW_VIEWPORT（-2） 或 IN_VIEWPORT_BLANK（0）
+    // 否则返回 ABOVE_VIEWPORT（-1：在视口上方）
+    //      或 BLOW_VIEWPORT（-2：在视口下方）
+    //      或 IN_VIEWPORT_BLANK（0：在视口内的空白处）
     // currentY：鼠标位置的 y 坐标（通过 event.getY() 得到的值）
     private static int getItemIndex(double currentY) {
         // 视口底部的 y 坐标

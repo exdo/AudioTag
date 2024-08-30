@@ -11,6 +11,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <exec.mainClass>xyz.idaoteng.audiotag.StartUp</exec.mainClass>
     </properties>
 
     <dependencies>
@@ -23,13 +24,13 @@
         <dependency>
             <groupId>net.coobird</groupId>
             <artifactId>thumbnailator</artifactId>
-            <version>0.4.20</version>
+            <version>0.1</version>
         </dependency>
 
         <dependency>
-            <groupId>net.jthink</groupId>
+            <groupId>org.jaudiotagger</groupId>
             <artifactId>jaudiotagger</artifactId>
-            <version>3.0.1</version>
+            <version>1.1.1</version>
         </dependency>
     </dependencies>
 
@@ -50,16 +51,20 @@
                 <version>0.0.8</version>
                 <executions>
                     <execution>
-                        <!-- Default configuration for running with: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
                             <mainClass>xyz.idaoteng.audiotag/xyz.idaoteng.audiotag.StartUp</mainClass>
-                            <launcher>app</launcher>
-                            <jlinkZipName>app</jlinkZipName>
-                            <jlinkImageName>app</jlinkImageName>
-                            <noManPages>true</noManPages>
                             <stripDebug>true</stripDebug>
                             <noHeaderFiles>true</noHeaderFiles>
+                            <noManPages>true</noManPages>
+                            <ignoreSigningInformation>true</ignoreSigningInformation>
+                            <launcher>AudioTag</launcher>
+                            <jlinkImageName>audiotag</jlinkImageName>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources</directory>
+                                </resource>
+                            </resources>
                         </configuration>
                     </execution>
                 </executions>
