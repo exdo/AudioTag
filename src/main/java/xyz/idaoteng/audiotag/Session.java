@@ -28,7 +28,6 @@ public class Session {
         String tmpDir = System.getProperty("java.io.tmpdir");
         File historyFile = new File(tmpDir, "audioTag.session.history");
         sessionHistoryFilePath = historyFile.getAbsolutePath();
-        System.out.println("sessionHistoryFilePath = " + sessionHistoryFilePath);
         if (!historyFile.exists()) {
             try {
                 boolean created = historyFile.createNewFile();
