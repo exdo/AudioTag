@@ -13,6 +13,7 @@ import xyz.idaoteng.audiotag.Utils;
 import xyz.idaoteng.audiotag.bean.AudioMetaData;
 import xyz.idaoteng.audiotag.component.Aside;
 import xyz.idaoteng.audiotag.component.Center;
+import xyz.idaoteng.audiotag.core.MetaDataWriter;
 
 import java.util.*;
 
@@ -176,45 +177,55 @@ public class AddTagBaseOnFilename{
                     // 如果选择跳过的话，只在原标签值为空时添加（下同）
                     if ("".equals(metaData.getTitle())) {
                         metaData.setTitle(value);
+                        MetaDataWriter.write(metaData);
                     }
                 } else {
                     metaData.setTitle(value);
+                    MetaDataWriter.write(metaData);
                 }
             }
             case "artist" -> {
                 if (SKIP_RADIO_BUTTON.isSelected()) {
                     if ("".equals(metaData.getArtist())) {
                         metaData.setArtist(value);
+                        MetaDataWriter.write(metaData);
                     }
                 } else {
                     metaData.setArtist(value);
+                    MetaDataWriter.write(metaData);
                 }
             }
             case "album" -> {
                 if (SKIP_RADIO_BUTTON.isSelected()) {
                     if ("".equals(metaData.getAlbum())) {
                         metaData.setAlbum(value);
+                        MetaDataWriter.write(metaData);
                     }
                 } else {
                     metaData.setAlbum(value);
+                    MetaDataWriter.write(metaData);
                 }
             }
             case "date" ->{
                 if (SKIP_RADIO_BUTTON.isSelected()) {
                     if ("".equals(metaData.getDate())) {
                         metaData.setDate(value);
+                        MetaDataWriter.write(metaData);
                     }
                 } else {
                     metaData.setDate(value);
+                    MetaDataWriter.write(metaData);
                 }
             }
             case "track" -> {
                 if (SKIP_RADIO_BUTTON.isSelected()) {
                     if ("".equals(metaData.getTrack())) {
                         metaData.setTrack(value);
+                        MetaDataWriter.write(metaData);
                     }
                 } else {
                     metaData.setTrack(value);
+                    MetaDataWriter.write(metaData);
                 }
             }
         }
