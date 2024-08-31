@@ -1,5 +1,7 @@
 package xyz.idaoteng.audiotag;
 
+import javafx.scene.control.Alert;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -20,15 +22,34 @@ public class Session {
 
     private static final ArrayList<String> ALTERNATIVE_GENRES = new ArrayList<>();
 
+    private static final String sessionHistoryFilePath;
+
     static {
+        String tmpDir = System.getProperty("java.io.tmpdir");
+        File historyFile = new File(tmpDir, "audioTag.session.history");
+        sessionHistoryFilePath = historyFile.getAbsolutePath();
+        System.out.println("sessionHistoryFilePath = " + sessionHistoryFilePath);
+        if (!historyFile.exists()) {
+            try {
+                boolean created = historyFile.createNewFile();
+                if (!created) {
+                    Alert alert = Utils.generateBasicErrorAlert("创建历史会话文件失败");
+                    alert.show();
+                    System.exit(2);
+                } else {
+                    System.out.println("sessionHistoryFilePath = " + sessionHistoryFilePath);
+                    saveSession();
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         readHistorySession();
     }
 
     private static void readHistorySession() {
-        try (InputStream history = Session.class.getResourceAsStream("session.history")) {
-            if (history == null) {
-                throw new RuntimeException("找不到历史会话文件");
-            }
+        try (InputStream history = new FileInputStream(sessionHistoryFilePath)) {
             try {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(history, StandardCharsets.UTF_8));
 
@@ -143,8 +164,7 @@ public class Session {
     }
 
     public static void saveSession() {
-        String historyFilePath = Session.class.getResource("session.history").getPath();
-        try (FileOutputStream outputStream = new FileOutputStream(historyFilePath)) {
+        try (FileOutputStream outputStream = new FileOutputStream(sessionHistoryFilePath)) {
             PrintWriter writer = new PrintWriter(outputStream);
             writer.println("folder_path_of_the_last_selected_file=" + folderPathOfTheLastSelectedFile);
             writer.println("path_to_the_last_selected_folder=" + pathToTheLastSelectedFolder);

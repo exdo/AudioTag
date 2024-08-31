@@ -69,6 +69,9 @@ public class Head {
         MenuItem addOrder = new MenuItem("从上至下依次添加序号");
         addOrder.setOnAction(event -> Center.addOrder());
 
+        Menu deleteSpecialTag = Center.generateDeleteSpecificTagMenu();
+        Center.configDeleteSpecificTagMenu(deleteSpecialTag);
+
         MenuItem packageToAlbum = new MenuItem("设置成同一专辑");
         packageToAlbum.setOnAction(event -> Center.packageToAlbum());
 
@@ -78,7 +81,8 @@ public class Head {
         MenuItem addArtistForSameAlbum = new MenuItem("为同一专辑添加同一艺术家");
         addArtistForSameAlbum.setOnAction(event -> Center.addArtistForSameAlbum());
 
-        other.getItems().addAll(addOrder, packageToAlbum, addCoverForSameAlbum, addArtistForSameAlbum);
+        other.getItems().addAll(addOrder, deleteSpecialTag, packageToAlbum,
+                addCoverForSameAlbum, addArtistForSameAlbum);
 
         RadioButton enableDragRow = new RadioButton("允许拖拽行");
         enableDragRow.setPadding(new Insets(4, 0, 0, 0));

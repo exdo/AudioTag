@@ -12,6 +12,7 @@ import javafx.scene.control.skin.TableViewSkin;
 import javafx.scene.input.*;
 import xyz.idaoteng.audiotag.Session;
 import xyz.idaoteng.audiotag.bean.AudioMetaData;
+import xyz.idaoteng.audiotag.bean.EditableTag;
 import xyz.idaoteng.audiotag.core.MetaDataReader;
 import xyz.idaoteng.audiotag.core.MetaDataWriter;
 import xyz.idaoteng.audiotag.dialog.*;
@@ -31,7 +32,6 @@ public class Center {
     private static final int BLOW_VIEWPORT = -2;
     private static final int IN_VIEWPORT_BLANK = 0;
     private static final double ROW_HEIGHT = 25;
-    private static final ContextMenu CONTEXT_MENU = new ContextMenu();
     public static final  MenuItem ENABLE_DRAG_ROW_MENU_ITEM = new MenuItem("允许拖拽行");
     private static RadioButton enableDragRowRadioButton = null;
     private static final MenuItem RENAME_MENU_ITEM = new MenuItem("重命名");
@@ -44,6 +44,7 @@ public class Center {
     public static final String BAN = "禁止拖拽行";
 
     private static final DataFormat DATA_FORMAT = new DataFormat("application/x-java-serialized-object");
+    private static Menu deleteSpecificTagMenu;
 
     // 初始化表格
     static {
@@ -73,6 +74,15 @@ public class Center {
 
         // 配置右键菜单
         configContextMenu();
+
+        // 配置 重命名按钮 和 删除特定标签菜单项 的 disable 属性
+        ObservableList<AudioMetaData> items = TABLE_VIEW.getSelectionModel().getSelectedItems();
+        items.addListener((ListChangeListener<AudioMetaData>) c -> {
+            // 重命名只在选中一个时可用
+            RENAME_MENU_ITEM.setDisable(c.getList().size() != 1);
+
+            deleteSpecificTagMenu.setDisable(items.isEmpty());
+        });
 
         // 初始化内容。在 Session 中记录了上次所展示的内容
         initContent();
@@ -188,6 +198,7 @@ public class Center {
     }
 
     private static void configContextMenu() {
+        ContextMenu contextMenu = new ContextMenu();
         MenuItem selectAll = new MenuItem("全选");
         selectAll.setOnAction(event -> selectAll());
 
@@ -223,6 +234,8 @@ public class Center {
         MenuItem addOrder = new MenuItem("从上至下依次添加序号");
         addOrder.setOnAction(event -> addOrder());
 
+        deleteSpecificTagMenu = generateDeleteSpecificTagMenu();
+
         MenuItem packageToAlbum = new MenuItem("设置成同一专辑");
         packageToAlbum.setOnAction(event -> packageToAlbum());
 
@@ -235,18 +248,68 @@ public class Center {
         MenuItem cancel = new MenuItem("取消");
         cancel.setOnAction(event -> TABLE_VIEW.getSelectionModel().clearSelection());
 
-        CONTEXT_MENU.getItems().add(selectAll);
-        CONTEXT_MENU.getItems().add(ENABLE_DRAG_ROW_MENU_ITEM);
-        CONTEXT_MENU.getItems().add(RENAME_MENU_ITEM);
-        CONTEXT_MENU.getItems().add(renameBaseOnTags);
-        CONTEXT_MENU.getItems().add(addTagsBaseOnFilename);
-        CONTEXT_MENU.getItems().add(deleteFromTable);
-        CONTEXT_MENU.getItems().add(deleteFile);
-        CONTEXT_MENU.getItems().add(addOrder);
-        CONTEXT_MENU.getItems().add(packageToAlbum);
-        CONTEXT_MENU.getItems().add(addCoverForSameAlbum);
-        CONTEXT_MENU.getItems().add(addArtistForSameAlbum);
-        CONTEXT_MENU.getItems().add(cancel);
+        contextMenu.getItems().add(selectAll);
+        contextMenu.getItems().add(ENABLE_DRAG_ROW_MENU_ITEM);
+        contextMenu.getItems().add(RENAME_MENU_ITEM);
+        contextMenu.getItems().add(renameBaseOnTags);
+        contextMenu.getItems().add(addTagsBaseOnFilename);
+        contextMenu.getItems().add(deleteFromTable);
+        contextMenu.getItems().add(deleteFile);
+        contextMenu.getItems().add(addOrder);
+        contextMenu.getItems().add(deleteSpecificTagMenu);
+        contextMenu.getItems().add(packageToAlbum);
+        contextMenu.getItems().add(addCoverForSameAlbum);
+        contextMenu.getItems().add(addArtistForSameAlbum);
+        contextMenu.getItems().add(cancel);
+
+        TABLE_VIEW.setContextMenu(contextMenu);
+    }
+
+    public static Menu generateDeleteSpecificTagMenu() {
+        Menu deleteSpecificTag = new Menu("删除特定标签");
+        MenuItem deleteTitle = new MenuItem("删除标题");
+        deleteTitle.setOnAction(event -> deleteTag(EditableTag.TITLE));
+        MenuItem deleteArtist = new MenuItem("删除艺术家");
+        deleteArtist.setOnAction(event -> deleteTag(EditableTag.ARTIST));
+        MenuItem deleteAlbum = new MenuItem("删除专辑");
+        deleteAlbum.setOnAction(event -> deleteTag(EditableTag.ALBUM));
+        MenuItem deleteDate = new MenuItem("删除出版日期");
+        deleteDate.setOnAction(event -> deleteTag(EditableTag.DATE));
+        MenuItem deleteGenre = new MenuItem("删除流派");
+        deleteGenre.setOnAction(event -> deleteTag(EditableTag.GENRE));
+        MenuItem deleteTrack = new MenuItem("删除音轨序号");
+        deleteTrack.setOnAction(event -> deleteTag(EditableTag.TRACK));
+        MenuItem deleteComment = new MenuItem("删除备注");
+        deleteComment.setOnAction(event -> deleteTag(EditableTag.COMMENT));
+        MenuItem deleteCover = new MenuItem("删除封面");
+        deleteCover.setOnAction(event -> deleteTag(EditableTag.COVER));
+        deleteSpecificTag.getItems().addAll(deleteTitle, deleteArtist, deleteAlbum, deleteDate,
+                deleteGenre, deleteTrack, deleteComment, deleteCover);
+        return deleteSpecificTag;
+    }
+
+    private static void deleteTag(EditableTag tag) {
+        ObservableList<AudioMetaData> items = TABLE_VIEW.getSelectionModel().getSelectedItems();
+
+        if (items.isEmpty()) {
+            return;
+        }
+
+        for (AudioMetaData item : items) {
+            switch (tag) {
+                case TITLE -> item.setTitle("");
+                case ARTIST -> item.setArtist("");
+                case ALBUM -> item.setAlbum("");
+                case DATE -> item.setDate("");
+                case GENRE -> item.setGenre("");
+                case TRACK -> item.setTrack("");
+                case COMMENT -> item.setComment("");
+                case COVER -> item.setCover(null);
+            }
+            MetaDataWriter.write(item);
+        }
+
+        updateTableView(null);
     }
 
     public static void selectAll() {
@@ -317,8 +380,6 @@ public class Center {
         updateTableView(null);
     }
 
-    // 用于记录右键菜单是否被打开，以便在合适的时机将其关闭
-    private static boolean contextMenuOpened = false;
     // 在 javafx 中一个完整的拖动事件也是单击事件
     // 鼠标是否进行过拖动：用来确认是到底是拖动还是单击
     private static boolean mouseDragged = false;
@@ -516,24 +577,13 @@ public class Center {
         if (itemIndex > 0) { // 非空白处右键单击
             // 在侧边栏中显示该行数据
             Aside.showMetaData(TABLE_VIEW.getItems().get(itemIndex - 1));
-            // 显示右键菜单
-            CONTEXT_MENU.show(TABLE_VIEW, event.getScreenX(), event.getScreenY());
-            contextMenuOpened = true;
         } else { // 空白处右键单击
             // 侧边栏显示空白
             Aside.showBlank();
-            // 关闭右键菜单
-            CONTEXT_MENU.hide();
-            contextMenuOpened = false;
         }
     }
 
     private static void handlerPrimaryButtonClick(MouseEvent event) {
-        // 左键单击时关闭右键菜单
-        if (contextMenuOpened) {
-            CONTEXT_MENU.hide();
-            contextMenuOpened = false;
-        }
         // 如果是拖动行为，则不执行下面的左键单击逻辑
         if (mouseDragged) {
             mouseDragged = false;
@@ -704,13 +754,8 @@ public class Center {
     }
 
     public static void takeOverRenameButton(Button rename) {
-        rename.setDisable(true);
-        ObservableList<AudioMetaData> items = TABLE_VIEW.getSelectionModel().getSelectedItems();
-        items.addListener((ListChangeListener<AudioMetaData>) c -> {
-            // 重命名只在选中一个时可用
-            RENAME_MENU_ITEM.setDisable(c.getList().size() != 1);
-            rename.setDisable(c.getList().size() != 1);
-        });
+        rename.disableProperty().bind(RENAME_MENU_ITEM.disableProperty());
+
         rename.setOnAction(event -> Rename.show(TABLE_VIEW.getSelectionModel().getSelectedItem()));
     }
 
@@ -730,6 +775,10 @@ public class Center {
                 ENABLE_DRAG_ROW_MENU_ITEM.setText(ALLOW);
             }
         });
+    }
+
+    public static void configDeleteSpecificTagMenu(Menu menu) {
+        menu.disableProperty().bind(deleteSpecificTagMenu.disableProperty());
     }
 
     public static void addOrder() {
