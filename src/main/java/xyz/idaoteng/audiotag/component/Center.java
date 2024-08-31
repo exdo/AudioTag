@@ -26,7 +26,6 @@ public class Center {
     private static final TableView<AudioMetaData> TABLE_VIEW = new TableView<>();
     private static ScrollBar verticalScrollBar = null;
     private static double horizontalScrollBarHeight;
-    private static double heightOutsideContentSection;
     private static double tableHeadRowHeight;
     private static final int ABOVE_VIEWPORT = -1;
     private static final int BLOW_VIEWPORT = -2;
@@ -575,6 +574,7 @@ public class Center {
         if (verticalScrollBar.isVisible()) { // 垂直滚动条可见时行高的计算方式
             // 除视口外的高度 = 表头的高度 + 水平滚动条的高度
             // 视口的高度 = 表格的高度 - 除视口外的高度
+            double heightOutsideContentSection = tableHeadRowHeight + horizontalScrollBarHeight;
             double viewportHeight = TABLE_VIEW.getHeight() - heightOutsideContentSection;
             // 最大偏移量 = 内容的实际高度 - 视口的高度
             double maxOffset = contentHeight - viewportHeight;
@@ -695,8 +695,9 @@ public class Center {
                 }
 
                 if (scrollBar.getOrientation().equals(Orientation.HORIZONTAL)) {
-                    horizontalScrollBarHeight = scrollBar.getHeight();
-                    heightOutsideContentSection = horizontalScrollBarHeight + tableHeadRowHeight;
+                    scrollBar.heightProperty().addListener((observable, oldValue, newValue) -> {
+                        horizontalScrollBarHeight = newValue.doubleValue();
+                    });
                 }
             }
         }
