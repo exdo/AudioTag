@@ -12,6 +12,7 @@ import xyz.idaoteng.audiotag.Session;
 import xyz.idaoteng.audiotag.StartUp;
 import xyz.idaoteng.audiotag.core.MetaDataReader;
 import xyz.idaoteng.audiotag.core.SupportedFileTypes;
+import xyz.idaoteng.audiotag.dialog.Filter;
 
 import java.io.File;
 import java.util.*;
@@ -50,14 +51,14 @@ public class Head {
         Button selectAll = new Button("全选");
         selectAll.setOnAction(event -> Center.selectAll());
 
+        Button filter = new Button("过滤");
+        Filter.takeOverFilterButton(filter);
+
         Button renameBaseOnTag = new Button("根据标签重命名");
         renameBaseOnTag.setOnAction(event -> Center.renameBaseOnTags());
 
         Button addTag = new Button("基于文件名添加标签");
         addTag.setOnAction(event -> Center.addTagBaseOnFilename());
-
-        Button remove = new Button("从表格中移除");
-        remove.setOnAction(event -> Center.removeSelectedItems());
 
         Button delete = new Button("删除文件");
         delete.setOnAction(event -> Center.deleteSelectedItems());
@@ -66,6 +67,9 @@ public class Head {
         Center.takeOverRenameButton(rename);
 
         MenuButton other = new MenuButton("其他");
+        MenuItem remove = new MenuItem("从表格中移除");
+        remove.setOnAction(event -> Center.removeSelectedItems());
+
         MenuItem addOrder = new MenuItem("从上至下依次添加序号");
         addOrder.setOnAction(event -> Center.addOrder());
 
@@ -88,8 +92,8 @@ public class Head {
         enableDragRow.setPadding(new Insets(4, 0, 0, 0));
         Center.takeOverEnableDragRow(enableDragRow);
 
-        HEAD.getChildren().addAll(SELECT_FILE_BUTTON, menuButton, REFRESH_BUTTON, selectAll,
-                renameBaseOnTag, addTag, remove, delete, rename, other, enableDragRow);
+        HEAD.getChildren().addAll(SELECT_FILE_BUTTON, menuButton, REFRESH_BUTTON, selectAll, filter,
+                renameBaseOnTag, addTag, delete, rename, other, enableDragRow);
     }
 
     private static void configRefreshButtonActionHandle() {

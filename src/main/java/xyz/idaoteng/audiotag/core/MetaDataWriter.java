@@ -2,12 +2,16 @@ package xyz.idaoteng.audiotag.core;
 
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
+import org.jaudiotagger.audio.wav.WavOptions;
+import org.jaudiotagger.audio.wav.WavSaveOptions;
 import org.jaudiotagger.tag.FieldDataInvalidException;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.TagOptionSingleton;
+import org.jaudiotagger.tag.id3.ID3v24Tag;
 import org.jaudiotagger.tag.images.StandardArtwork;
 import org.jaudiotagger.tag.reference.ID3V2Version;
+import org.jaudiotagger.tag.wav.WavTag;
 import xyz.idaoteng.audiotag.bean.AudioMetaData;
 
 import java.io.File;
@@ -15,7 +19,12 @@ import java.io.File;
 public class MetaDataWriter {
     static {
         // 默认使用ID3v2.4
-        TagOptionSingleton.getInstance().setID3V2Version(ID3V2Version.ID3_V24);
+        TagOptionSingleton optionSingleton = TagOptionSingleton.getInstance();
+        optionSingleton.setID3V2Version(ID3V2Version.ID3_V24);
+        // 只读取wav文件的ID3标签
+        optionSingleton.setWavOptions(WavOptions.READ_ID3_ONLY);
+        // 只保存wav文件的ID3标签
+        optionSingleton.setWavSaveOptions(WavSaveOptions.SAVE_ACTIVE);
     }
 
     public static void write(AudioMetaData metaData) {
@@ -32,6 +41,11 @@ public class MetaDataWriter {
         }
 
         Tag tag = audioFile.createDefaultTag();
+
+        if (tag instanceof WavTag wavTag) {
+            wavTag.setID3Tag(new ID3v24Tag());
+        }
+
         try {
             if (!"".equals(metaData.getTitle())) {
                 tag.setField(FieldKey.TITLE, metaData.getTitle());

@@ -19,7 +19,9 @@ public class Delete {
         alert.setHeaderText("确认删除所有选中的文件？\n注意：文件会直接删除而不是移至回收站");
         List<String> paths = dataList.stream().map(AudioMetaData::getAbsolutePath).toList();
         alert.setContentText(String.join("\n", paths));
+
         Optional<ButtonType> buttonType = alert.showAndWait();
+
         List<String> failed = new ArrayList<>(dataList.size());
         List<AudioMetaData> succeed = new ArrayList<>(dataList.size());
         if (buttonType.isPresent() && buttonType.get() == ButtonType.OK) {

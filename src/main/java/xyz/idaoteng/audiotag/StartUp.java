@@ -26,6 +26,7 @@ public class StartUp extends Application {
         Scene scene = new Scene(root, 1131, 665);
         primaryStage.setScene(scene);
         primaryStage.setTitle("音乐信息编辑器");
+        primaryStage.getIcons().add(ImageInApp.getAppIcon());
         primaryStage.setMinHeight(root.getHeight());
         primaryStage.setMinWidth(885);
         primaryStage.show();

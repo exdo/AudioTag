@@ -835,14 +835,14 @@ public class Center {
         for (AudioMetaData selectedItem : selectedItems) {
             String album = selectedItem.getAlbum();
             byte[] cover = selectedItem.getCover();
-            if (album != null && cover != null) {
+            if (!"".equals(album) && cover != null) {
                 albumCovers.put(album, cover);
             }
         }
 
         for (AudioMetaData selectedItem : selectedItems) {
             String album = selectedItem.getAlbum();
-            if (album != null) {
+            if (!"".equals(album)) {
                 selectedItem.setCover(albumCovers.get(album));
                 MetaDataWriter.write(selectedItem);
             }
@@ -867,18 +867,30 @@ public class Center {
         for (AudioMetaData selectedItem : selectedItems) {
             String album = selectedItem.getAlbum();
             String artist = selectedItem.getArtist();
-            if (album != null && artist != null) {
+            if (!"".equals(album) && !"".equals(artist)) {
                 albumArtist.put(album, artist);
             }
         }
 
         for (AudioMetaData selectedItem : selectedItems) {
             String album = selectedItem.getAlbum();
-            if (album != null) {
+            if (!"".equals(album)) {
                 selectedItem.setArtist(albumArtist.get(album));
             }
         }
         Aside.refresh();
         updateTableView(null);
+    }
+
+    private static final ArrayList<AudioMetaData> BEFORE_FILTERING = new ArrayList<>();
+    public static void filter() {
+        List<AudioMetaData> before = TABLE_VIEW.getItems();
+        BEFORE_FILTERING.clear();
+        BEFORE_FILTERING.addAll(before);
+        Filter.show(before);
+    }
+
+    public static void turnOffFilter() {
+        updateTableView(BEFORE_FILTERING);
     }
 }

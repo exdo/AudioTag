@@ -143,30 +143,32 @@ public class AddTagBaseOnFilename{
     private static void parsFilename(AudioMetaData metaData) {
         String filename = Utils.getFilenameWithoutExtension(metaData.getFilename());
 
-        String separator = SEPARATORS.poll();
+        ArrayDeque<String> tempTagNames = new ArrayDeque<>(TAG_NAMES);
+        ArrayDeque<String> tempSeparators = new ArrayDeque<>(SEPARATORS);
+        String separator = tempSeparators.poll();
         while (separator != null) {
             // 如果文件名包含分隔符
             if (filename.contains(separator)) {
                 String[] slice = filename.split(separator, 2);
                 // 则第一个切片为下一个标签（如果有的话）的标签值
-                if (!TAG_NAMES.isEmpty()) {
-                    addTag(metaData, TAG_NAMES.poll(), slice[0]);
+                if (!tempTagNames.isEmpty()) {
+                    addTag(metaData, tempTagNames.poll(), slice[0]);
                 }
                 // 剩下的所有字符接着分割
                 filename = slice[1];
             } else {
                 // 如果文件名不包含分隔符
                 // 则剩下的所有字符为下一个标签（如果有的话）的标签值
-                if (!TAG_NAMES.isEmpty()) {
-                    addTag(metaData, TAG_NAMES.poll(), filename);
+                if (!tempTagNames.isEmpty()) {
+                    addTag(metaData, tempTagNames.poll(), filename);
                 }
             }
 
-            separator = SEPARATORS.poll();
+            separator = tempSeparators.poll();
         }
         // 处理最后一次分割的第二个切片
-        if (!TAG_NAMES.isEmpty() && !"".equals(filename)) {
-            addTag(metaData, TAG_NAMES.poll(), filename);
+        if (!tempTagNames.isEmpty() && !"".equals(filename)) {
+            addTag(metaData, tempTagNames.poll(), filename);
         }
     }
 
