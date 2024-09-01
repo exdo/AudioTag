@@ -46,22 +46,16 @@ public class Filter {
 
         ARTIST_COMBO_BOX.setMinWidth(250);
         ARTIST_COMBO_BOX.setMaxWidth(250);
-        ARTIST_COMBO_BOX.getItems().add("");
-        ARTIST_COMBO_BOX.getItems().addAll(Center.getAlternativeArtists());
         HBox artistHBox = new HBox(ARTIST_CHECK_BOX, ARTIST_COMBO_BOX);
         artistHBox.setSpacing(5);
 
         ALBUM_COMBO_BOX.setMinWidth(275);
         ALBUM_COMBO_BOX.setMaxWidth(275);
-        ALBUM_COMBO_BOX.getItems().add("");
-        ALBUM_COMBO_BOX.getItems().addAll(Center.getAlternativeAlbums());
         HBox albumHBox = new HBox(ALBUM_CHECK_BOX, ALBUM_COMBO_BOX);
         albumHBox.setSpacing(5);
 
         GENRE_COMBO_BOX.setMinWidth(200);
         GENRE_COMBO_BOX.setMaxWidth(200);
-        GENRE_COMBO_BOX.getItems().add("");
-        GENRE_COMBO_BOX.getItems().addAll(Session.getAlternativeGenres());
         HBox genreHBox = new HBox(GENRE_CHECK_BOX, GENRE_COMBO_BOX);
         genreHBox.setSpacing(5);
 
@@ -129,6 +123,19 @@ public class Filter {
     public static void show(List<AudioMetaData> dataList) {
         ALL_ITEMS.clear();
         ALL_ITEMS.addAll(dataList);
+
+        ARTIST_COMBO_BOX.getItems().clear();
+        ARTIST_COMBO_BOX.getItems().add("");
+        ARTIST_COMBO_BOX.getItems().addAll(Center.getAlternativeArtists());
+
+        ALBUM_COMBO_BOX.getItems().clear();
+        ALBUM_COMBO_BOX.getItems().add("");
+        ALBUM_COMBO_BOX.getItems().addAll(Center.getAlternativeAlbums());
+
+        GENRE_COMBO_BOX.getItems().clear();
+        GENRE_COMBO_BOX.getItems().add("");
+        GENRE_COMBO_BOX.getItems().addAll(Session.getAlternativeGenres());
+
         STAGE.showAndWait();
     }
 
