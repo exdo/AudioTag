@@ -245,24 +245,68 @@ public class Center {
         MenuItem addArtistForSameAlbum = new MenuItem("为同一专辑添加同一艺术家");
         addArtistForSameAlbum.setOnAction(event -> addArtistForSameAlbum());
 
+        MenuItem addGenreForSameAlbum = new MenuItem("为同一专辑添加同一流派");
+        addGenreForSameAlbum.setOnAction(event -> addGenreForSameAlbum());
+
+        MenuItem addDateForSameAlbum = new MenuItem("为同一专辑添加同一出版日期");
+        addDateForSameAlbum.setOnAction(event -> addDateForSameAlbum());
+
         MenuItem cancel = new MenuItem("取消");
         cancel.setOnAction(event -> TABLE_VIEW.getSelectionModel().clearSelection());
 
-        contextMenu.getItems().add(selectAll);
-        contextMenu.getItems().add(ENABLE_DRAG_ROW_MENU_ITEM);
-        contextMenu.getItems().add(RENAME_MENU_ITEM);
-        contextMenu.getItems().add(renameBaseOnTags);
-        contextMenu.getItems().add(addTagsBaseOnFilename);
-        contextMenu.getItems().add(deleteFromTable);
-        contextMenu.getItems().add(deleteFile);
-        contextMenu.getItems().add(addOrder);
-        contextMenu.getItems().add(deleteSpecificTagMenu);
-        contextMenu.getItems().add(packageToAlbum);
-        contextMenu.getItems().add(addCoverForSameAlbum);
-        contextMenu.getItems().add(addArtistForSameAlbum);
-        contextMenu.getItems().add(cancel);
+        contextMenu.getItems().addAll(selectAll,
+                ENABLE_DRAG_ROW_MENU_ITEM,
+                RENAME_MENU_ITEM,
+                renameBaseOnTags,
+                addTagsBaseOnFilename,
+                deleteFromTable,
+                deleteFile,
+                addOrder,
+                deleteSpecificTagMenu,
+                packageToAlbum,
+                addCoverForSameAlbum,
+                addArtistForSameAlbum,
+                addGenreForSameAlbum,
+                addDateForSameAlbum,
+                cancel);
 
         TABLE_VIEW.setContextMenu(contextMenu);
+    }
+
+    private static void addDateForSameAlbum() {
+        List<AudioMetaData> selectedItems = checkSelectedRows();
+        if (selectedItems == null) return;
+
+        HashMap<String, String> albumDate = new HashMap<>();
+        for (AudioMetaData selectedItem : selectedItems) {
+            String album = selectedItem.getAlbum();
+            String date = selectedItem.getDate();
+            if (!"".equals(album) && !"".equals(date)) {
+                albumDate.put(album, date);
+            }
+        }
+
+        for (AudioMetaData selectedItem : selectedItems) {
+            String album = selectedItem.getAlbum();
+            if (!"".equals(album)) {
+                selectedItem.setDate(albumDate.get(album));
+                MetaDataWriter.write(selectedItem);
+            }
+        }
+        Aside.refresh();
+        updateTableView(null);
+    }
+
+    public static List<AudioMetaData> checkSelectedRows() {
+        List<AudioMetaData> selectedItems = TABLE_VIEW.getSelectionModel().getSelectedItems();
+        if (selectedItems.isEmpty()) {
+            return NeedToSelectAll.isSelectAll() ? TABLE_VIEW.getItems() : null;
+        }
+        return selectedItems;
+    }
+
+    private static void addGenreForSameAlbum() {
+
     }
 
     public static Menu generateDeleteSpecificTagMenu() {
@@ -283,8 +327,10 @@ public class Center {
         deleteComment.setOnAction(event -> deleteTag(EditableTag.COMMENT));
         MenuItem deleteCover = new MenuItem("删除封面");
         deleteCover.setOnAction(event -> deleteTag(EditableTag.COVER));
+        MenuItem deleteAll = new MenuItem("删除全部");
+        deleteAll.setOnAction(event -> deleteSelectedItems());
         deleteSpecificTag.getItems().addAll(deleteTitle, deleteArtist, deleteAlbum, deleteDate,
-                deleteGenre, deleteTrack, deleteComment, deleteCover);
+                deleteGenre, deleteTrack, deleteComment, deleteCover, deleteAll);
         return deleteSpecificTag;
     }
 
@@ -305,6 +351,16 @@ public class Center {
                 case TRACK -> item.setTrack("");
                 case COMMENT -> item.setComment("");
                 case COVER -> item.setCover(null);
+                case ALL -> {
+                    item.setTitle("");
+                    item.setArtist("");
+                    item.setAlbum("");
+                    item.setDate("");
+                    item.setGenre("");
+                    item.setTrack("");
+                    item.setComment("");
+                    item.setCover(null);
+                }
             }
             MetaDataWriter.write(item);
         }
@@ -320,28 +376,18 @@ public class Center {
         List<AudioMetaData> selectedItems = TABLE_VIEW.getSelectionModel().getSelectedItems();
 
         if (selectedItems.isEmpty()) {
-            boolean cancel = NoRowsSelected.show();
-            if (!cancel) {
+            if (NeedToSelectAll.isSelectAll()) {
                 TABLE_VIEW.getItems().clear();
             }
-            return;
+        } else {
+            TABLE_VIEW.getItems().removeAll(selectedItems);
+            updateTableView(null);
         }
-
-        TABLE_VIEW.getItems().removeAll(selectedItems);
-        updateTableView(null);
     }
 
     public static void deleteSelectedItems() {
-        List<AudioMetaData> selectedItems = TABLE_VIEW.getSelectionModel().getSelectedItems();
-
-        if (selectedItems.isEmpty()) {
-            boolean cancel = NoRowsSelected.show();
-            if (cancel) {
-                return;
-            } else {
-                selectedItems = TABLE_VIEW.getItems();
-            }
-        }
+        List<AudioMetaData> selectedItems = checkSelectedRows();
+        if (selectedItems == null) return;
 
         List<AudioMetaData> succeed = Delete.show(selectedItems);
         TABLE_VIEW.getItems().removeAll(succeed);
@@ -349,32 +395,16 @@ public class Center {
     }
 
     public static void renameBaseOnTags() {
-        List<AudioMetaData> selectedItems = TABLE_VIEW.getSelectionModel().getSelectedItems();
-
-        if (selectedItems.isEmpty()) {
-            boolean cancel = NoRowsSelected.show();
-            if (cancel) {
-                return;
-            } else {
-                selectedItems = TABLE_VIEW.getItems();
-            }
-        }
+        List<AudioMetaData> selectedItems = checkSelectedRows();
+        if (selectedItems == null) return;
 
         RenameBaseOnTag.show(selectedItems);
         updateTableView(null);
     }
 
     public static void addTagBaseOnFilename() {
-        List<AudioMetaData> selectedItems = TABLE_VIEW.getSelectionModel().getSelectedItems();
-
-        if (selectedItems.isEmpty()) {
-            boolean cancel = NoRowsSelected.show();
-            if (cancel) {
-                return;
-            } else {
-                selectedItems = TABLE_VIEW.getItems();
-            }
-        }
+        List<AudioMetaData> selectedItems = checkSelectedRows();
+        if (selectedItems == null) return;
 
         AddTagBaseOnFilename.show(selectedItems);
         updateTableView(null);
@@ -782,16 +812,8 @@ public class Center {
     }
 
     public static void addOrder() {
-        List<AudioMetaData> selectedItems = TABLE_VIEW.getSelectionModel().getSelectedItems();
-
-        if (selectedItems.isEmpty()) {
-            boolean cancel = NoRowsSelected.show();
-            if (cancel) {
-                return;
-            } else {
-                selectedItems = TABLE_VIEW.getItems();
-            }
-        }
+        List<AudioMetaData> selectedItems = checkSelectedRows();
+        if (selectedItems == null) return;
 
         for (int i = 0; i < selectedItems.size(); i++) {
             selectedItems.get(i).setTrack(String.valueOf(i + 1));
@@ -801,12 +823,8 @@ public class Center {
     }
 
     public static void packageToAlbum() {
-        List<AudioMetaData> selectedItems = TABLE_VIEW.getSelectionModel().getSelectedItems();
-
-        if (selectedItems.isEmpty()) {
-            boolean cancel = NoRowsSelected.show();
-            if (cancel) return;
-        }
+        List<AudioMetaData> selectedItems = checkSelectedRows();
+        if (selectedItems == null) return;
 
         String albumName = PackageToAlbum.show();
         if (albumName == null) return;
@@ -820,16 +838,8 @@ public class Center {
     }
 
     public static void addCoverForSameAlbum() {
-        List<AudioMetaData> selectedItems = TABLE_VIEW.getSelectionModel().getSelectedItems();
-
-        if (selectedItems.isEmpty()) {
-            boolean cancel = NoRowsSelected.show();
-            if (cancel) {
-                return;
-            } else {
-                selectedItems = TABLE_VIEW.getItems();
-            }
-        }
+        List<AudioMetaData> selectedItems = checkSelectedRows();
+        if (selectedItems == null) return;
 
         HashMap<String, byte[]> albumCovers = new HashMap<>();
         for (AudioMetaData selectedItem : selectedItems) {
@@ -852,16 +862,8 @@ public class Center {
     }
 
     public static void addArtistForSameAlbum() {
-        List<AudioMetaData> selectedItems = TABLE_VIEW.getSelectionModel().getSelectedItems();
-
-        if (selectedItems.isEmpty()) {
-            boolean cancel = NoRowsSelected.show();
-            if (cancel) {
-                return;
-            } else {
-                selectedItems = TABLE_VIEW.getItems();
-            }
-        }
+        List<AudioMetaData> selectedItems = checkSelectedRows();
+        if (selectedItems == null) return;
 
         HashMap<String, String> albumArtist = new HashMap<>();
         for (AudioMetaData selectedItem : selectedItems) {

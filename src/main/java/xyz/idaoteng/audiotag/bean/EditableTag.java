@@ -8,5 +8,6 @@ public enum EditableTag {
     GENRE,
     TRACK,
     COMMENT,
-    COVER
+    COVER,
+    ALL
 }
