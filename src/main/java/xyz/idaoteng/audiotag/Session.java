@@ -164,7 +164,7 @@ public class Session {
 
     public static void saveSession() {
         try (FileOutputStream outputStream = new FileOutputStream(sessionHistoryFilePath)) {
-            PrintWriter writer = new PrintWriter(outputStream);
+            PrintWriter writer = new PrintWriter(outputStream, true, StandardCharsets.UTF_8);
             writer.println("folder_path_of_the_last_selected_file=" + folderPathOfTheLastSelectedFile);
             writer.println("path_to_the_last_selected_folder=" + pathToTheLastSelectedFolder);
             writer.println("folder_path_of_the_last_selected_image=" + folderPathOfTheLastSelectedImage);
