@@ -21,16 +21,35 @@
             <version>17.0.1</version>
         </dependency>
 
-        <dependency>
-            <groupId>net.coobird</groupId>
-            <artifactId>thumbnailator</artifactId>
-            <version>0.1</version>
-        </dependency>
-
+        <!--
+            实际的 Maven 依赖：
+            <dependency>
+                <groupId>net.jthink</groupId>
+                <artifactId>jaudiotagger</artifactId>
+                <version>3.0.1</version>
+            </dependency>
+            官方的依赖没有 module-info.java 导致无法 jlink
+            下面是对 jaudiotagger 的源码进行一定的精简并添加 module-info.java 使其模块化后的本地 Maven 依赖
+            thumbnailator 同理
+         -->
         <dependency>
             <groupId>org.jaudiotagger</groupId>
             <artifactId>jaudiotagger</artifactId>
             <version>1.1.5</version>
+        </dependency>
+
+        <!--
+            实际的 Maven 依赖：
+            <dependency>
+              <groupId>net.coobird</groupId>
+              <artifactId>thumbnailator</artifactId>
+              <version>0.4.20</version>
+            </dependency>
+         -->
+        <dependency>
+            <groupId>net.coobird</groupId>
+            <artifactId>thumbnailator</artifactId>
+            <version>0.1</version>
         </dependency>
     </dependencies>
 
