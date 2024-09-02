@@ -327,8 +327,8 @@ public class Center {
         deleteComment.setOnAction(event -> deleteTag(EditableTag.COMMENT));
         MenuItem deleteCover = new MenuItem("删除封面");
         deleteCover.setOnAction(event -> deleteTag(EditableTag.COVER));
-        MenuItem deleteAll = new MenuItem("删除全部");
-        deleteAll.setOnAction(event -> deleteSelectedItems());
+        MenuItem deleteAll = new MenuItem("删除全部标签");
+        deleteAll.setOnAction(event -> deleteTag(EditableTag.ALL));
         deleteSpecificTag.getItems().addAll(deleteTitle, deleteArtist, deleteAlbum, deleteDate,
                 deleteGenre, deleteTrack, deleteComment, deleteCover, deleteAll);
         return deleteSpecificTag;
