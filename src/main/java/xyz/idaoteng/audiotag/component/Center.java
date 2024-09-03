@@ -306,7 +306,25 @@ public class Center {
     }
 
     private static void addGenreForSameAlbum() {
+        List<AudioMetaData> selectedItems = checkSelectedRows();
+        if (selectedItems == null) return;
 
+        HashMap<String, String> albumGenre = new HashMap<>();
+        for (AudioMetaData item : selectedItems) {
+            String album = item.getAlbum();
+            String genre = item.getGenre();
+            if (!"".equals(album) && !"".equals(genre)) {
+                albumGenre.put(album, genre);
+            }
+        }
+
+        for (AudioMetaData item : selectedItems) {
+            String album = item.getAlbum();
+            if (!"".equals(album)) {
+                item.setGenre(albumGenre.get(album));
+                MetaDataWriter.write(item);
+            }
+        }
     }
 
     public static Menu generateDeleteSpecificTagMenu() {
