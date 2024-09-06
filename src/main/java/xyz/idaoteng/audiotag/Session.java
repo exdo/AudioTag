@@ -155,6 +155,8 @@ public class Session {
     }
 
     public static void addGenre(String genre) {
+        if ("".equals(genre.trim())) return;
+
         ALTERNATIVE_GENRES.add(genre);
     }
 

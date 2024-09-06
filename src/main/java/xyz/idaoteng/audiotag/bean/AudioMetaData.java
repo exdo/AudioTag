@@ -1,6 +1,6 @@
 package xyz.idaoteng.audiotag.bean;
 
-public class AudioMetaData implements Cloneable {
+public class AudioMetaData {
     private String absolutePath;
     private String filename;
     private String artist = "";
