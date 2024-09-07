@@ -79,14 +79,8 @@ public class Head {
         MenuItem packageToAlbum = new MenuItem("设置成同一专辑");
         packageToAlbum.setOnAction(event -> Center.packageToAlbum());
 
-        MenuItem addCoverForSameAlbum = new MenuItem("为同一专辑添加同一封面");
-        addCoverForSameAlbum.setOnAction(event -> Center.addCoverForSameAlbum());
-
-        MenuItem addArtistForSameAlbum = new MenuItem("为同一专辑添加同一艺术家");
-        addArtistForSameAlbum.setOnAction(event -> Center.addArtistForSameAlbum());
-
         other.getItems().addAll(addOrder, deleteSpecialTag, packageToAlbum,
-                addCoverForSameAlbum, addArtistForSameAlbum);
+                Center.generateSameAlbumOptionMenu());
 
         RadioButton enableDragRow = new RadioButton("允许拖拽行");
         enableDragRow.setPadding(new Insets(4, 0, 0, 0));
@@ -146,7 +140,7 @@ public class Head {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setInitialDirectory(new File(Session.getFolderPathOfTheLastSelectedFile()));
             fileChooser.getExtensionFilters().addAll(EXTENSION_FILTER);
-            fileChooser.setTitle("选择应音频文件（多选）");
+            fileChooser.setTitle("选择音频文件（多选）");
             List<File> files = fileChooser.showOpenMultipleDialog(StartUp.getPrimaryStage());
             if (files != null && !files.isEmpty()) {
                 List<AudioMetaData> dataList = new ArrayList<>(files.size());

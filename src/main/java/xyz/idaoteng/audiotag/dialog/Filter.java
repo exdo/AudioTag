@@ -62,14 +62,17 @@ public class Filter {
 
         ARTIST_COMBO_BOX.setMinWidth(250);
         ARTIST_COMBO_BOX.setMaxWidth(250);
+        ARTIST_COMBO_BOX.setEditable(true);
         ARTIST_COMBO_BOX.setDisable(true);
 
         ALBUM_COMBO_BOX.setMinWidth(275);
         ALBUM_COMBO_BOX.setMaxWidth(275);
+        ALBUM_COMBO_BOX.setEditable(true);
         ALBUM_COMBO_BOX.setDisable(true);
 
         GENRE_COMBO_BOX.setMinWidth(200);
         GENRE_COMBO_BOX.setMaxWidth(200);
+        GENRE_COMBO_BOX.setEditable(true);
         GENRE_COMBO_BOX.setDisable(true);
 
         VBox optionHBox = new VBox(10);
@@ -106,19 +109,19 @@ public class Filter {
             FILTERED_ITEMS.clear();
             List<AudioMetaData> filtered = ALL_ITEMS.stream().filter(metaData -> {
                 if (ARTIST_CHECK_BOX.isSelected()) {
-                    return metaData.getArtist().equals(ARTIST_COMBO_BOX.getValue());
+                    return metaData.getArtist().contains(ARTIST_COMBO_BOX.getValue());
                 } else {
                     return true;
                 }
             }).filter(metaData -> {
                 if (ALBUM_CHECK_BOX.isSelected()) {
-                    return metaData.getAlbum().equals(ALBUM_COMBO_BOX.getValue());
+                    return metaData.getAlbum().contains(ALBUM_COMBO_BOX.getValue());
                 } else {
                     return true;
                 }
             }).filter(metaData -> {
                 if (GENRE_CHECK_BOX.isSelected()) {
-                    return metaData.getGenre().equals(GENRE_COMBO_BOX.getValue());
+                    return metaData.getGenre().contains(GENRE_COMBO_BOX.getValue());
                 } else {
                     return true;
                 }

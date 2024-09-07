@@ -239,18 +239,6 @@ public class Center {
         MenuItem packageToAlbum = new MenuItem("设置成同一专辑");
         packageToAlbum.setOnAction(event -> packageToAlbum());
 
-        MenuItem addCoverForSameAlbum = new MenuItem("为同一专辑添加同一封面");
-        addCoverForSameAlbum.setOnAction(event -> addCoverForSameAlbum());
-
-        MenuItem addArtistForSameAlbum = new MenuItem("为同一专辑添加同一艺术家");
-        addArtistForSameAlbum.setOnAction(event -> addArtistForSameAlbum());
-
-        MenuItem addGenreForSameAlbum = new MenuItem("为同一专辑添加同一流派");
-        addGenreForSameAlbum.setOnAction(event -> addGenreForSameAlbum());
-
-        MenuItem addDateForSameAlbum = new MenuItem("为同一专辑添加同一出版日期");
-        addDateForSameAlbum.setOnAction(event -> addDateForSameAlbum());
-
         MenuItem cancel = new MenuItem("取消");
         cancel.setOnAction(event -> TABLE_VIEW.getSelectionModel().clearSelection());
 
@@ -264,14 +252,32 @@ public class Center {
                 addOrder,
                 deleteSpecificTagMenu,
                 packageToAlbum,
-                addCoverForSameAlbum,
-                addArtistForSameAlbum,
-                addGenreForSameAlbum,
-                addDateForSameAlbum,
+                generateSameAlbumOptionMenu(),
                 cancel);
 
         TABLE_VIEW.setContextMenu(contextMenu);
     }
+
+    public static Menu generateSameAlbumOptionMenu() {
+        Menu menu = new Menu("批量设置专辑");
+
+        MenuItem addCover = new MenuItem("为同一专辑添加同一封面");
+        addCover.setOnAction(event -> addCoverForSameAlbum());
+
+        MenuItem addArtist = new MenuItem("为同一专辑添加同一艺术家");
+        addArtist.setOnAction(event -> addArtistForSameAlbum());
+
+        MenuItem addGenre = new MenuItem("为同一专辑添加同一流派");
+        addGenre.setOnAction(event -> addGenreForSameAlbum());
+
+        MenuItem addDate = new MenuItem("为同一专辑添加同一出版日期");
+        addDate.setOnAction(event -> addDateForSameAlbum());
+
+        menu.getItems().addAll(addCover, addArtist, addGenre, addDate);
+
+        return menu;
+    }
+
 
     private static void addDateForSameAlbum() {
         List<AudioMetaData> selectedItems = checkSelectedRows();
