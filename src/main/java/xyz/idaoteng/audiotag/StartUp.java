@@ -31,7 +31,7 @@ public class StartUp extends Application {
         primaryStage.setMinWidth(885);
         primaryStage.show();
 
-        Center.confirmHeadRowHeight();
+        Center.configWhenTableAlreadyRendered();
     }
 
     @Override
