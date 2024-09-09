@@ -594,6 +594,7 @@ public class Center {
     }
 
     public static void configWhenTableAlreadyRendered() {
+        // 为实现拖选，需要先获取表头的高度
         // 表头的高度需要 skin 已经渲染完毕时才能获取
         TableViewSkin<?> skin = (TableViewSkin<?>) TABLE_VIEW.getSkin();
         ObservableList<Node> childrenList = skin.getChildren();

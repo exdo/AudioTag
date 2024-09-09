@@ -47,6 +47,7 @@ public class MetaDataReader {
         }
 
         AudioHeader audioHeader = audioFile.getAudioHeader();
+        // 根据jaudiotagger 的注释 bitrate 是以 kbps 为单位，但 dsf 文件实际得到的是以 bps 为单位
         long bitRate = audioHeader.getBitRateAsNumber();
         if ("dsf".equals(Utils.getExtension(file))) {
             bitRate = Math.round(bitRate / 1000.0);

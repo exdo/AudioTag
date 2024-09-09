@@ -1,5 +1,6 @@
 package xyz.idaoteng.audiotag.core;
 
+import org.jaudiotagger.audio.SupportedFileFormat;
 import xyz.idaoteng.audiotag.Utils;
 
 import java.io.File;
@@ -10,11 +11,10 @@ import java.util.List;
 public class SupportedFileTypes {
     public static final HashSet<String> SUPPORTED_FILE_TYPES = new HashSet<>();
     static {
-        SUPPORTED_FILE_TYPES.add("flac");
-        SUPPORTED_FILE_TYPES.add("mp3");
-        SUPPORTED_FILE_TYPES.add("wav");
-        SUPPORTED_FILE_TYPES.add("m4a");
-        SUPPORTED_FILE_TYPES.add("dsf");
+        SupportedFileFormat[] formats = SupportedFileFormat.values();
+        for (SupportedFileFormat format : formats) {
+            SUPPORTED_FILE_TYPES.add(format.getFilesuffix());
+        }
     }
 
     public static boolean isSupported(File file) {
