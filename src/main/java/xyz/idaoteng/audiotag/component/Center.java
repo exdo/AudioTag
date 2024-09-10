@@ -5,10 +5,10 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
-import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.skin.TableHeaderRow;
 import javafx.scene.control.skin.TableViewSkin;
@@ -23,8 +23,8 @@ import xyz.idaoteng.audiotag.dialog.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -259,6 +259,7 @@ public class Center {
                 deleteSpecificTagMenu,
                 packageToAlbum,
                 generateSameAlbumOptionMenu(),
+                generateTidyMenu(),
                 cancel);
 
         TABLE_VIEW.setContextMenu(contextMenu);
@@ -584,6 +585,29 @@ public class Center {
         }
         Aside.refresh();
         updateTableView(null);
+    }
+
+    public static Menu generateTidyMenu() {
+        Menu tidyMenu = new Menu("整理");
+
+        MenuItem tidyByArtist = new MenuItem("将同一歌手的文件放置在同一文件夹");
+        tidyByArtist.setOnAction(event -> {
+            List<AudioMetaData> dataList = checkSelectedRows();
+            if (dataList == null) return;
+
+            Tidy.show(dataList, true);
+        });
+
+        MenuItem tidyByAlbum = new MenuItem("将同一专辑的文件放置在同一文件夹");
+        tidyByAlbum.setOnAction(event -> {
+            List<AudioMetaData> dataList = checkSelectedRows();
+            if (dataList == null) return;
+
+            Tidy.show(dataList, false);
+        });
+
+        tidyMenu.getItems().addAll(tidyByArtist, tidyByAlbum);
+        return tidyMenu;
     }
 
     private static void initContent() {
