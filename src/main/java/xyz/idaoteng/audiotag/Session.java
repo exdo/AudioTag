@@ -114,6 +114,9 @@ public class Session {
     }
 
     public static String getFolderPathOfTheLastSelectedFile() {
+        if (!new File(folderPathOfTheLastSelectedFile).exists()) {
+            folderPathOfTheLastSelectedFile = System.getProperty("user.home");
+        }
         return folderPathOfTheLastSelectedFile;
     }
 
@@ -122,6 +125,9 @@ public class Session {
     }
 
     public static String getPathToTheLastSelectedFolder() {
+        if (!new File(pathToTheLastSelectedFolder).exists()) {
+            pathToTheLastSelectedFolder = System.getProperty("user.home");
+        }
         return pathToTheLastSelectedFolder;
     }
 
@@ -130,6 +136,9 @@ public class Session {
     }
 
     public static String getFolderPathOfTheLastSelectedImage() {
+        if (!new File(folderPathOfTheLastSelectedImage).exists()) {
+            folderPathOfTheLastSelectedImage = System.getProperty("user.home");
+        }
         return folderPathOfTheLastSelectedImage;
     }
 
@@ -138,6 +147,9 @@ public class Session {
     }
 
     public static String getLastSelectedImageSavingPath() {
+        if (!new File(lastSelectedImageSavingPath).exists()) {
+            lastSelectedImageSavingPath = System.getProperty("user.home");
+        }
         return lastSelectedImageSavingPath;
     }
 

@@ -19,7 +19,7 @@ import xyz.idaoteng.audiotag.component.Center;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class Preview {
@@ -76,12 +76,13 @@ public class Preview {
     private static void configConfirmButton(Button confirm) {
         confirm.setOnAction(event -> {
             ObservableList<Filename> list = TABLE.getItems();
-            List<String> failedPaths = new ArrayList<>(list.size());
+            HashMap<String, String> failedPathAndReason = new HashMap<>(list.size());
             for (Filename f : list) {
                 if (f.isNeedToRename()) {
                     AudioMetaData metaData = f.getMetaData();
-                    if (!rename(metaData, f.getFile())) {
-                        failedPaths.add(metaData.getAbsolutePath());
+                    String message = rename(metaData, f.getFile());
+                    if (message != null) {
+                        failedPathAndReason.put(metaData.getAbsolutePath(), message);
                     } else {
                         metaData.setFilename(f.getNewName());
                         metaData.setAbsolutePath(f.getFile().getAbsolutePath());
@@ -91,9 +92,13 @@ public class Preview {
 
             Center.updateTableView(null);
 
-            if (!failedPaths.isEmpty()) {
+            if (!failedPathAndReason.isEmpty()) {
                 Alert alert = Utils.generateBasicErrorAlert("以下文件重命名失败");
-                alert.setContentText(String.join("\n", failedPaths));
+                StringBuilder content = new StringBuilder();
+                for (String path : failedPathAndReason.keySet()) {
+                    content.append(path).append(": ").append(failedPathAndReason.get(path)).append("\n");
+                }
+                alert.setContentText(content.toString());
                 alert.show();
             }
 
@@ -101,18 +106,18 @@ public class Preview {
         });
     }
 
-    private static boolean rename(AudioMetaData data, File newFile) {
+    private static String rename(AudioMetaData data, File newFile) {
         File originalFile = new File(data.getAbsolutePath());
 
         if (data.getFilename().equals(newFile.getName())) {
-            return true;
+            return null;
         }
 
         try {
             Files.move(originalFile.toPath(), newFile.toPath());
-            return true;
+            return null;
         } catch (IOException e) {
-            return false;
+            return e.getMessage();
         }
     }
 

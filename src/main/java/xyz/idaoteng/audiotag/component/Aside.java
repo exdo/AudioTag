@@ -211,20 +211,66 @@ public class Aside {
 
         comboBox.setEditable(true);
 
-        comboBox.setOnAction(event -> {
-            String newValue = comboBox.getValue();
+        comboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 switch (type) {
-                    case TITLE -> metaDataDisplayed.setTitle(newValue);
-                    case ARTIST -> metaDataDisplayed.setArtist(newValue);
-                    case ALBUM -> metaDataDisplayed.setAlbum(newValue);
-                    case DATE -> metaDataDisplayed.setDate(newValue);
-                    case GENRE -> metaDataDisplayed.setGenre(newValue);
-                    case TRACK -> metaDataDisplayed.setTrack(newValue);
-                    case COMMENT -> metaDataDisplayed.setComment(newValue);
+                    case TITLE -> {
+                        if (!newValue.equals(originalMetaData.getTitle())) {
+                            metaDataDisplayed.setTitle(newValue);
+                            CONFIRM_BOX.setVisible(true);
+                        } else {
+                            CONFIRM_BOX.setVisible(false);
+                        }
+                    }
+                    case ARTIST -> {
+                        if (!newValue.equals(originalMetaData.getArtist())) {
+                            metaDataDisplayed.setTitle(newValue);
+                            CONFIRM_BOX.setVisible(true);
+                        } else {
+                            CONFIRM_BOX.setVisible(false);
+                        }
+                    }
+                    case ALBUM -> {
+                        if (!newValue.equals(originalMetaData.getAlbum())) {
+                            metaDataDisplayed.setTitle(newValue);
+                            CONFIRM_BOX.setVisible(true);
+                        } else {
+                            CONFIRM_BOX.setVisible(false);
+                        }
+                    }
+                    case GENRE -> {
+                        if (!newValue.equals(originalMetaData.getGenre())) {
+                            metaDataDisplayed.setTitle(newValue);
+                            CONFIRM_BOX.setVisible(true);
+                        } else {
+                            CONFIRM_BOX.setVisible(false);
+                        }
+                    }
+                    case TRACK -> {
+                        if (!newValue.equals(originalMetaData.getTrack())) {
+                            metaDataDisplayed.setTitle(newValue);
+                            CONFIRM_BOX.setVisible(true);
+                        } else {
+                            CONFIRM_BOX.setVisible(false);
+                        }
+                    }
+                    case DATE -> {
+                        if (!newValue.equals(originalMetaData.getDate())) {
+                            metaDataDisplayed.setTitle(newValue);
+                            CONFIRM_BOX.setVisible(true);
+                        } else {
+                            CONFIRM_BOX.setVisible(false);
+                        }
+                    }
+                    case COMMENT -> {
+                        if (!newValue.equals(originalMetaData.getComment())) {
+                            metaDataDisplayed.setTitle(newValue);
+                            CONFIRM_BOX.setVisible(true);
+                        } else {
+                            CONFIRM_BOX.setVisible(false);
+                        }
+                    }
                 }
-
-                CONFIRM_BOX.setVisible(true);
             }
         });
     }
