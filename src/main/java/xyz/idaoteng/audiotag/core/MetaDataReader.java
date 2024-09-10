@@ -96,7 +96,10 @@ public class MetaDataReader {
                     dataList.addAll(readSubfolders(file));
                 } else {
                     if (SupportedFileTypes.isSupported(file)) {
-                        dataList.add(readFile(file));
+                        AudioMetaData metaData = readFile(file);
+                        if (metaData != null) {
+                            dataList.add(metaData);
+                        }
                     }
                 }
             }

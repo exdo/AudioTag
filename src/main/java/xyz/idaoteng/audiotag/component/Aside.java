@@ -224,7 +224,7 @@ public class Aside {
                     }
                     case ARTIST -> {
                         if (!newValue.equals(originalMetaData.getArtist())) {
-                            metaDataDisplayed.setTitle(newValue);
+                            metaDataDisplayed.setArtist(newValue);
                             CONFIRM_BOX.setVisible(true);
                         } else {
                             CONFIRM_BOX.setVisible(false);
@@ -232,7 +232,7 @@ public class Aside {
                     }
                     case ALBUM -> {
                         if (!newValue.equals(originalMetaData.getAlbum())) {
-                            metaDataDisplayed.setTitle(newValue);
+                            metaDataDisplayed.setAlbum(newValue);
                             CONFIRM_BOX.setVisible(true);
                         } else {
                             CONFIRM_BOX.setVisible(false);
@@ -240,7 +240,7 @@ public class Aside {
                     }
                     case GENRE -> {
                         if (!newValue.equals(originalMetaData.getGenre())) {
-                            metaDataDisplayed.setTitle(newValue);
+                            metaDataDisplayed.setGenre(newValue);
                             CONFIRM_BOX.setVisible(true);
                         } else {
                             CONFIRM_BOX.setVisible(false);
@@ -248,7 +248,7 @@ public class Aside {
                     }
                     case TRACK -> {
                         if (!newValue.equals(originalMetaData.getTrack())) {
-                            metaDataDisplayed.setTitle(newValue);
+                            metaDataDisplayed.setTrack(newValue);
                             CONFIRM_BOX.setVisible(true);
                         } else {
                             CONFIRM_BOX.setVisible(false);
@@ -256,7 +256,7 @@ public class Aside {
                     }
                     case DATE -> {
                         if (!newValue.equals(originalMetaData.getDate())) {
-                            metaDataDisplayed.setTitle(newValue);
+                            metaDataDisplayed.setDate(newValue);
                             CONFIRM_BOX.setVisible(true);
                         } else {
                             CONFIRM_BOX.setVisible(false);
@@ -264,7 +264,7 @@ public class Aside {
                     }
                     case COMMENT -> {
                         if (!newValue.equals(originalMetaData.getComment())) {
-                            metaDataDisplayed.setTitle(newValue);
+                            metaDataDisplayed.setComment(newValue);
                             CONFIRM_BOX.setVisible(true);
                         } else {
                             CONFIRM_BOX.setVisible(false);
