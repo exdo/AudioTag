@@ -24,8 +24,8 @@ import java.util.List;
 
 public class Tidy {
     private static final Stage STAGE = new Stage();
-    public static final VBox BODY = new VBox(15);
-    public static final Label LABEL = new Label("将文件整理至：");
+    private static final VBox BODY = new VBox(15);
+    private static final Label LABEL = new Label("将文件整理至：");
     private static final TextField TEXT_FIELD = new TextField();
     private static final RadioButton COPY = new RadioButton("复制");
     private static final RadioButton MOVE = new RadioButton("移动");

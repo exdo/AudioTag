@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 
 public class SupportedFileTypes {
-    public static final HashSet<String> SUPPORTED_FILE_TYPES = new HashSet<>();
+    private static final HashSet<String> SUPPORTED_FILE_TYPES = new HashSet<>();
     static {
         SupportedFileFormat[] formats = SupportedFileFormat.values();
         for (SupportedFileFormat format : formats) {

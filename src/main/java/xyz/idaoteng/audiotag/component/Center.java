@@ -31,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Center {
     private static final TableView<AudioMetaData> TABLE_VIEW = new TableView<>();
+    private static final ContextMenu CONTEXT_MENU = new ContextMenu();
     private static ScrollBar verticalScrollBar = null;
     private static double horizontalScrollBarHeight;
     private static double tableHeadRowHeight;
@@ -38,7 +39,7 @@ public class Center {
     private static final int BLOW_VIEWPORT = -2;
     private static final int IN_VIEWPORT_BLANK = 0;
     private static final double ROW_HEIGHT = 25;
-    public static final  MenuItem ENABLE_DRAG_ROW_MENU_ITEM = new MenuItem("允许拖拽行");
+    private static final  MenuItem ENABLE_DRAG_ROW_MENU_ITEM = new MenuItem("允许拖拽行");
     private static RadioButton enableDragRowRadioButton = null;
     private static final MenuItem RENAME_MENU_ITEM = new MenuItem("重命名");
 
@@ -46,8 +47,8 @@ public class Center {
     private static final HashSet<String> ALTERNATIVE_ALBUMS = new HashSet<>();
 
     private static boolean disableDragRow = true;
-    public static final String ALLOW = "允许拖拽行";
-    public static final String BAN = "禁止拖拽行";
+    private static final String ALLOW = "允许拖拽行";
+    private static final String BAN = "禁止拖拽行";
 
     private static final DataFormat DATA_FORMAT = new DataFormat("application/x-java-serialized-object");
     private static Menu deleteSpecificTagMenu;
@@ -204,7 +205,6 @@ public class Center {
     }
 
     private static void configContextMenu() {
-        ContextMenu contextMenu = new ContextMenu();
         MenuItem selectAll = new MenuItem("全选");
         selectAll.setOnAction(event -> selectAll());
 
@@ -248,7 +248,7 @@ public class Center {
         MenuItem cancel = new MenuItem("取消");
         cancel.setOnAction(event -> TABLE_VIEW.getSelectionModel().clearSelection());
 
-        contextMenu.getItems().addAll(selectAll,
+        CONTEXT_MENU.getItems().addAll(selectAll,
                 ENABLE_DRAG_ROW_MENU_ITEM,
                 RENAME_MENU_ITEM,
                 renameBaseOnTags,
@@ -262,7 +262,7 @@ public class Center {
                 generateTidyMenu(),
                 cancel);
 
-        TABLE_VIEW.setContextMenu(contextMenu);
+        TABLE_VIEW.setContextMenu(CONTEXT_MENU);
     }
 
     public static void selectAll() {
@@ -456,6 +456,7 @@ public class Center {
             MetaDataWriter.write(item);
         }
 
+        Aside.refresh();
         updateTableView(null);
     }
 
@@ -497,7 +498,7 @@ public class Center {
     public static void addCoverForSameAlbum() {
         List<AudioMetaData> selectedItems = checkSelectedRows();
         if (selectedItems == null) return;
-
+        // albumCovers 专辑 -> 封面 映射表
         HashMap<String, byte[]> albumCovers = new HashMap<>();
         for (AudioMetaData selectedItem : selectedItems) {
             String album = selectedItem.getAlbum();
@@ -510,6 +511,7 @@ public class Center {
         for (AudioMetaData selectedItem : selectedItems) {
             String album = selectedItem.getAlbum();
             if (!"".equals(album)) {
+                // 根据 专辑 找到 封面
                 selectedItem.setCover(albumCovers.get(album));
                 MetaDataWriter.write(selectedItem);
             }
@@ -521,7 +523,7 @@ public class Center {
     public static void addArtistForSameAlbum() {
         List<AudioMetaData> selectedItems = checkSelectedRows();
         if (selectedItems == null) return;
-
+        // albumArtist 专辑 -> 艺术家 映射表
         HashMap<String, String> albumArtist = new HashMap<>();
         for (AudioMetaData selectedItem : selectedItems) {
             String album = selectedItem.getAlbum();
@@ -534,6 +536,7 @@ public class Center {
         for (AudioMetaData selectedItem : selectedItems) {
             String album = selectedItem.getAlbum();
             if (!"".equals(album)) {
+                // 根据 专辑 找到 艺术家
                 selectedItem.setArtist(albumArtist.get(album));
             }
         }
@@ -544,7 +547,7 @@ public class Center {
     private static void addGenreForSameAlbum() {
         List<AudioMetaData> selectedItems = checkSelectedRows();
         if (selectedItems == null) return;
-
+        // albumGenre 专辑 -> 流派 映射表
         HashMap<String, String> albumGenre = new HashMap<>();
         for (AudioMetaData item : selectedItems) {
             String album = item.getAlbum();
@@ -557,16 +560,19 @@ public class Center {
         for (AudioMetaData item : selectedItems) {
             String album = item.getAlbum();
             if (!"".equals(album)) {
+                // 根据 专辑 找到 流派
                 item.setGenre(albumGenre.get(album));
                 MetaDataWriter.write(item);
             }
         }
+        Aside.refresh();
+        updateTableView(null);
     }
 
     private static void addDateForSameAlbum() {
         List<AudioMetaData> selectedItems = checkSelectedRows();
         if (selectedItems == null) return;
-
+        // albumDate 专辑 -> 发行日期 映射表
         HashMap<String, String> albumDate = new HashMap<>();
         for (AudioMetaData selectedItem : selectedItems) {
             String album = selectedItem.getAlbum();
@@ -579,6 +585,7 @@ public class Center {
         for (AudioMetaData selectedItem : selectedItems) {
             String album = selectedItem.getAlbum();
             if (!"".equals(album)) {
+                // 根据 专辑 找到 发行日期
                 selectedItem.setDate(albumDate.get(album));
                 MetaDataWriter.write(selectedItem);
             }

@@ -8,14 +8,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
 public class ImageInApp {
-    public static final ByteArrayOutputStream DEFAULT_COVER = new ByteArrayOutputStream();
-    public static final ByteArrayOutputStream RENAME_ICON = new ByteArrayOutputStream();
-    public static final ByteArrayOutputStream DELETE_ICON = new ByteArrayOutputStream();
-    public static final ByteArrayOutputStream ERROR_ICON = new ByteArrayOutputStream();
-    public static final ByteArrayOutputStream SELECT_ALL_ICON = new ByteArrayOutputStream();
-    public static final ByteArrayOutputStream CLEAR_ICON = new ByteArrayOutputStream();
-    public static final ByteArrayOutputStream ALBUM_ICON = new ByteArrayOutputStream();
-    public static final ByteArrayOutputStream APP_ICON = new ByteArrayOutputStream();
+    private static final ByteArrayOutputStream DEFAULT_COVER = new ByteArrayOutputStream();
+    private static final ByteArrayOutputStream RENAME_ICON = new ByteArrayOutputStream();
+    private static final ByteArrayOutputStream DELETE_ICON = new ByteArrayOutputStream();
+    private static final ByteArrayOutputStream ERROR_ICON = new ByteArrayOutputStream();
+    private static final ByteArrayOutputStream SELECT_ALL_ICON = new ByteArrayOutputStream();
+    private static final ByteArrayOutputStream CLEAR_ICON = new ByteArrayOutputStream();
+    private static final ByteArrayOutputStream ALBUM_ICON = new ByteArrayOutputStream();
+    private static final ByteArrayOutputStream APP_ICON = new ByteArrayOutputStream();
 
     static {
         try (InputStream inputStream = ImageInApp.class.getResourceAsStream("cover.png")) {
