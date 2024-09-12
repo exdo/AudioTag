@@ -13,6 +13,7 @@ import xyz.idaoteng.audiotag.StartUp;
 import xyz.idaoteng.audiotag.core.MetaDataReader;
 import xyz.idaoteng.audiotag.core.SupportedFileTypes;
 import xyz.idaoteng.audiotag.dialog.Filter;
+import xyz.idaoteng.audiotag.exception.CantReadException;
 
 import java.io.File;
 import java.util.*;
@@ -99,7 +100,9 @@ public class Head {
                 String path = iterator.next();
                 File file = new File(path);
                 if (file.exists()) {
-                    refreshed.add(MetaDataReader.readFile(file));
+                    try {
+                        refreshed.add(MetaDataReader.readFile(file));
+                    } catch (CantReadException ignored) {}
                 } else {
                     iterator.remove();
                 }
@@ -144,7 +147,11 @@ public class Head {
             List<File> files = fileChooser.showOpenMultipleDialog(StartUp.getPrimaryStage());
             if (files != null && !files.isEmpty()) {
                 List<AudioMetaData> dataList = new ArrayList<>(files.size());
-                files.forEach(file -> dataList.add(MetaDataReader.readFile(file)));
+                files.forEach(file -> {
+                    try {
+                        dataList.add(MetaDataReader.readFile(file));
+                    } catch (CantReadException ignored) {}
+                });
                 Center.updateTableView(dataList);
                 String folderPath = files.get(0).getParentFile().getAbsolutePath();
                 Session.setFolderPathOfTheLastSelectedFile(folderPath);

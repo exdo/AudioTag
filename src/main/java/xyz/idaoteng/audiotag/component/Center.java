@@ -14,11 +14,13 @@ import javafx.scene.control.skin.TableHeaderRow;
 import javafx.scene.control.skin.TableViewSkin;
 import javafx.scene.input.*;
 import xyz.idaoteng.audiotag.Session;
+import xyz.idaoteng.audiotag.Utils;
 import xyz.idaoteng.audiotag.bean.AudioMetaData;
 import xyz.idaoteng.audiotag.bean.EditableTag;
 import xyz.idaoteng.audiotag.core.MetaDataReader;
 import xyz.idaoteng.audiotag.core.MetaDataWriter;
 import xyz.idaoteng.audiotag.dialog.*;
+import xyz.idaoteng.audiotag.exception.CantReadException;
 
 import java.awt.*;
 import java.io.File;
@@ -504,6 +506,7 @@ public class Center {
             String album = selectedItem.getAlbum();
             byte[] cover = selectedItem.getCover();
             if (!"".equals(album) && cover != null) {
+                cover = Utils.retouchCover(cover);
                 albumCovers.put(album, cover);
             }
         }
@@ -620,7 +623,11 @@ public class Center {
     private static void initContent() {
         List<String> paths = Session.getCurrentTableViewContentPaths();
         List<AudioMetaData> audioMetaData = new ArrayList<>(paths.size());
-        paths.forEach(path -> audioMetaData.add(MetaDataReader.readFile(new File(path))));
+        paths.forEach(path -> {
+            try {
+                audioMetaData.add(MetaDataReader.readFile(new File(path)));
+            } catch (CantReadException ignored) {}
+        });
         updateTableView(audioMetaData);
     }
 

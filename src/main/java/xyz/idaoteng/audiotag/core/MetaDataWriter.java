@@ -36,6 +36,7 @@ public class MetaDataWriter {
             audioFile = AudioFileIO.read(file);
             audioFile.delete();
         } catch (Exception e) {
+            System.out.println(metaData.getAbsolutePath());
             System.out.println("读取音频文件或删除音频文件标签失败");
             System.out.println(e.getMessage());
             e.printStackTrace();
@@ -85,6 +86,7 @@ public class MetaDataWriter {
         try {
             AudioFileIO.write(audioFile);
         } catch (Exception e) {
+            System.out.println(metaData.getAbsolutePath());
             System.out.println("写入标签时IO异常");
             System.out.println(e.getMessage());
             e.printStackTrace();

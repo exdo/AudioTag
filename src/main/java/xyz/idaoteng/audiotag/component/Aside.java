@@ -369,7 +369,11 @@ public class Aside {
     }
 
     public static void refresh() {
-        showMetaData(originalMetaData);
+        if (originalMetaData != null) {
+            showMetaData(originalMetaData);
+        } else {
+            showBlank();
+        }
     }
 
     public static VBox getAside() {

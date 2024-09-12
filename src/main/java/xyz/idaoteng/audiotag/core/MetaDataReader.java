@@ -5,8 +5,9 @@ import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.AudioHeader;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
-import xyz.idaoteng.audiotag.bean.AudioMetaData;
 import xyz.idaoteng.audiotag.Utils;
+import xyz.idaoteng.audiotag.bean.AudioMetaData;
+import xyz.idaoteng.audiotag.exception.CantReadException;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,14 +20,16 @@ import java.util.List;
 public class MetaDataReader {
     private static final String BITRATE_UNIT = " kbit/s";
 
-    public static AudioMetaData readFile(File file) {
+    public static AudioMetaData readFile(File file) throws CantReadException {
         AudioFile audioFile;
         try {
+            System.out.println("读取文件：" + file.getAbsolutePath());
             audioFile = AudioFileIO.read(file);
+            System.out.println("读取文件成功");
         } catch (Exception e) {
-            System.out.println("读取文件失败");
+            System.out.println(">>>>>>>>>>>>>>读取文件失败<<<<<<<<<<<<<<<<");
             e.printStackTrace();
-            return null;
+            throw new CantReadException();
         }
 
         AudioMetaData audioMetaData = new AudioMetaData();
@@ -72,7 +75,9 @@ public class MetaDataReader {
             for (Path path : directoryStream) {
                 File file = path.toFile();
                 if (SupportedFileTypes.isSupported(file)) {
-                    dataList.add(readFile(file));
+                    try {
+                        dataList.add(readFile(file));
+                    } catch (CantReadException ignore) {}
                 }
             }
         } catch (IOException e) {
@@ -96,10 +101,9 @@ public class MetaDataReader {
                     dataList.addAll(readSubfolders(file));
                 } else {
                     if (SupportedFileTypes.isSupported(file)) {
-                        AudioMetaData metaData = readFile(file);
-                        if (metaData != null) {
-                            dataList.add(metaData);
-                        }
+                        try {
+                            dataList.add(readFile(file));
+                        } catch (CantReadException ignored) {}
                     }
                 }
             }

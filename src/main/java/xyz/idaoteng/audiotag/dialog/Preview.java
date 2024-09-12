@@ -17,7 +17,6 @@ import xyz.idaoteng.audiotag.bean.Filename;
 import xyz.idaoteng.audiotag.component.Center;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
@@ -116,7 +115,7 @@ public class Preview {
         try {
             Files.move(originalFile.toPath(), newFile.toPath());
             return null;
-        } catch (IOException e) {
+        } catch (Exception e) {
             return e.getMessage();
         }
     }

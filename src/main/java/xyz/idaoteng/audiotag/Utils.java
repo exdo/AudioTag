@@ -63,4 +63,17 @@ public class Utils {
             throw new RuntimeException(e);
         }
     }
+
+    public static byte[] retouchCover(byte[] cover) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        try {
+            Thumbnails.of(new ByteArrayInputStream(cover))
+                    .forceSize(360, 360)
+                    .outputFormat("jpg")
+                    .toOutputStream(outputStream);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return outputStream.toByteArray();
+    }
 }
