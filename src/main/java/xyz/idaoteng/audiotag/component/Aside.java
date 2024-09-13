@@ -150,7 +150,6 @@ public class Aside {
 
         if (delete) {
             setDefaultCover();
-            CONFIRM_BOX.setVisible(true);
         } else {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("选择封面");
@@ -160,7 +159,6 @@ public class Aside {
             File file = fileChooser.showOpenDialog(StartUp.getPrimaryStage());
             if (file != null) {
                 setCover(Utils.retouchCover(file));
-                CONFIRM_BOX.setVisible(true);
                 Session.setFolderPathOfTheLastSelectedImage(file.getParentFile().getAbsolutePath());
             }
         }
@@ -189,7 +187,6 @@ public class Aside {
         CONFIRM_BOX.setSpacing(50);
         CONFIRM_BOX.setPadding(new Insets(20, 0, 0, 0));
         CONFIRM_BOX.getChildren().addAll(CONFIRM_BUTTON, CANCEL_BUTTON);
-        CONFIRM_BOX.setVisible(false);
     }
 
     private static void exchangeEditableValue(AudioMetaData from, AudioMetaData to) {
@@ -217,57 +214,36 @@ public class Aside {
                     case TITLE -> {
                         if (!newValue.equals(originalMetaData.getTitle())) {
                             metaDataDisplayed.setTitle(newValue);
-                            CONFIRM_BOX.setVisible(true);
-                        } else {
-                            CONFIRM_BOX.setVisible(false);
                         }
                     }
                     case ARTIST -> {
                         if (!newValue.equals(originalMetaData.getArtist())) {
                             metaDataDisplayed.setArtist(newValue);
-                            CONFIRM_BOX.setVisible(true);
-                        } else {
-                            CONFIRM_BOX.setVisible(false);
                         }
                     }
                     case ALBUM -> {
                         if (!newValue.equals(originalMetaData.getAlbum())) {
                             metaDataDisplayed.setAlbum(newValue);
-                            CONFIRM_BOX.setVisible(true);
-                        } else {
-                            CONFIRM_BOX.setVisible(false);
                         }
                     }
                     case GENRE -> {
                         if (!newValue.equals(originalMetaData.getGenre())) {
                             metaDataDisplayed.setGenre(newValue);
-                            CONFIRM_BOX.setVisible(true);
-                        } else {
-                            CONFIRM_BOX.setVisible(false);
                         }
                     }
                     case TRACK -> {
                         if (!newValue.equals(originalMetaData.getTrack())) {
                             metaDataDisplayed.setTrack(newValue);
-                            CONFIRM_BOX.setVisible(true);
-                        } else {
-                            CONFIRM_BOX.setVisible(false);
                         }
                     }
                     case DATE -> {
                         if (!newValue.equals(originalMetaData.getDate())) {
                             metaDataDisplayed.setDate(newValue);
-                            CONFIRM_BOX.setVisible(true);
-                        } else {
-                            CONFIRM_BOX.setVisible(false);
                         }
                     }
                     case COMMENT -> {
                         if (!newValue.equals(originalMetaData.getComment())) {
                             metaDataDisplayed.setComment(newValue);
-                            CONFIRM_BOX.setVisible(true);
-                        } else {
-                            CONFIRM_BOX.setVisible(false);
                         }
                     }
                 }
@@ -349,13 +325,11 @@ public class Aside {
             setDefaultCover();
         }
 
-        CONFIRM_BOX.setVisible(false);
     }
 
     public static void showBlank() {
         showMetaData(new AudioMetaData());
         originalMetaData = null;
-        CONFIRM_BOX.setVisible(false);
 
         TITLE_COMBO_BOX.setDisable(true);
         ARTIST_COMBO_BOX.setDisable(true);

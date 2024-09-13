@@ -5,6 +5,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import xyz.idaoteng.audiotag.component.Aside;
+import xyz.idaoteng.audiotag.component.Bottom;
 import xyz.idaoteng.audiotag.component.Center;
 import xyz.idaoteng.audiotag.component.Head;
 
@@ -22,8 +23,9 @@ public class StartUp extends Application {
         root.setTop(Head.getHead());
         root.setCenter(Center.getCenter());
         root.setRight(Aside.getAside());
+        root.setBottom(Bottom.getBottom());
 
-        Scene scene = new Scene(root, 1131, 665);
+        Scene scene = new Scene(root, 1131, 725);
         primaryStage.setScene(scene);
         primaryStage.setTitle("音乐信息编辑器");
         primaryStage.getIcons().add(ImageInApp.getAppIcon());

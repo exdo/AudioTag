@@ -14,6 +14,7 @@ import org.jaudiotagger.tag.reference.ID3V2Version;
 import org.jaudiotagger.tag.wav.WavInfoTag;
 import org.jaudiotagger.tag.wav.WavTag;
 import xyz.idaoteng.audiotag.bean.AudioMetaData;
+import xyz.idaoteng.audiotag.component.Bottom;
 
 import java.io.File;
 
@@ -33,12 +34,13 @@ public class MetaDataWriter {
         // 写入标签前先删除原始标签以统一标签版本
         AudioFile audioFile;
         try {
+            Bottom.print("正在读取文件：" + file.getAbsolutePath());
             audioFile = AudioFileIO.read(file);
+            Bottom.print("正在删除原来的标签");
             audioFile.delete();
         } catch (Exception e) {
-            System.out.println(metaData.getAbsolutePath());
-            System.out.println("读取音频文件或删除音频文件标签失败");
-            System.out.println(e.getMessage());
+            Bottom.print("读取音频文件或删除音频文件标签失败：" + metaData.getAbsolutePath());
+            Bottom.print(e.getMessage());
             e.printStackTrace();
             return;
         }
@@ -52,6 +54,7 @@ public class MetaDataWriter {
         }
 
         // 部分 field 不允许为空，空标签值不写入也可减少IO操作
+        Bottom.print("正在写入标签");
         try {
             if (!"".equals(metaData.getTitle())) {
                 tag.setField(FieldKey.TITLE, metaData.getTitle());
@@ -80,15 +83,16 @@ public class MetaDataWriter {
             audioFile.setTag(tag);
         } catch (FieldDataInvalidException e) {
             e.printStackTrace();
-            throw new RuntimeException(e.getMessage());
+            Bottom.print("写入标签时字段数据非法：" + metaData.getAbsolutePath());
+            Bottom.print(e.getMessage());
         }
 
         try {
             AudioFileIO.write(audioFile);
+            Bottom.print("写入标签成功");
         } catch (Exception e) {
-            System.out.println(metaData.getAbsolutePath());
-            System.out.println("写入标签时IO异常");
-            System.out.println(e.getMessage());
+            Bottom.print("写入标签时IO异常: metaData.getAbsolutePath()");
+            Bottom.print(e.getMessage());
             e.printStackTrace();
         }
     }

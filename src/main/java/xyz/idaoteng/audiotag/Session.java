@@ -4,10 +4,7 @@ import javafx.scene.control.Alert;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class Session {
     private static final String PATH_SEPARATOR = "&#&";
@@ -20,7 +17,7 @@ public class Session {
 
     private static final List<String> CURRENT_TABLEVIEW_CONTENT_PATHS = new ArrayList<>();
 
-    private static final ArrayList<String> ALTERNATIVE_GENRES = new ArrayList<>();
+    private static final HashSet<String> ALTERNATIVE_GENRES = new HashSet<>();
 
     private static final String sessionHistoryFilePath;
 
@@ -172,7 +169,7 @@ public class Session {
         ALTERNATIVE_GENRES.add(genre);
     }
 
-    public static List<String> getAlternativeGenres() {
+    public static HashSet<String> getAlternativeGenres() {
         return ALTERNATIVE_GENRES;
     }
 
