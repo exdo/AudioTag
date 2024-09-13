@@ -18,12 +18,17 @@ public class SupportedFileTypes {
     }
 
     public static boolean isSupported(File file) {
-        return SUPPORTED_FILE_TYPES.contains(Utils.getExtension(file));
+        String extension = Utils.getExtension(file);
+        if ("dff".equals(extension)) {
+            return false;
+        }
+        return SUPPORTED_FILE_TYPES.contains(extension);
     }
 
     public static List<String> getTypes() {
         List<String> types = new ArrayList<>(5);
         SUPPORTED_FILE_TYPES.forEach(type -> types.add("*." + type));
+        types.remove("*." + "dff");
         return types;
     }
 }

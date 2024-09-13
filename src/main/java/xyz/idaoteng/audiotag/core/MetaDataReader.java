@@ -71,18 +71,24 @@ public class MetaDataReader {
 
     private static List<AudioMetaData> getAudioMetaData(File directory) {
         List<AudioMetaData> dataList = new ArrayList<>();
+        List<File> audioFile = new ArrayList<>();
         try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(directory.toPath())) {
             for (Path path : directoryStream) {
                 File file = path.toFile();
                 if (SupportedFileTypes.isSupported(file)) {
-                    try {
-                        dataList.add(readFile(file));
-                    } catch (CantReadException ignore) {}
+                    audioFile.add(file);
                 }
             }
         } catch (IOException e) {
             System.out.println("读取目录失败：" + directory.getAbsolutePath());
             e.printStackTrace();
+        }
+        // TODO 显示进度条
+        for (File file : audioFile) {
+            try {
+                dataList.add(readFile(file));
+            } catch (CantReadException ignored) {
+            }
         }
         return dataList;
     }

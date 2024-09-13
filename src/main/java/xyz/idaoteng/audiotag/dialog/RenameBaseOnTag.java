@@ -28,9 +28,6 @@ public class RenameBaseOnTag {
     private static final List<AudioMetaData> DATA_LIST = new ArrayList<>();
 
     static {
-        STAGE.initModality(Modality.APPLICATION_MODAL);
-        STAGE.setTitle("根据标签重命名");
-
         VBox body = new VBox();
         body.setPadding(new Insets(15, 30, 10, 30));
         body.setSpacing(10);
@@ -65,6 +62,8 @@ public class RenameBaseOnTag {
                 GIVE_UP_RADIO_BUTTON, fillBlank, confirmAndCancel);
 
         Scene scene = new Scene(body, 500, 200);
+        STAGE.initModality(Modality.APPLICATION_MODAL);
+        STAGE.setTitle("根据标签重命名");
         STAGE.setResizable(false);
         STAGE.setScene(scene);
     }
