@@ -100,57 +100,75 @@ public class Center {
     private static void createColumn() {
         TableColumn<AudioMetaData, String> filenameColumn = new TableColumn<>("文件名");
         filenameColumn.setPrefWidth(235);
+        filenameColumn.setId("filename");
         filenameColumn.setCellValueFactory(new PropertyValueFactory<>("filename"));
+        filenameColumn.setReorderable(false);
 
         TableColumn<AudioMetaData, String> titleColumn = new TableColumn<>("标题");
         titleColumn.setPrefWidth(175);
+        titleColumn.setId("title");
         titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
 
         TableColumn<AudioMetaData, String> artistColumn = new TableColumn<>("艺术家");
         artistColumn.setPrefWidth(150);
+        artistColumn.setId("artist");
         artistColumn.setCellValueFactory(new PropertyValueFactory<>("artist"));
 
         TableColumn<AudioMetaData, String> albumColumn = new TableColumn<>("专辑");
         albumColumn.setPrefWidth(175);
+        albumColumn.setId("album");
         albumColumn.setCellValueFactory(new PropertyValueFactory<>("album"));
 
         TableColumn<AudioMetaData, String> dateColumn = new TableColumn<>("出版日期");
         dateColumn.setPrefWidth(100);
+        dateColumn.setId("date");
         dateColumn.setStyle("-fx-alignment: CENTER-RIGHT");
         dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
 
         TableColumn<AudioMetaData, String> genreColumn = new TableColumn<>("流派");
         genreColumn.setPrefWidth(85);
+        genreColumn.setId("genre");
         genreColumn.setCellValueFactory(new PropertyValueFactory<>("genre"));
 
         TableColumn<AudioMetaData, String> trackColumn = new TableColumn<>("音轨序号");
         trackColumn.setPrefWidth(55);
+        trackColumn.setId("track");
         trackColumn.setCellValueFactory(new PropertyValueFactory<>("track"));
 
         TableColumn<AudioMetaData, String> commentColumn = new TableColumn<>("备注");
         commentColumn.setPrefWidth(200);
+        commentColumn.setId("comment");
         commentColumn.setCellValueFactory(new PropertyValueFactory<>("comment"));
 
         TableColumn<AudioMetaData, String> bitrateColumn = new TableColumn<>("比特率");
         bitrateColumn.setPrefWidth(75);
+        bitrateColumn.setId("bitrate");
         bitrateColumn.setStyle("-fx-alignment: CENTER-RIGHT");
         bitrateColumn.setCellValueFactory(new PropertyValueFactory<>("bitrate"));
 
         TableColumn<AudioMetaData, String> lengthColumn = new TableColumn<>("时长");
         lengthColumn.setPrefWidth(65);
+        lengthColumn.setId("length");
         lengthColumn.setStyle("-fx-alignment: CENTER-RIGHT");
         lengthColumn.setCellValueFactory(new PropertyValueFactory<>("length"));
 
-        TABLE_VIEW.getColumns().add(filenameColumn);
-        TABLE_VIEW.getColumns().add(titleColumn);
-        TABLE_VIEW.getColumns().add(artistColumn);
-        TABLE_VIEW.getColumns().add(albumColumn);
-        TABLE_VIEW.getColumns().add(dateColumn);
-        TABLE_VIEW.getColumns().add(genreColumn);
-        TABLE_VIEW.getColumns().add(trackColumn);
-        TABLE_VIEW.getColumns().add(commentColumn);
-        TABLE_VIEW.getColumns().add(bitrateColumn);
-        TABLE_VIEW.getColumns().add(lengthColumn);
+        HashMap<String, TableColumn<AudioMetaData, String>> id_column = new HashMap<>(10);
+        id_column.put("filename", filenameColumn);
+        id_column.put("title", titleColumn);
+        id_column.put("artist", artistColumn);
+        id_column.put("album", albumColumn);
+        id_column.put("date", dateColumn);
+        id_column.put("genre", genreColumn);
+        id_column.put("track", trackColumn);
+        id_column.put("comment", commentColumn);
+        id_column.put("bitrate", bitrateColumn);
+        id_column.put("length", lengthColumn);
+
+        HashMap<Integer, String> columnsOrder = Session.getColumnsOrder();
+        for (int i = 0; i < 10; i++) {
+            String id = columnsOrder.get(i);
+            TABLE_VIEW.getColumns().add(id_column.get(id));
+        }
     }
 
     private static void makeRowDraggable(TableRow<AudioMetaData> row) {
@@ -988,5 +1006,14 @@ public class Center {
 
     public static void turnOffFilter() {
         updateTableView(BEFORE_FILTERING);
+    }
+
+    public static HashMap<Integer, String> getColumnOrder() {
+        HashMap<Integer, String> columnOrder = new HashMap<>();
+        ObservableList<TableColumn<AudioMetaData, ?>> columns = TABLE_VIEW.getColumns();
+        for (int i = 0; i < columns.size(); i++) {
+            columnOrder.put(i, columns.get(i).getId());
+        }
+        return columnOrder;
     }
 }

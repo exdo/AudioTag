@@ -9,9 +9,9 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import xyz.idaoteng.audiotag.Session;
 import xyz.idaoteng.audiotag.bean.AudioMetaData;
 import xyz.idaoteng.audiotag.component.Center;
+import xyz.idaoteng.audiotag.constant.MusicGenre;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -163,7 +163,7 @@ public class Filter {
 
         GENRE_COMBO_BOX.getItems().clear();
         GENRE_COMBO_BOX.getItems().add("");
-        GENRE_COMBO_BOX.getItems().addAll(Session.getAlternativeGenres());
+        GENRE_COMBO_BOX.getItems().addAll(MusicGenre.getGenres());
 
         STAGE.showAndWait();
     }

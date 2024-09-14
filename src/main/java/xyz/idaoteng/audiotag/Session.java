@@ -1,6 +1,8 @@
 package xyz.idaoteng.audiotag;
 
 import javafx.scene.control.Alert;
+import xyz.idaoteng.audiotag.component.Center;
+import xyz.idaoteng.audiotag.constant.DefaultColumnOrder;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -8,7 +10,6 @@ import java.util.*;
 
 public class Session {
     private static final String PATH_SEPARATOR = "&#&";
-    private static final String GENRE_SEPARATOR = "&@&";
 
     private static String folderPathOfTheLastSelectedFile;
     private static String pathToTheLastSelectedFolder;
@@ -17,9 +18,9 @@ public class Session {
 
     private static final List<String> CURRENT_TABLEVIEW_CONTENT_PATHS = new ArrayList<>();
 
-    private static final HashSet<String> ALTERNATIVE_GENRES = new HashSet<>();
-
     private static final String sessionHistoryFilePath;
+
+    private static HashMap<Integer, String> columnsOrder = null;
 
     static {
         String tmpDir = System.getProperty("java.io.tmpdir");
@@ -31,10 +32,10 @@ public class Session {
                 if (!created) {
                     Alert alert = Utils.generateBasicErrorAlert("创建历史会话文件失败");
                     alert.show();
-                    System.exit(2);
+                    System.exit(403);
                 } else {
                     System.out.println("sessionHistoryFilePath = " + sessionHistoryFilePath);
-                    saveSession();
+                    initHistoryFile();
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -65,26 +66,30 @@ public class Session {
                 CURRENT_TABLEVIEW_CONTENT_PATHS.addAll(processPaths(line5));
 
                 String line6 = reader.readLine();
-                processGenres(line6);
+                columnsOrder = processOrder(line6);
 
                 reader.close();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 throw new RuntimeException("读取历史会话失败");
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException("找不到历史会话文件");
         }
 
     }
 
-    private static void processGenres(String line) {
-        line = line.substring(line.indexOf('=') + 1);
-        if (!"".equals(line)) {
-            if (line.contains(GENRE_SEPARATOR)) {
-                ALTERNATIVE_GENRES.addAll(List.of(line.split(GENRE_SEPARATOR)));
-            } else {
-                ALTERNATIVE_GENRES.add(line);
+    private static HashMap<Integer, String> processOrder(String line6) {
+        line6 = line6.substring(line6.indexOf('=') + 1);
+        if ("".equals(line6)) {
+            return DefaultColumnOrder.defaultOrder();
+        } else {
+            HashMap<Integer, String> order = new HashMap<>();
+            String[] entries = line6.split(";");
+            for (String entry : entries) {
+                String[] kv = entry.split(":");
+                order.put(Integer.parseInt(kv[0]), kv[1]);
             }
+            return order;
         }
     }
 
@@ -163,8 +168,24 @@ public class Session {
         return CURRENT_TABLEVIEW_CONTENT_PATHS;
     }
 
-    public static HashSet<String> getAlternativeGenres() {
-        return ALTERNATIVE_GENRES;
+    public static HashMap<Integer, String> getColumnsOrder() {
+        return columnsOrder;
+    }
+
+    private static void initHistoryFile() {
+        try (FileOutputStream outputStream = new FileOutputStream(sessionHistoryFilePath)) {
+            PrintWriter writer = new PrintWriter(outputStream, true, StandardCharsets.UTF_8);
+            writer.println("folder_path_of_the_last_selected_file=");
+            writer.println("path_to_the_last_selected_folder=");
+            writer.println("folder_path_of_the_last_selected_image=");
+            writer.println("last_selected_image_saving_path=");
+            writer.println("current_tableview_content_paths=");
+            writer.println("column_order=");
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static void saveSession() {
@@ -175,11 +196,24 @@ public class Session {
             writer.println("folder_path_of_the_last_selected_image=" + folderPathOfTheLastSelectedImage);
             writer.println("last_selected_image_saving_path=" + lastSelectedImageSavingPath);
             writer.println("current_tableview_content_paths=" + String.join(PATH_SEPARATOR, CURRENT_TABLEVIEW_CONTENT_PATHS));
-            writer.println("alternative_genres=" + String.join(GENRE_SEPARATOR, ALTERNATIVE_GENRES));
+            writer.println(generateColumnOrderString(Center.getColumnOrder()));
             writer.flush();
             writer.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static String generateColumnOrderString(HashMap<Integer, String> columnOrder) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("column_order=");
+        for (int i = 0; i < 10; i++) {
+            sb.append(i);
+            sb.append(":");
+            sb.append(columnOrder.get(i));
+            sb.append(";");
+        }
+        // 去除尾部的分号
+        return sb.substring(0, sb.length() - 1);
     }
 }

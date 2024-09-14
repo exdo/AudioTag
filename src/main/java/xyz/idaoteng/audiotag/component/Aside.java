@@ -11,8 +11,12 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import xyz.idaoteng.audiotag.*;
+import xyz.idaoteng.audiotag.ImageInApp;
+import xyz.idaoteng.audiotag.Session;
+import xyz.idaoteng.audiotag.StartUp;
+import xyz.idaoteng.audiotag.Utils;
 import xyz.idaoteng.audiotag.bean.AudioMetaData;
+import xyz.idaoteng.audiotag.constant.MusicGenre;
 import xyz.idaoteng.audiotag.core.MetaDataWriter;
 
 import java.io.ByteArrayInputStream;
@@ -67,7 +71,7 @@ public class Aside {
         configComboBox(ComboBoxType.DATE, DATE_COMBO_BOX, true);
 
         Label genreLabel = new Label("流派");
-        GENRE_COMBO_BOX.getItems().addAll(Session.getAlternativeGenres());
+        GENRE_COMBO_BOX.getItems().addAll(MusicGenre.getGenres());
         configComboBox(ComboBoxType.GENRE, GENRE_COMBO_BOX, false);
         VBox genrePanel = new VBox(5);
         genrePanel.setMinWidth(165);
@@ -314,7 +318,7 @@ public class Aside {
         GENRE_COMBO_BOX.getItems().clear();
         GENRE_COMBO_BOX.setValue(original.getGenre());
         GENRE_COMBO_BOX.getItems().add("");
-        GENRE_COMBO_BOX.getItems().addAll(Session.getAlternativeGenres());
+        GENRE_COMBO_BOX.getItems().addAll(MusicGenre.getGenres());
 
         TRACK_COMBO_BOX.setValue(original.getTrack());
         TRACK_COMBO_BOX.getItems().add("");
