@@ -299,10 +299,12 @@ public class Aside {
 
         ARTIST_COMBO_BOX.getItems().clear();
         ARTIST_COMBO_BOX.setValue(original.getArtist());
+        ARTIST_COMBO_BOX.getItems().add("");
         ARTIST_COMBO_BOX.getItems().addAll(Center.getAlternativeArtists());
 
         ALBUM_COMBO_BOX.getItems().clear();
         ALBUM_COMBO_BOX.setValue(original.getAlbum());
+        ALBUM_COMBO_BOX.getItems().add("");
         ALBUM_COMBO_BOX.getItems().addAll(Center.getAlternativeAlbums());
 
         DATE_COMBO_BOX.getItems().clear();
@@ -311,9 +313,11 @@ public class Aside {
 
         GENRE_COMBO_BOX.getItems().clear();
         GENRE_COMBO_BOX.setValue(original.getGenre());
+        GENRE_COMBO_BOX.getItems().add("");
         GENRE_COMBO_BOX.getItems().addAll(Session.getAlternativeGenres());
 
         TRACK_COMBO_BOX.setValue(original.getTrack());
+        TRACK_COMBO_BOX.getItems().add("");
 
         COMMENT_COMBO_BOX.getItems().clear();
         COMMENT_COMBO_BOX.setValue(original.getComment());

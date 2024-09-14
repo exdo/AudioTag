@@ -45,9 +45,9 @@ public class Session {
     }
 
     private static void readHistorySession() {
-        try (InputStream history = new FileInputStream(sessionHistoryFilePath)) {
+        try (FileReader fileReader = new FileReader(sessionHistoryFilePath, StandardCharsets.UTF_8)) {
             try {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(history, StandardCharsets.UTF_8));
+                BufferedReader reader = new BufferedReader(fileReader);
 
                 String line1 = reader.readLine();
                 folderPathOfTheLastSelectedFile = processPath(line1);
@@ -161,12 +161,6 @@ public class Session {
 
     public static List<String> getCurrentTableViewContentPaths() {
         return CURRENT_TABLEVIEW_CONTENT_PATHS;
-    }
-
-    public static void addGenre(String genre) {
-        if ("".equals(genre.trim())) return;
-
-        ALTERNATIVE_GENRES.add(genre);
     }
 
     public static HashSet<String> getAlternativeGenres() {

@@ -305,7 +305,7 @@ public class Center {
         }
     }
 
-    // 表格刷新后，记录表格内容的变化并生成备选艺术家、备选专辑、备选流派
+    // 表格刷新后，记录表格内容的变化并生成备选艺术家、备选专辑
     private static void recordeUpdate(List<AudioMetaData> dataList) {
         ALTERNATIVE_ARTISTS.clear();
         ALTERNATIVE_ALBUMS.clear();
@@ -326,14 +326,6 @@ public class Center {
                 album = album.trim();
                 if (!"".equals(album)) {
                     ALTERNATIVE_ALBUMS.add(album);
-                }
-            }
-
-            String genre = metaData.getGenre();
-            if (genre != null) {
-                genre = genre.trim();
-                if (!"".equals(genre) && !Session.getAlternativeGenres().contains(genre)) {
-                    Session.addGenre(genre);
                 }
             }
 
