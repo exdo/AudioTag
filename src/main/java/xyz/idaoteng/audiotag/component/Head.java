@@ -81,7 +81,7 @@ public class Head {
         packageToAlbum.setOnAction(event -> Center.packageToAlbum());
 
         other.getItems().addAll(addOrder, deleteSpecialTag, packageToAlbum,
-                Center.generateSameAlbumOptionMenu());
+                Center.generateSameAlbumOptionMenu(), Center.generateTidyMenu());
 
         RadioButton enableDragRow = new RadioButton("允许拖拽行");
         enableDragRow.setPadding(new Insets(4, 0, 0, 0));
@@ -91,25 +91,25 @@ public class Head {
                 renameBaseOnTag, addTag, delete, rename, other, enableDragRow);
     }
 
-    private static void configRefreshButtonActionHandle() {
-        REFRESH_BUTTON.setOnAction(event -> {
-            List<String> current = Session.getCurrentTableViewContentPaths();
-            List<AudioMetaData> refreshed = new ArrayList<>(current.size());
-            Iterator<String> iterator = current.iterator();
-            while (iterator.hasNext()) {
-                String path = iterator.next();
-                File file = new File(path);
-                if (file.exists()) {
+    private static void configSelectFileButtonActionHandle() {
+        SELECT_FILE_BUTTON.setOnAction(event -> {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setInitialDirectory(new File(Session.getFolderPathOfTheLastSelectedFile()));
+            fileChooser.getExtensionFilters().addAll(EXTENSION_FILTER);
+            fileChooser.setTitle("选择音频文件（多选）");
+            List<File> files = fileChooser.showOpenMultipleDialog(StartUp.getPrimaryStage());
+            if (files != null && !files.isEmpty()) {
+                List<AudioMetaData> dataList = new ArrayList<>(files.size());
+                files.forEach(file -> {
                     try {
-                        refreshed.add(MetaDataReader.readFile(file));
+                        dataList.add(MetaDataReader.readFile(file));
                     } catch (CantReadException ignored) {}
-                } else {
-                    iterator.remove();
-                }
+                });
+                Center.updateTableView(dataList);
+                String folderPath = files.get(0).getParentFile().getAbsolutePath();
+                Session.setFolderPathOfTheLastSelectedFile(folderPath);
             }
-            Aside.showMetaData(new AudioMetaData());
-            Center.updateTableView(refreshed);
-         });
+        });
     }
 
     private static void configSelectDirectoryButtonActionHandle() {
@@ -138,24 +138,24 @@ public class Head {
         });
     }
 
-    private static void configSelectFileButtonActionHandle() {
-        SELECT_FILE_BUTTON.setOnAction(event -> {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setInitialDirectory(new File(Session.getFolderPathOfTheLastSelectedFile()));
-            fileChooser.getExtensionFilters().addAll(EXTENSION_FILTER);
-            fileChooser.setTitle("选择音频文件（多选）");
-            List<File> files = fileChooser.showOpenMultipleDialog(StartUp.getPrimaryStage());
-            if (files != null && !files.isEmpty()) {
-                List<AudioMetaData> dataList = new ArrayList<>(files.size());
-                files.forEach(file -> {
+    private static void configRefreshButtonActionHandle() {
+        REFRESH_BUTTON.setOnAction(event -> {
+            List<String> current = Session.getCurrentTableViewContentPaths();
+            List<AudioMetaData> refreshed = new ArrayList<>(current.size());
+            Iterator<String> iterator = current.iterator();
+            while (iterator.hasNext()) {
+                String path = iterator.next();
+                File file = new File(path);
+                if (file.exists()) {
                     try {
-                        dataList.add(MetaDataReader.readFile(file));
+                        refreshed.add(MetaDataReader.readFile(file));
                     } catch (CantReadException ignored) {}
-                });
-                Center.updateTableView(dataList);
-                String folderPath = files.get(0).getParentFile().getAbsolutePath();
-                Session.setFolderPathOfTheLastSelectedFile(folderPath);
+                } else {
+                    iterator.remove();
+                }
             }
+            Aside.showMetaData(new AudioMetaData());
+            Center.updateTableView(refreshed);
         });
     }
 

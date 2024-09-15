@@ -41,7 +41,7 @@ public class Rename {
                         Center.updateTableView(null);
                     } catch (IOException e) {
                         Alert alert = Utils.generateBasicErrorAlert("文件重命名失败");
-                        alert.setContentText(e.getMessage());
+                        alert.setContentText(metaData.getAbsolutePath() + "：\n" + e.getMessage() + "\n");
                         alert.show();
                     }
                 }

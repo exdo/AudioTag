@@ -97,7 +97,7 @@ public class Aside {
         COVER_PANEL.setMinHeight(200);
         COVER_PANEL.setMinWidth(200);
         COVER_PANEL.setStyle("-fx-border-style: solid; -fx-border-color: #cccccc; -fx-border-width: 1 1 1 1");
-        configCoverPanelAction();
+        configCoverPanelActionHandle();
 
         VBox coverOptions = new VBox(15);
         coverOptions.setAlignment(Pos.CENTER);
@@ -116,92 +116,6 @@ public class Aside {
                 coverLabel, coverPanelAndOptions, CONFIRM_BOX);
 
         showBlank();
-    }
-
-    private static void configCoverOptionActionHandle() {
-        CHANGE_COVER_BUTTON.setOnAction(event -> updateCoverAction(false));
-
-        EXTRACT_COVER_BUTTON.setOnAction(event -> {
-            if (originalMetaData != null) {
-                FileChooser fileChooser = new FileChooser();
-                fileChooser.setTitle("保存封面");
-                String path = Session.getLastSelectedImageSavingPath();
-                fileChooser.setInitialDirectory(new File(path));
-                fileChooser.getExtensionFilters().addAll(COVER_EXTENSION_FILTER);
-                File file = fileChooser.showSaveDialog(StartUp.getPrimaryStage());
-                if (file != null) {
-                    Utils.saveCover(originalMetaData.getCover(), file);
-                    Session.setLastSelectedImageSavingPath(file.getParentFile().getAbsolutePath());
-                }
-            }
-        });
-
-        DELETE_COVER_BUTTON.setOnAction(event -> updateCoverAction(true));
-    }
-
-    private static void configCoverPanelAction() {
-        COVER_PANEL.setOnMouseClicked(event -> {
-            if (metaDataDisplayed == null) return;
-
-            if (event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 1) {
-                updateCoverAction(false);
-            }
-        });
-    }
-
-    private static void updateCoverAction(boolean delete) {
-        if (originalMetaData == null) return;
-
-        if (delete) {
-            setDefaultCover();
-        } else {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("选择封面");
-            String path = Session.getFolderPathOfTheLastSelectedImage();
-            fileChooser.setInitialDirectory(new File(path));
-            fileChooser.getExtensionFilters().addAll(COVER_EXTENSION_FILTER);
-            File file = fileChooser.showOpenDialog(StartUp.getPrimaryStage());
-            if (file != null) {
-                setCover(Utils.retouchCover(file));
-                Session.setFolderPathOfTheLastSelectedImage(file.getParentFile().getAbsolutePath());
-            }
-        }
-    }
-
-    private static void initConfirmBox() {
-        CONFIRM_BUTTON.setOnAction(event -> {
-            if (originalMetaData == null || metaDataDisplayed == null) return;
-
-            exchangeEditableValue(metaDataDisplayed, originalMetaData);
-
-            MetaDataWriter.write(originalMetaData);
-
-            showMetaData(originalMetaData);
-            Center.updateTableView(null);
-            Center.selectItem(originalMetaData);
-        });
-
-        CANCEL_BUTTON.setOnAction(event -> {
-            if (originalMetaData == null || metaDataDisplayed == null) return;
-
-            showMetaData(originalMetaData);
-        });
-
-        CONFIRM_BOX.setAlignment(Pos.CENTER);
-        CONFIRM_BOX.setSpacing(50);
-        CONFIRM_BOX.setPadding(new Insets(20, 0, 0, 0));
-        CONFIRM_BOX.getChildren().addAll(CONFIRM_BUTTON, CANCEL_BUTTON);
-    }
-
-    private static void exchangeEditableValue(AudioMetaData from, AudioMetaData to) {
-        to.setTitle(from.getTitle());
-        to.setArtist(from.getArtist());
-        to.setAlbum(from.getAlbum());
-        to.setDate(from.getDate());
-        to.setGenre(from.getGenre());
-        to.setTrack(from.getTrack());
-        to.setComment(from.getComment());
-        to.setCover(from.getCover());
     }
 
     private static void configComboBox(ComboBoxType type, ComboBox<String> comboBox, boolean defaultSize) {
@@ -255,33 +169,90 @@ public class Aside {
         });
     }
 
-    private static void setDefaultCover() {
-        COVER_PANEL.getChildren().clear();
-        COVER_PANEL.setAlignment(Pos.CENTER);
-        COVER_PANEL.getChildren().add(ImageInApp.getDefaultCover());
+    private static void configCoverPanelActionHandle() {
+        COVER_PANEL.setOnMouseClicked(event -> {
+            if (metaDataDisplayed == null) return;
 
-        if (metaDataDisplayed != null) {
-            metaDataDisplayed.setCover(null);
-        }
-
-        CHANGE_COVER_BUTTON.setDisable(originalMetaData == null);
-        EXTRACT_COVER_BUTTON.setDisable(true);
-        DELETE_COVER_BUTTON.setDisable(true);
+            if (event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 1) {
+                updateCover(false);
+            }
+        });
     }
 
-    private static void setCover(byte[] coverBytes) {
-        COVER_PANEL.getChildren().clear();
-        ImageView cover = new ImageView();
-        cover.setFitWidth(200);
-        cover.setFitHeight(200);
-        cover.setImage(new Image(new ByteArrayInputStream(coverBytes)));
-        COVER_PANEL.getChildren().add(cover);
+    private static void updateCover(boolean delete) {
+        if (originalMetaData == null) return;
 
-        metaDataDisplayed.setCover(coverBytes);
+        if (delete) {
+            setDefaultCover();
+        } else {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("选择封面");
+            String path = Session.getFolderPathOfTheLastSelectedImage();
+            fileChooser.setInitialDirectory(new File(path));
+            fileChooser.getExtensionFilters().addAll(COVER_EXTENSION_FILTER);
+            File file = fileChooser.showOpenDialog(StartUp.getPrimaryStage());
+            if (file != null) {
+                setCover(Utils.retouchCover(file));
+                Session.setFolderPathOfTheLastSelectedImage(file.getParentFile().getAbsolutePath());
+            }
+        }
+    }
 
-        CHANGE_COVER_BUTTON.setDisable(false);
-        EXTRACT_COVER_BUTTON.setDisable(false);
-        DELETE_COVER_BUTTON.setDisable(false);
+    private static void configCoverOptionActionHandle() {
+        CHANGE_COVER_BUTTON.setOnAction(event -> updateCover(false));
+
+        EXTRACT_COVER_BUTTON.setOnAction(event -> {
+            if (originalMetaData != null) {
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setTitle("保存封面");
+                String path = Session.getLastSelectedImageSavingPath();
+                fileChooser.setInitialDirectory(new File(path));
+                fileChooser.getExtensionFilters().addAll(COVER_EXTENSION_FILTER);
+                File file = fileChooser.showSaveDialog(StartUp.getPrimaryStage());
+                if (file != null) {
+                    Utils.saveCover(originalMetaData.getCover(), file);
+                    Session.setLastSelectedImageSavingPath(file.getParentFile().getAbsolutePath());
+                }
+            }
+        });
+
+        DELETE_COVER_BUTTON.setOnAction(event -> updateCover(true));
+    }
+
+    private static void initConfirmBox() {
+        CONFIRM_BUTTON.setOnAction(event -> {
+            if (originalMetaData == null || metaDataDisplayed == null) return;
+
+            exchangeEditableValue(metaDataDisplayed, originalMetaData);
+
+            MetaDataWriter.write(originalMetaData);
+
+            showMetaData(originalMetaData);
+            Center.updateTableView(null);
+            Center.selectItem(originalMetaData);
+        });
+
+        CANCEL_BUTTON.setOnAction(event -> {
+            if (originalMetaData == null || metaDataDisplayed == null) return;
+
+            showMetaData(originalMetaData);
+        });
+
+        CONFIRM_BOX.setAlignment(Pos.CENTER);
+        CONFIRM_BOX.setSpacing(50);
+        CONFIRM_BOX.setPadding(new Insets(20, 0, 0, 0));
+        CONFIRM_BOX.getChildren().addAll(CONFIRM_BUTTON, CANCEL_BUTTON);
+    }
+
+    private static void exchangeEditableValue(AudioMetaData from, AudioMetaData to) {
+        to.setTitle(from.getTitle());
+        to.setArtist(from.getArtist());
+        to.setAlbum(from.getAlbum());
+        to.setDate(from.getDate());
+        to.setGenre(from.getGenre());
+        to.setTrack(from.getTrack());
+        to.setComment(from.getComment());
+        to.setCover(from.getCover());
     }
 
     public static void showMetaData(AudioMetaData original) {
@@ -333,6 +304,35 @@ public class Aside {
             setDefaultCover();
         }
 
+    }
+
+    private static void setCover(byte[] coverBytes) {
+        COVER_PANEL.getChildren().clear();
+        ImageView cover = new ImageView();
+        cover.setFitWidth(200);
+        cover.setFitHeight(200);
+        cover.setImage(new Image(new ByteArrayInputStream(coverBytes)));
+        COVER_PANEL.getChildren().add(cover);
+
+        metaDataDisplayed.setCover(coverBytes);
+
+        CHANGE_COVER_BUTTON.setDisable(false);
+        EXTRACT_COVER_BUTTON.setDisable(false);
+        DELETE_COVER_BUTTON.setDisable(false);
+    }
+
+    private static void setDefaultCover() {
+        COVER_PANEL.getChildren().clear();
+        COVER_PANEL.setAlignment(Pos.CENTER);
+        COVER_PANEL.getChildren().add(ImageInApp.getDefaultCover());
+
+        if (metaDataDisplayed != null) {
+            metaDataDisplayed.setCover(null);
+        }
+
+        CHANGE_COVER_BUTTON.setDisable(originalMetaData == null);
+        EXTRACT_COVER_BUTTON.setDisable(true);
+        DELETE_COVER_BUTTON.setDisable(true);
     }
 
     public static void showBlank() {

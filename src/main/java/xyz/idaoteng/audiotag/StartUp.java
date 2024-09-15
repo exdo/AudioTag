@@ -46,6 +46,7 @@ public class StartUp extends Application {
     }
 
     public static void main(String[] args) {
+        // 关闭 jaudiotagger 的日志
         LogManager logManager = LogManager.getLogManager();
         try (InputStream input = StartUp.class.getResourceAsStream("log.properties")) {
             logManager.readConfiguration(input);

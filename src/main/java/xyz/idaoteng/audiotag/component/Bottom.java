@@ -16,6 +16,7 @@ public class Bottom {
         AnchorPane.setLeftAnchor(TEXT_AREA, 3.0);
         AnchorPane.setRightAnchor(TEXT_AREA, 0.0);
         AnchorPane.setBottomAnchor(TEXT_AREA, 3.0);
+
         ANCHOR_PANE.getChildren().add(TEXT_AREA);
         ANCHOR_PANE.setPrefWidth(1131);
         ANCHOR_PANE.setMinHeight(55);

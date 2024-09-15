@@ -89,10 +89,6 @@ public class MetaDataReader {
         return dataList;
     }
 
-    private static List<AudioMetaData> readSubfolders(File directory) {
-        return getAudioMetaDataRecursively(directory);
-    }
-
     private static List<AudioMetaData> getAudioMetaDataRecursively(File directory) {
         List<AudioMetaData> dataList = new ArrayList<>();
         Path dirPath = directory.toPath();
@@ -115,5 +111,9 @@ public class MetaDataReader {
             e.printStackTrace();
         }
         return dataList;
+    }
+
+    private static List<AudioMetaData> readSubfolders(File directory) {
+        return getAudioMetaDataRecursively(directory);
     }
 }

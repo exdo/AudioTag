@@ -11,6 +11,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import xyz.idaoteng.audiotag.bean.AudioMetaData;
+import xyz.idaoteng.audiotag.component.Bottom;
 
 import java.io.File;
 import java.io.IOException;
@@ -98,31 +99,33 @@ public class Tidy {
 
     public static void copyOrMoveFiles(HashMap<String, HashSet<AudioMetaData>> files) {
         for (String artist : files.keySet()) {
-            File artistDir = new File(TEXT_FIELD.getText(), artist);
-            if (!artistDir.exists()) {
-                boolean success = artistDir.mkdir();
+            File artistOrAlbumDir = new File(TEXT_FIELD.getText(), artist);
+            if (!artistOrAlbumDir.exists()) {
+                boolean success = artistOrAlbumDir.mkdir();
                 if (!success) {
-                    System.out.println("创建目录 " + artist + " 失败");
+                    Bottom.print("创建目录 " + artist + " 失败");
                     continue;
                 }
             }
 
             for (AudioMetaData data : files.get(artist)) {
                 Path source = Path.of(data.getAbsolutePath());
-                Path target = Path.of(artistDir.getAbsolutePath(), data.getFilename());
+                Path target = Path.of(artistOrAlbumDir.getAbsolutePath(), data.getFilename());
                 if (COPY.isSelected()) {
                     try {
                         Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
                     } catch (IOException e) {
                         e.printStackTrace();
-                        System.out.println("文件 " + data.getFilename() + " 复制失败");
+                        Bottom.print("文件 " + data.getFilename() + " 复制失败");
+                        Bottom.print(e.getMessage());
                     }
                 } else {
                     try {
                         Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);
                     } catch (IOException e) {
                         e.printStackTrace();
-                        System.out.println("文件 " + data.getFilename() + " 移动失败");
+                        Bottom.print("文件 " + data.getFilename() + " 移动失败");
+                        Bottom.print(e.getMessage());
                     }
                 }
             }

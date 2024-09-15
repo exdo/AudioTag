@@ -12,6 +12,7 @@ import javafx.stage.Stage;
 import xyz.idaoteng.audiotag.Utils;
 import xyz.idaoteng.audiotag.bean.AudioMetaData;
 import xyz.idaoteng.audiotag.bean.Filename;
+import xyz.idaoteng.audiotag.component.Bottom;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -70,11 +71,6 @@ public class RenameBaseOnTag {
 
     private static void configConfirmButton(Button confirm) {
         confirm.setOnAction(event -> {
-            if (DATA_LIST.isEmpty()) {
-                STAGE.close();
-                return;
-            }
-
             String template = TEMPLATE_TEXT_FIELD.getText().trim();
             if (template.equals("")) {
                 Alert alert = Utils.generateBasicErrorAlert("模板不能为空");
@@ -85,7 +81,9 @@ public class RenameBaseOnTag {
                 for (AudioMetaData data : DATA_LIST) {
                     String newFilename = parseTemplate(template, data, skip);
                     if (newFilename != null) {
-                        previewList.add(new Filename(data, buildNewFile(data, newFilename)));
+                        File originalFile = new File(data.getAbsolutePath());
+                        File newFile = new File(originalFile.getParentFile(), newFilename);
+                        previewList.add(new Filename(data, newFile));
                     }
                 }
 
@@ -98,11 +96,6 @@ public class RenameBaseOnTag {
         });
     }
 
-    private static File buildNewFile(AudioMetaData data, String newFilename) {
-        File originalFile = new File(data.getAbsolutePath());
-        return new File(originalFile.getParentFile(), newFilename);
-    }
-
     public static String parseTemplate(String template, AudioMetaData data, boolean skipWhenEmpty) {
         StringBuilder sb = new StringBuilder(template.length());
 
@@ -113,21 +106,32 @@ public class RenameBaseOnTag {
                 if (end > i) {
                     String placeholder = template.substring(i + 1, end);
                     String actualValue = convertToActualValue(placeholder, data);
+
+                    if (actualValue == null) {
+                        Bottom.print("模板中存在无效的占位符：`" + placeholder + "`");
+                        return null;
+                    }
+
                     if ("".equals(actualValue)) {
                         if (skipWhenEmpty) {
+                            // 来自标签的实际值为空且策略为放弃重命名，则返回 null
                             return null;
                         } else {
+                            // 来自标签的实际值为空且策略为填充空字符串，则用空格填充
                             sb.append(' ');
                         }
                     } else {
+                        // 将两个 ` 间的 占位符 替换成来自标签的实际值
                         sb.append(actualValue);
                     }
                     i = end + 1;
                 } else {
+                    // 模板中存在未闭合的占位符，原样保留
                     sb.append('`');
                     i++;
                 }
             } else {
+                // 占位符以外的字符原样保留
                 sb.append(template.charAt(i));
                 i++;
             }
@@ -145,7 +149,7 @@ public class RenameBaseOnTag {
             case "album" -> data.getAlbum();
             case "date" -> data.getDate();
             case "track" -> data.getTrack();
-            default -> "";
+            default -> null;
         };
     }
 

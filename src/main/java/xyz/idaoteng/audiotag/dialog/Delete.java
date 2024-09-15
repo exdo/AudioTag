@@ -41,7 +41,7 @@ public class Delete {
 
         if (!failed.isEmpty()) {
             alert = Utils.generateBasicErrorAlert("以下文件删除失败");
-            alert.setContentText(String.join("\n", failed));
+            alert.setContentText(String.join("\n", failed) + "\n\n请尝试手动删除");
             alert.show();
         }
 

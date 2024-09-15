@@ -10,6 +10,8 @@ import xyz.idaoteng.audiotag.ImageInApp;
 
 
 public class CommonConfig {
+    // 在输入框最右边添加 X 号按钮，用于清空输入框
+    // 将输入框和菜单按钮组合成一个 HBox
     public static HBox packageIntoHBox(TextField textField, MenuButton menuButton) {
         HBox hBox = new HBox();
 
@@ -48,17 +50,23 @@ public class CommonConfig {
         return hBox;
     }
 
+    // 点击菜单按钮中的某个选项后，在输入框中添加相应的 占位符
     public static void configMenuButton(TextField textField, MenuButton menuButton) {
         MenuItem artist = new MenuItem("艺术家");
         artist.setOnAction(event -> textField.setText(textField.getText() + "`artist`"));
+
         MenuItem title = new MenuItem("标题");
         title.setOnAction(event -> textField.setText(textField.getText() + "`title`"));
+
         MenuItem album = new MenuItem("专辑");
         album.setOnAction(event -> textField.setText(textField.getText() + "`album`"));
+
         MenuItem date = new MenuItem("出版日期");
         date.setOnAction(event -> textField.setText(textField.getText() + "`date`"));
+
         MenuItem trackNumber = new MenuItem("音轨序号");
         trackNumber.setOnAction(event -> textField.setText(textField.getText() + "`track`"));
+
         menuButton.getItems().addAll(artist, title, album, date, trackNumber);
     }
 }

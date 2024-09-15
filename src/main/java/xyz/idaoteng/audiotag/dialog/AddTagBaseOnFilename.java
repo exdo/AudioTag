@@ -98,12 +98,6 @@ public class AddTagBaseOnFilename{
         });
     }
 
-    public static void show(List<AudioMetaData> metaDataList) {
-        DATA_LIST.clear();
-        DATA_LIST.addAll(metaDataList);
-        STAGE.show();
-    }
-
     private static final ArrayDeque<String> TAG_NAMES = new ArrayDeque<>();
     private static final ArrayDeque<String> SEPARATORS = new ArrayDeque<>();
     // 返回true表示模板合法，返回false表示模板不合法
@@ -231,5 +225,11 @@ public class AddTagBaseOnFilename{
                 }
             }
         }
+    }
+
+    public static void show(List<AudioMetaData> metaDataList) {
+        DATA_LIST.clear();
+        DATA_LIST.addAll(metaDataList);
+        STAGE.show();
     }
 }
