@@ -71,12 +71,10 @@ public class TimelessApi implements Api{
             SongDetail[] details = result.getData().getList();
             for (SongDetail detail : details) {
                 if (detail.getSongname().equals(title)) {
-                    if (Arrays.stream(detail.getSinger()).anyMatch(s -> s.getName().equals(artist))) {
-                        if (!"".equals(detail.getAlbumcover())) {
-                            byte[] cover = fetchCover(detail.getAlbumcover());
-                            if (cover != null) {
-                                covers.add(cover);
-                            }
+                    if (!"".equals(detail.getAlbumcover())) {
+                        byte[] cover = fetchCover(detail.getAlbumcover());
+                        if (cover != null) {
+                            covers.add(cover);
                         }
                     }
                 }
