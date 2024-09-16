@@ -18,6 +18,7 @@ import xyz.idaoteng.audiotag.Utils;
 import xyz.idaoteng.audiotag.bean.AudioMetaData;
 import xyz.idaoteng.audiotag.constant.MusicGenre;
 import xyz.idaoteng.audiotag.core.MetaDataWriter;
+import xyz.idaoteng.audiotag.dialog.SelectCover;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -35,6 +36,7 @@ public class Aside {
     private static final Button CHANGE_COVER_BUTTON = new Button("更换");
     private static final Button EXTRACT_COVER_BUTTON = new Button("提取");
     private static final Button DELETE_COVER_BUTTON = new Button("删除");
+    private static final Button SEARCH_COVER_BUTTON = new Button("搜索");
     private static final Button CONFIRM_BUTTON = new Button("确认更改");
     private static final Button CANCEL_BUTTON = new Button("取消");
     private static final HBox CONFIRM_BOX = new HBox();
@@ -101,7 +103,8 @@ public class Aside {
 
         VBox coverOptions = new VBox(15);
         coverOptions.setAlignment(Pos.CENTER);
-        coverOptions.getChildren().addAll(CHANGE_COVER_BUTTON, EXTRACT_COVER_BUTTON, DELETE_COVER_BUTTON);
+        coverOptions.getChildren().addAll(CHANGE_COVER_BUTTON, EXTRACT_COVER_BUTTON,
+                DELETE_COVER_BUTTON, SEARCH_COVER_BUTTON);
         configCoverOptionActionHandle();
 
         HBox coverPanelAndOptions = new HBox(3);
@@ -217,6 +220,13 @@ public class Aside {
         });
 
         DELETE_COVER_BUTTON.setOnAction(event -> updateCover(true));
+
+        SEARCH_COVER_BUTTON.setOnAction(event -> {
+            byte[] coverBytes = SelectCover.show(originalMetaData.getTitle(), originalMetaData.getArtist(), originalMetaData.getAlbum());
+            if (coverBytes != null) {
+                setCover(coverBytes);
+            }
+        });
     }
 
     private static void initConfirmBox() {
@@ -319,6 +329,7 @@ public class Aside {
         CHANGE_COVER_BUTTON.setDisable(false);
         EXTRACT_COVER_BUTTON.setDisable(false);
         DELETE_COVER_BUTTON.setDisable(false);
+        SEARCH_COVER_BUTTON.setDisable(false);
     }
 
     private static void setDefaultCover() {
@@ -333,6 +344,7 @@ public class Aside {
         CHANGE_COVER_BUTTON.setDisable(originalMetaData == null);
         EXTRACT_COVER_BUTTON.setDisable(true);
         DELETE_COVER_BUTTON.setDisable(true);
+        SEARCH_COVER_BUTTON.setDisable(originalMetaData == null);
     }
 
     public static void showBlank() {

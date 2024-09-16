@@ -31,9 +31,7 @@ public class CommonConfig {
             textField.requestFocus();
         });
 
-        textField.textProperty().addListener((observable, oldValue, newValue) -> {
-            clear.setVisible(observable.getValue().length() > 0);
-        });
+        textField.textProperty().addListener((ob, o, n) -> clear.setVisible(ob.getValue().length() > 0));
 
         AnchorPane textFieldAndClear = new AnchorPane();
         textFieldAndClear.setMaxWidth(350);
