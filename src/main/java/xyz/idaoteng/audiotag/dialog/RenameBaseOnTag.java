@@ -12,7 +12,7 @@ import javafx.stage.Stage;
 import xyz.idaoteng.audiotag.Utils;
 import xyz.idaoteng.audiotag.bean.AudioMetaData;
 import xyz.idaoteng.audiotag.bean.Filename;
-import xyz.idaoteng.audiotag.component.Bottom;
+import xyz.idaoteng.audiotag.exception.InvalidPlaceholderException;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -78,13 +78,18 @@ public class RenameBaseOnTag {
             } else {
                 boolean skip = GIVE_UP_RADIO_BUTTON.isSelected();
                 List<Filename> previewList = new ArrayList<>(DATA_LIST.size());
-                for (AudioMetaData data : DATA_LIST) {
-                    String newFilename = parseTemplate(template, data, skip);
-                    if (newFilename != null) {
-                        File originalFile = new File(data.getAbsolutePath());
-                        File newFile = new File(originalFile.getParentFile(), newFilename);
-                        previewList.add(new Filename(data, newFile));
+                try {
+                    for (AudioMetaData data : DATA_LIST) {
+                        String newFilename = parseTemplate(template, data, skip);
+                        if (newFilename != null) {
+                            File originalFile = new File(data.getAbsolutePath());
+                            File newFile = new File(originalFile.getParentFile(), newFilename);
+                            previewList.add(new Filename(data, newFile));
+                        }
                     }
+                } catch (InvalidPlaceholderException e) {
+                    Utils.generateBasicErrorAlert("模板中存在无效的占位符").show();
+                    return;
                 }
 
                 if (!previewList.isEmpty()) {
@@ -96,7 +101,7 @@ public class RenameBaseOnTag {
         });
     }
 
-    public static String parseTemplate(String template, AudioMetaData data, boolean skipWhenEmpty) {
+    public static String parseTemplate(String template, AudioMetaData data, boolean skipWhenEmpty) throws InvalidPlaceholderException {
         StringBuilder sb = new StringBuilder(template.length());
 
         int i = 0;
@@ -108,8 +113,7 @@ public class RenameBaseOnTag {
                     String actualValue = convertToActualValue(placeholder, data);
 
                     if (actualValue == null) {
-                        Bottom.print("模板中存在无效的占位符：`" + placeholder + "`");
-                        return null;
+                        throw new InvalidPlaceholderException();
                     }
 
                     if ("".equals(actualValue)) {

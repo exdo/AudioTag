@@ -7,7 +7,6 @@ import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
 import xyz.idaoteng.audiotag.Utils;
 import xyz.idaoteng.audiotag.bean.AudioMetaData;
-import xyz.idaoteng.audiotag.component.Bottom;
 import xyz.idaoteng.audiotag.exception.CantReadException;
 
 import java.io.File;
@@ -24,11 +23,10 @@ public class MetaDataReader {
     public static AudioMetaData readFile(File file) throws CantReadException {
         AudioFile audioFile;
         try {
-            Bottom.print("正在读取文件：" + file.getAbsolutePath());
             audioFile = AudioFileIO.read(file);
-            Bottom.print("读取成功");
         } catch (Exception e) {
-            Bottom.print("读取失败：" + e.getMessage());
+            System.out.println("文件：" + file.getAbsolutePath());
+            System.out.println("读取失败：" + e.getMessage());
             e.printStackTrace();
             throw new CantReadException();
         }
@@ -82,8 +80,8 @@ public class MetaDataReader {
                 }
             }
         } catch (IOException e) {
-            Bottom.print("读取目录失败：" + directory.getAbsolutePath());
-            Bottom.print(e.getMessage());
+            System.out.println("读取目录失败：" + directory.getAbsolutePath());
+            System.out.println(e.getMessage());
             e.printStackTrace();
         }
         return dataList;
@@ -106,8 +104,8 @@ public class MetaDataReader {
                 }
             }
         } catch (IOException e) {
-            Bottom.print("读取目录失败：" + directory.getAbsolutePath());
-            Bottom.print(e.getMessage());
+            System.out.println("读取目录失败：" + directory.getAbsolutePath());
+            System.out.println(e.getMessage());
             e.printStackTrace();
         }
         return dataList;
