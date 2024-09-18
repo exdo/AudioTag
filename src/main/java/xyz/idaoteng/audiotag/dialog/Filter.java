@@ -180,4 +180,9 @@ public class Filter {
             }
         });
     }
+
+    public static void setFilterOn() {
+        filterButton.setText(FILTER_ON);
+        Center.turnOffFilter();
+    }
 }

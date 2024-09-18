@@ -105,6 +105,7 @@ public class Head {
                         dataList.add(MetaDataReader.readFile(file));
                     } catch (CantReadException ignored) {}
                 });
+                Filter.setFilterOn();
                 Center.updateTableView(dataList);
                 String folderPath = files.get(0).getParentFile().getAbsolutePath();
                 Session.setFolderPathOfTheLastSelectedFile(folderPath);
@@ -120,6 +121,7 @@ public class Head {
             File dir = directoryChooser.showDialog(StartUp.getPrimaryStage());
             if (dir != null) {
                 List<AudioMetaData> audioMetaData = MetaDataReader.readDirectory(dir, true);
+                Filter.setFilterOn();
                 Center.updateTableView(audioMetaData);
                 Session.setPathToTheLastSelectedFolder(dir.getAbsolutePath());
             }
@@ -132,6 +134,7 @@ public class Head {
             File dir = directoryChooser.showDialog(StartUp.getPrimaryStage());
             if (dir != null) {
                 List<AudioMetaData> audioMetaData = MetaDataReader.readDirectory(dir, false);
+                Filter.setFilterOn();
                 Center.updateTableView(audioMetaData);
                 Session.setPathToTheLastSelectedFolder(dir.getAbsolutePath());
             }

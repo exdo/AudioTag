@@ -999,13 +999,13 @@ public class Center {
     private static final ArrayList<AudioMetaData> BEFORE_FILTERING = new ArrayList<>();
     public static void filter() {
         List<AudioMetaData> before = TABLE_VIEW.getItems();
-        BEFORE_FILTERING.clear();
         BEFORE_FILTERING.addAll(before);
         Filter.show(before);
     }
 
     public static void turnOffFilter() {
         updateTableView(BEFORE_FILTERING);
+        BEFORE_FILTERING.clear();
     }
 
     public static HashMap<Integer, String> getColumnOrder() {

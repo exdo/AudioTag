@@ -42,7 +42,12 @@ public class Session {
             }
         }
 
-        readHistorySession();
+        try {
+            readHistorySession();
+        } catch (Exception e) {
+            initHistoryFile();
+            readHistorySession();
+        }
     }
 
     private static void readHistorySession() {
@@ -85,6 +90,9 @@ public class Session {
         } else {
             HashMap<Integer, String> order = new HashMap<>();
             String[] entries = line6.split(";");
+            if  (entries.length != 10) {
+                return DefaultColumnOrder.defaultOrder();
+            }
             for (String entry : entries) {
                 String[] kv = entry.split(":");
                 order.put(Integer.parseInt(kv[0]), kv[1]);
