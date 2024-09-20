@@ -16,6 +16,7 @@ public class ImageInApp {
     private static final ByteArrayOutputStream CLEAR_ICON = new ByteArrayOutputStream();
     private static final ByteArrayOutputStream ALBUM_ICON = new ByteArrayOutputStream();
     private static final ByteArrayOutputStream APP_ICON = new ByteArrayOutputStream();
+    private static final ByteArrayOutputStream SORRY_ICON = new ByteArrayOutputStream();
 
     static {
         try (InputStream inputStream = ImageInApp.class.getResourceAsStream("cover.png")) {
@@ -72,6 +73,13 @@ public class ImageInApp {
             inputStream.transferTo(APP_ICON);
         } catch (Exception e) {
             throw new RuntimeException("无法加载应用图标");
+        }
+
+        try (InputStream inputStream = ImageInApp.class.getResourceAsStream("sorry.png")) {
+            if (inputStream == null) throw new RuntimeException("无法加载错误图标");
+            inputStream.transferTo(SORRY_ICON);
+        } catch (Exception e) {
+            throw new RuntimeException("无法加载遗憾图标");
         }
     }
 
@@ -133,5 +141,13 @@ public class ImageInApp {
 
     public static Image getAppIcon() {
         return new Image(new ByteArrayInputStream(APP_ICON.toByteArray()));
+    }
+
+    public static ImageView getSorryIcon() {
+        ImageView icon = new ImageView();
+        icon.setFitWidth(35);
+        icon.setFitHeight(35);
+        icon.setImage(new Image(new ByteArrayInputStream(SORRY_ICON.toByteArray())));
+        return icon;
     }
 }

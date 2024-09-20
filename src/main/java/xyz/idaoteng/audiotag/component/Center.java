@@ -1004,6 +1004,7 @@ public class Center {
     }
 
     public static void turnOffFilter() {
+        if (BEFORE_FILTERING.isEmpty()) return;
         updateTableView(BEFORE_FILTERING);
         BEFORE_FILTERING.clear();
     }

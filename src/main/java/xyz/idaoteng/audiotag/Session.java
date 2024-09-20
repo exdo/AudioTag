@@ -197,6 +197,9 @@ public class Session {
     }
 
     public static void saveSession() {
+        // 关闭过滤器，防止保存时丢失数据
+        Center.turnOffFilter();
+
         try (FileOutputStream outputStream = new FileOutputStream(sessionHistoryFilePath)) {
             PrintWriter writer = new PrintWriter(outputStream, true, StandardCharsets.UTF_8);
             writer.println("folder_path_of_the_last_selected_file=" + folderPathOfTheLastSelectedFile);
@@ -204,7 +207,7 @@ public class Session {
             writer.println("folder_path_of_the_last_selected_image=" + folderPathOfTheLastSelectedImage);
             writer.println("last_selected_image_saving_path=" + lastSelectedImageSavingPath);
             writer.println("current_tableview_content_paths=" + String.join(PATH_SEPARATOR, CURRENT_TABLEVIEW_CONTENT_PATHS));
-            writer.println(generateColumnOrderString(Center.getColumnOrder()));
+            writer.println(generateColumnOrderString());
             writer.flush();
             writer.close();
         } catch (IOException e) {
@@ -212,7 +215,8 @@ public class Session {
         }
     }
 
-    private static String generateColumnOrderString(HashMap<Integer, String> columnOrder) {
+    private static String generateColumnOrderString() {
+        HashMap<Integer, String> columnOrder = Center.getColumnOrder();
         StringBuilder sb = new StringBuilder();
         sb.append("column_order=");
         for (int i = 0; i < 10; i++) {

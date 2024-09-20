@@ -22,6 +22,9 @@ import xyz.idaoteng.audiotag.dialog.SelectCover;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class Aside {
     private static final VBox ASIDE = new VBox(5);
@@ -233,6 +236,10 @@ public class Aside {
         CONFIRM_BUTTON.setOnAction(event -> {
             if (originalMetaData == null || metaDataDisplayed == null) return;
 
+            List<String> changedTagNames = getChangedTags();
+            if (changedTagNames.isEmpty()) {
+                return;
+            }
             exchangeEditableValue(metaDataDisplayed, originalMetaData);
 
             MetaDataWriter.write(originalMetaData);
@@ -252,6 +259,39 @@ public class Aside {
         CONFIRM_BOX.setSpacing(50);
         CONFIRM_BOX.setPadding(new Insets(20, 0, 0, 0));
         CONFIRM_BOX.getChildren().addAll(CONFIRM_BUTTON, CANCEL_BUTTON);
+    }
+
+    // TODO 添加通知功能
+    //  用来在通知中显示修改过的标签
+    private static List<String> getChangedTags() {
+        List<String> changedTagNames = new ArrayList<>();
+        if (originalMetaData != null && metaDataDisplayed != null) {
+            if (!originalMetaData.getTitle().equals(metaDataDisplayed.getTitle())) {
+                changedTagNames.add("标题");
+            }
+            if (!originalMetaData.getArtist().equals(metaDataDisplayed.getArtist())) {
+                changedTagNames.add("艺术家");
+            }
+            if (!originalMetaData.getAlbum().equals(metaDataDisplayed.getAlbum())) {
+                changedTagNames.add("专辑");
+            }
+            if (!originalMetaData.getDate().equals(metaDataDisplayed.getDate())) {
+                changedTagNames.add("日期");
+            }
+            if (!originalMetaData.getGenre().equals(metaDataDisplayed.getGenre())) {
+                changedTagNames.add("流派");
+            }
+            if (!originalMetaData.getTrack().equals(metaDataDisplayed.getTrack())) {
+                changedTagNames.add("序号");
+            }
+            if (!originalMetaData.getComment().equals(metaDataDisplayed.getComment())) {
+                changedTagNames.add("备注");
+            }
+            if (!Arrays.equals(originalMetaData.getCover(), metaDataDisplayed.getCover())) {
+                changedTagNames.add("封面");
+            }
+        }
+        return changedTagNames;
     }
 
     private static void exchangeEditableValue(AudioMetaData from, AudioMetaData to) {

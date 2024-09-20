@@ -10,6 +10,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import xyz.idaoteng.audiotag.ImageInApp;
 import xyz.idaoteng.audiotag.Utils;
 import xyz.idaoteng.audiotag.api.Api;
 import xyz.idaoteng.audiotag.api.TimelessApi;
@@ -32,7 +33,10 @@ public class SelectCover {
     public static byte[] show(String title, String artist, String album) {
         List<byte[]> coves = API.getCover(title, artist, album);
         if (coves == null) {
-            Alert alert = Utils.generateBasicErrorAlert("没有找到结果");
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("很遗憾");
+            alert.setGraphic(ImageInApp.getSorryIcon());
+            alert.setHeaderText("搜索结果为空");
             alert.show();
             return null;
         }
