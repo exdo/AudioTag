@@ -47,7 +47,7 @@ public class SelectCover {
         gridPane.setVgap(5);
 
         for (int i = 0; i < coves.size(); i++) {
-            Node node = generateNode(coves.get(i), i);
+            Node node = generateAlternativeImageNode(coves.get(i), i);
             gridPane.add(node, i % 5, i / 5);
         }
 
@@ -86,7 +86,7 @@ public class SelectCover {
         return null;
     }
 
-    private static Node generateNode(byte[] cove, int index) {
+    private static Node generateAlternativeImageNode(byte[] cove, int index) {
         AnchorPane pane = new AnchorPane();
         pane.setMinHeight(150);
         pane.setMaxHeight(150);

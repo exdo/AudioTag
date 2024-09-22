@@ -15,6 +15,7 @@ import xyz.idaoteng.audiotag.Utils;
 import xyz.idaoteng.audiotag.bean.AudioMetaData;
 import xyz.idaoteng.audiotag.bean.Filename;
 import xyz.idaoteng.audiotag.component.Center;
+import xyz.idaoteng.audiotag.notification.Notification;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -75,13 +76,13 @@ public class Preview {
     private static void configConfirmButton(Button confirm) {
         confirm.setOnAction(event -> {
             ObservableList<Filename> list = TABLE.getItems();
-            HashMap<String, String> failedPathAndReason = new HashMap<>(list.size());
+            HashMap<String, String> failedPath_Reason = new HashMap<>(list.size());
             for (Filename f : list) {
                 if (f.isNeedToRename()) {
                     AudioMetaData metaData = f.getMetaData();
                     String message = rename(metaData, f.getFile());
                     if (message != null) {
-                        failedPathAndReason.put(metaData.getAbsolutePath(), message);
+                        failedPath_Reason.put(metaData.getAbsolutePath(), message);
                     } else {
                         metaData.setFilename(f.getNewName());
                         metaData.setAbsolutePath(f.getFile().getAbsolutePath());
@@ -91,14 +92,16 @@ public class Preview {
 
             Center.updateTableView(null);
 
-            if (!failedPathAndReason.isEmpty()) {
+            if (!failedPath_Reason.isEmpty()) {
                 Alert alert = Utils.generateBasicErrorAlert("以下文件重命名失败");
                 StringBuilder content = new StringBuilder();
-                for (String path : failedPathAndReason.keySet()) {
-                    content.append(path).append(": ").append(failedPathAndReason.get(path)).append("\n");
+                for (String path : failedPath_Reason.keySet()) {
+                    content.append(path).append(": ").append(failedPath_Reason.get(path)).append("\n");
                 }
                 alert.setContentText(content.toString());
                 alert.show();
+            } else {
+                Notification.showNotification("已成功重命名");
             }
 
             STAGE.close();

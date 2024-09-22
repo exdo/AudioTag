@@ -14,6 +14,7 @@ import xyz.idaoteng.audiotag.bean.AudioMetaData;
 import xyz.idaoteng.audiotag.component.Aside;
 import xyz.idaoteng.audiotag.component.Center;
 import xyz.idaoteng.audiotag.core.MetaDataWriter;
+import xyz.idaoteng.audiotag.notification.Notification;
 
 import java.util.*;
 
@@ -95,6 +96,7 @@ public class AddTagBaseOnFilename{
             Center.updateTableView(null);
             Aside.refresh();
             STAGE.close();
+            Notification.showNotification("标签已添加");
         });
     }
 

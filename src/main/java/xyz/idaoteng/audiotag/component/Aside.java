@@ -19,6 +19,7 @@ import xyz.idaoteng.audiotag.bean.AudioMetaData;
 import xyz.idaoteng.audiotag.constant.MusicGenre;
 import xyz.idaoteng.audiotag.core.MetaDataWriter;
 import xyz.idaoteng.audiotag.dialog.SelectCover;
+import xyz.idaoteng.audiotag.notification.Notification;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -84,7 +85,7 @@ public class Aside {
         genrePanel.getChildren().addAll(genreLabel, GENRE_COMBO_BOX);
 
         Label trackLabel = new Label("音轨序号");
-        TRACK_COMBO_BOX.getItems().addAll("1", "2", "3", "4", "5", "6", "7", "8", "9", "10");
+        TRACK_COMBO_BOX.getItems().addAll("", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10");
         configComboBox(ComboBoxType.TRACK, TRACK_COMBO_BOX, false);
         VBox trackPanel = new VBox(5);
         trackPanel.getChildren().addAll(trackLabel, TRACK_COMBO_BOX);
@@ -237,9 +238,8 @@ public class Aside {
             if (originalMetaData == null || metaDataDisplayed == null) return;
 
             List<String> changedTagNames = getChangedTags();
-            if (changedTagNames.isEmpty()) {
-                return;
-            }
+            if (changedTagNames.isEmpty()) return;
+
             exchangeEditableValue(metaDataDisplayed, originalMetaData);
 
             MetaDataWriter.write(originalMetaData);
@@ -247,6 +247,8 @@ public class Aside {
             showMetaData(originalMetaData);
             Center.updateTableView(null);
             Center.selectItem(originalMetaData);
+            String message = String.join("、", changedTagNames) + " 已修改";
+            Notification.showNotification(message);
         });
 
         CANCEL_BUTTON.setOnAction(event -> {
@@ -261,7 +263,6 @@ public class Aside {
         CONFIRM_BOX.getChildren().addAll(CONFIRM_BUTTON, CANCEL_BUTTON);
     }
 
-    // TODO 添加通知功能
     //  用来在通知中显示修改过的标签
     private static List<String> getChangedTags() {
         List<String> changedTagNames = new ArrayList<>();

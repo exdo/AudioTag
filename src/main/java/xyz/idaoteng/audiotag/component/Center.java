@@ -21,6 +21,7 @@ import xyz.idaoteng.audiotag.core.MetaDataReader;
 import xyz.idaoteng.audiotag.core.MetaDataWriter;
 import xyz.idaoteng.audiotag.dialog.*;
 import xyz.idaoteng.audiotag.exception.CantReadException;
+import xyz.idaoteng.audiotag.notification.Notification;
 
 import java.awt.*;
 import java.io.File;
@@ -400,6 +401,7 @@ public class Center {
         }
         Aside.refresh();
         updateTableView(null);
+        Notification.showNotification("序号已添加");
     }
 
     public static Menu generateDeleteSpecificTagMenu() {
@@ -470,6 +472,7 @@ public class Center {
 
         Aside.refresh();
         updateTableView(null);
+        Notification.showNotification("删除完毕");
     }
 
     public static void packageToAlbum() {
@@ -485,6 +488,7 @@ public class Center {
         }
         Aside.refresh();
         updateTableView(null);
+        Notification.showNotification("已设置为同一专辑");
     }
 
     public static Menu generateSameAlbumOptionMenu() {
@@ -531,6 +535,7 @@ public class Center {
         }
         Aside.refresh();
         updateTableView(null);
+        Notification.showNotification("专辑封面更新完毕");
     }
 
     public static void addArtistForSameAlbum() {
@@ -555,6 +560,7 @@ public class Center {
         }
         Aside.refresh();
         updateTableView(null);
+        Notification.showNotification("专辑艺术家更新完毕");
     }
 
     private static void addGenreForSameAlbum() {
@@ -580,6 +586,7 @@ public class Center {
         }
         Aside.refresh();
         updateTableView(null);
+        Notification.showNotification("专辑流派更新完毕");
     }
 
     private static void addDateForSameAlbum() {
@@ -605,6 +612,7 @@ public class Center {
         }
         Aside.refresh();
         updateTableView(null);
+        Notification.showNotification("专辑发行日期更新完毕");
     }
 
     public static Menu generateTidyMenu() {
