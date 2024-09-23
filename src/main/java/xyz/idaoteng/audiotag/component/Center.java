@@ -45,6 +45,7 @@ public class Center {
     private static final  MenuItem ENABLE_DRAG_ROW_MENU_ITEM = new MenuItem("允许拖拽行");
     private static RadioButton enableDragRowRadioButton = null;
     private static final MenuItem RENAME_MENU_ITEM = new MenuItem("重命名");
+    private static final MenuItem OPEN_BY_BROWSER = new MenuItem("打开文件所在的目录");
 
     private static final HashSet<String> ALTERNATIVE_ARTISTS = new HashSet<>();
     private static final HashSet<String> ALTERNATIVE_ALBUMS = new HashSet<>();
@@ -85,11 +86,14 @@ public class Center {
         // 配置右键菜单
         configContextMenu();
 
-        // 配置 重命名按钮 和 删除特定标签菜单项 的 disable 属性
+        // 配置 重命名按钮 、 打开文件所在的目录按钮 和 删除特定标签菜单项 的 disable 属性
         ObservableList<AudioMetaData> items = TABLE_VIEW.getSelectionModel().getSelectedItems();
-        items.addListener((ListChangeListener<AudioMetaData>) c -> {
-            // 重命名只在选中一个时可用
-            RENAME_MENU_ITEM.setDisable(c.getList().size() != 1);
+        items.addListener((ListChangeListener<AudioMetaData>) listener -> {
+            // 重命名按钮只在选中一个时可用
+            RENAME_MENU_ITEM.setDisable(listener.getList().size() != 1);
+
+            // 打开文件所在的目录按钮只在选中一个时可用
+            OPEN_BY_BROWSER.setDisable(listener.getList().size() != 1);
 
             deleteSpecificTagMenu.setDisable(items.isEmpty());
         });
@@ -266,6 +270,16 @@ public class Center {
         MenuItem packageToAlbum = new MenuItem("设置成同一专辑");
         packageToAlbum.setOnAction(event -> packageToAlbum());
 
+        OPEN_BY_BROWSER.setOnAction(event -> {
+            AudioMetaData audioMetaData = TABLE_VIEW.getSelectionModel().getSelectedItem();
+            String path = audioMetaData.getAbsolutePath();
+            try {
+                Desktop.getDesktop().open(new File(path).getParentFile());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
         MenuItem cancel = new MenuItem("取消");
         cancel.setOnAction(event -> TABLE_VIEW.getSelectionModel().clearSelection());
 
@@ -281,6 +295,7 @@ public class Center {
                 packageToAlbum,
                 generateSameAlbumOptionMenu(),
                 generateTidyMenu(),
+                OPEN_BY_BROWSER,
                 cancel);
 
         TABLE_VIEW.setContextMenu(CONTEXT_MENU);
