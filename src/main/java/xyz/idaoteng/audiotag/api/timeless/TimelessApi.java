@@ -1,9 +1,10 @@
-package xyz.idaoteng.audiotag.api;
+package xyz.idaoteng.audiotag.api.timeless;
 
 import com.google.gson.Gson;
-import xyz.idaoteng.audiotag.api.bean.LyricResult;
-import xyz.idaoteng.audiotag.api.bean.SongDetail;
-import xyz.idaoteng.audiotag.api.bean.SongsResult;
+import xyz.idaoteng.audiotag.api.Api;
+import xyz.idaoteng.audiotag.api.timeless.dto.LyricResult;
+import xyz.idaoteng.audiotag.api.timeless.dto.SongDetail;
+import xyz.idaoteng.audiotag.api.timeless.dto.SongsResult;
 import xyz.idaoteng.audiotag.exception.ApiException;
 
 import java.io.IOException;
@@ -17,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class TimelessApi implements Api{
+public class TimelessApi implements Api {
     private static final String SEARCH_URL = "https://api.timelessq.com/music/tencent/search?keyword=%s&page=1&pageSize=10";
     private static SongsResult searchSong(String keyword) throws ApiException {
         keyword = keyword.replaceAll(" ", "%20");

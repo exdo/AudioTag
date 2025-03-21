@@ -1,4 +1,4 @@
-package xyz.idaoteng.audiotag.api.bean;
+package xyz.idaoteng.audiotag.api.timeless.dto;
 
 public class Lyric {
     /**

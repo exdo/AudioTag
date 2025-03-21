@@ -12,5 +12,5 @@ module xyz.idaoteng.audiotag {
     exports xyz.idaoteng.audiotag;
     exports xyz.idaoteng.audiotag.bean;
 
-    opens xyz.idaoteng.audiotag.api.bean to com.google.gson;
+    opens xyz.idaoteng.audiotag.api.timeless.dto to com.google.gson;
 }

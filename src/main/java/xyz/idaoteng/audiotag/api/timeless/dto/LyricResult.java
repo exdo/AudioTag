@@ -1,12 +1,12 @@
-package xyz.idaoteng.audiotag.api.bean;
+package xyz.idaoteng.audiotag.api.timeless.dto;
 
-public class SongsResult {
-    private Songs data;
+public class LyricResult {
+    private Lyric lyric;
     private String errmsg;
     private long errno;
 
-    public Songs getData() { return data; }
-    public void setData(Songs value) { this.data = value; }
+    public Lyric getLyric() { return lyric; }
+    public void setLyric(Lyric value) { this.lyric = value; }
 
     public String getErrmsg() { return errmsg; }
     public void setErrmsg(String value) { this.errmsg = value; }

@@ -13,7 +13,7 @@ import javafx.scene.layout.VBox;
 import xyz.idaoteng.audiotag.ImageInApp;
 import xyz.idaoteng.audiotag.Utils;
 import xyz.idaoteng.audiotag.api.Api;
-import xyz.idaoteng.audiotag.api.TimelessApi;
+import xyz.idaoteng.audiotag.api.timeless.TimelessApi;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
