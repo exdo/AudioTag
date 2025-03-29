@@ -1,6 +1,5 @@
 package xyz.idaoteng.audiotag;
 
-import javafx.scene.control.Alert;
 import xyz.idaoteng.audiotag.component.Center;
 import xyz.idaoteng.audiotag.constant.DefaultColumnOrder;
 
@@ -18,20 +17,31 @@ public class Session {
 
     private static final List<String> CURRENT_TABLEVIEW_CONTENT_PATHS = new ArrayList<>();
 
-    private static final String sessionHistoryFilePath;
+    private static String sessionHistoryFilePath;
 
     private static HashMap<Integer, String> columnsOrder = null;
 
     static {
-        String tmpDir = System.getProperty("java.io.tmpdir");
-        File historyFile = new File(tmpDir, "audioTag.session.history");
-        sessionHistoryFilePath = historyFile.getAbsolutePath();
+        File historyFile;
+        sessionHistoryFilePath = Utils.getHistoryFilePathInRegistry();
+        if (sessionHistoryFilePath == null) {
+            String tmpDir = System.getProperty("java.io.tmpdir");
+            historyFile = new File(tmpDir, "session.history");
+            sessionHistoryFilePath = historyFile.getAbsolutePath();
+        }else {
+            historyFile = new File(sessionHistoryFilePath);
+        }
+
         if (!historyFile.exists()) {
             try {
                 boolean created = historyFile.createNewFile();
                 if (!created) {
-                    Alert alert = Utils.generateBasicErrorAlert("创建历史会话文件失败");
-                    alert.show();
+                    Utils.generateBasicErrorAlert("创建历史会话文件失败").show();
+                    try {
+                        Thread.sleep(3000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                     System.exit(403);
                 } else {
                     System.out.println("sessionHistoryFilePath = " + sessionHistoryFilePath);
@@ -49,6 +59,8 @@ public class Session {
             readHistorySession();
         }
     }
+
+
 
     private static void readHistorySession() {
         try (FileReader fileReader = new FileReader(sessionHistoryFilePath, StandardCharsets.UTF_8)) {

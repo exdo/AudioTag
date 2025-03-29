@@ -4,12 +4,44 @@ import javafx.scene.control.Alert;
 import net.coobird.thumbnailator.Thumbnails;
 
 import javax.imageio.ImageIO;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.Charset;
 
 public class Utils {
+    public static String getHistoryFilePathInRegistry() {
+        String result = "";
+        try {
+            String regKey = "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\AudioTag.exe";
+            String itemName = "history";
+
+            Process process = Runtime.getRuntime().exec(
+                    "reg query \"" + regKey + "\" /v " + itemName
+            );
+
+            try (BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(process.getInputStream(), Charset.forName("GBK")))
+            ) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    if (line.trim().startsWith(itemName)) {
+                        String[] parts = line.trim().split("\\s+", 3);
+                        if (parts.length == 3) {
+                            result = parts[2];
+                        }
+                    }
+                }
+            }
+
+            int exitCode = process.waitFor();
+            if (exitCode == 0) {
+                return result;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public static Alert generateBasicErrorAlert(String headText) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("错误");

@@ -775,8 +775,8 @@ public class Center {
         if (verticalScrollBar.isVisible()) { // 垂直滚动条可见时行高的计算方式
             // 除视口外的高度 = 表头的高度 + 水平滚动条的高度
             // 视口的高度 = 表格的高度 - 除视口外的高度
-            double heightOutsideContentSection = tableHeadRowHeight + horizontalScrollBarHeight;
-            double viewportHeight = TABLE_VIEW.getHeight() - heightOutsideContentSection;
+            double heightExceptViewport = tableHeadRowHeight + horizontalScrollBarHeight;
+            double viewportHeight = TABLE_VIEW.getHeight() - heightExceptViewport;
             // 最大偏移量 = 内容的实际高度 - 视口的高度
             double maxOffset = contentHeight - viewportHeight;
             // 偏移量 = 最大偏移量 * 滚动条的偏移比例

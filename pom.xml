@@ -21,7 +21,7 @@
         </dependency>
 
         <!--
-            实际的 Maven 依赖：
+            源 Maven 依赖：
             <dependency>
                 <groupId>net.jthink</groupId>
                 <artifactId>jaudiotagger</artifactId>
@@ -38,7 +38,7 @@
         </dependency>
 
         <!--
-            实际的 Maven 依赖：
+            源 Maven 依赖：
             <dependency>
               <groupId>net.coobird</groupId>
               <artifactId>thumbnailator</artifactId>
