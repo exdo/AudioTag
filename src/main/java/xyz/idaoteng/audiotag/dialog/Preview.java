@@ -15,7 +15,7 @@ import xyz.idaoteng.audiotag.Utils;
 import xyz.idaoteng.audiotag.bean.AudioMetaData;
 import xyz.idaoteng.audiotag.bean.Filename;
 import xyz.idaoteng.audiotag.component.Center;
-import xyz.idaoteng.audiotag.notification.Notification;
+import xyz.idaoteng.audiotag.component.Notification;
 
 import java.io.File;
 import java.nio.file.Files;

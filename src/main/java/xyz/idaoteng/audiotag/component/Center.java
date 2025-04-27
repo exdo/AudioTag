@@ -21,7 +21,6 @@ import xyz.idaoteng.audiotag.core.MetaDataReader;
 import xyz.idaoteng.audiotag.core.MetaDataWriter;
 import xyz.idaoteng.audiotag.dialog.*;
 import xyz.idaoteng.audiotag.exception.CantReadException;
-import xyz.idaoteng.audiotag.notification.Notification;
 
 import java.awt.*;
 import java.io.File;

@@ -1,4 +1,4 @@
-package xyz.idaoteng.audiotag.notification;
+package xyz.idaoteng.audiotag.component;
 
 import javafx.animation.PauseTransition;
 import javafx.scene.Scene;

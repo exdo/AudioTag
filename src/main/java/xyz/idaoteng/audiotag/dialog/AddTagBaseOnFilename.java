@@ -14,7 +14,7 @@ import xyz.idaoteng.audiotag.bean.AudioMetaData;
 import xyz.idaoteng.audiotag.component.Aside;
 import xyz.idaoteng.audiotag.component.Center;
 import xyz.idaoteng.audiotag.core.MetaDataWriter;
-import xyz.idaoteng.audiotag.notification.Notification;
+import xyz.idaoteng.audiotag.component.Notification;
 
 import java.util.*;
 

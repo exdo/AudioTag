@@ -19,7 +19,6 @@ import xyz.idaoteng.audiotag.bean.AudioMetaData;
 import xyz.idaoteng.audiotag.constant.MusicGenre;
 import xyz.idaoteng.audiotag.core.MetaDataWriter;
 import xyz.idaoteng.audiotag.dialog.SelectCover;
-import xyz.idaoteng.audiotag.notification.Notification;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
