@@ -27,7 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Aside {
-    private static final VBox ASIDE = new VBox(5);
+    private static final VBox ASIDE = new VBox();
     private static final ComboBox<String> TITLE_COMBO_BOX = new ComboBox<>();
     private static final ComboBox<String> ARTIST_COMBO_BOX = new ComboBox<>();
     private static final ComboBox<String> ALBUM_COMBO_BOX = new ComboBox<>();
@@ -49,30 +49,36 @@ public class Aside {
 
     private static final FileChooser.ExtensionFilter COVER_EXTENSION_FILTER;
 
+    private static double asideMinHeight = 0;
+
     private enum ComboBoxType {
         TITLE, ARTIST, ALBUM, DATE, GENRE, TRACK, COMMENT
     }
 
     // 初始化侧边栏
     static {
-        // 封面文件类型过滤器
+        // 配置封面文件类型过滤器
         String[] imageExtensions = new String[]{"*.jpg", "*.jpeg", "*.png", "*.bmp", "*.webp"};
         COVER_EXTENSION_FILTER = new FileChooser.ExtensionFilter("图片文件", imageExtensions);
+
         // 设置侧边栏样式
-        ASIDE.setMinWidth(250);
         ASIDE.setPadding(new Insets(10, 10, 10, 10));
         ASIDE.setStyle("-fx-border-style: solid; -fx-border-color: #cccccc; -fx-border-width: 1 0 0 1");
         // 配置侧边栏组件（渲染效果与书写顺序一致）
         Label titleLabel = new Label("标题");
+        asideMinHeight = asideMinHeight + titleLabel.getHeight();
         configComboBox(ComboBoxType.TITLE, TITLE_COMBO_BOX, true);
 
         Label artistLabel = new Label("艺术家");
+        asideMinHeight = asideMinHeight + artistLabel.getHeight();
         configComboBox(ComboBoxType.ARTIST, ARTIST_COMBO_BOX, true);
 
         Label albumLabel = new Label("专辑");
+        asideMinHeight = asideMinHeight + albumLabel.getHeight();
         configComboBox(ComboBoxType.ALBUM, ALBUM_COMBO_BOX, true);
 
         Label dateLabel = new Label("出版日期");
+        asideMinHeight = asideMinHeight + dateLabel.getHeight();
         configComboBox(ComboBoxType.DATE, DATE_COMBO_BOX, true);
 
         Label genreLabel = new Label("流派");
@@ -84,16 +90,17 @@ public class Aside {
         genrePanel.getChildren().addAll(genreLabel, GENRE_COMBO_BOX);
 
         Label trackLabel = new Label("音轨序号");
-        TRACK_COMBO_BOX.getItems().addAll("", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10");
+        TRACK_COMBO_BOX.getItems().setAll("", "1", "2", "3", "4", "5", "6", "7", "8", "9");
         configComboBox(ComboBoxType.TRACK, TRACK_COMBO_BOX, false);
         VBox trackPanel = new VBox(5);
         trackPanel.getChildren().addAll(trackLabel, TRACK_COMBO_BOX);
 
         HBox genreAndTrack = new HBox(10);
-        genreAndTrack.setMaxWidth(240);
+        genreAndTrack.setMaxWidth(250);
         genreAndTrack.getChildren().addAll(genrePanel, trackPanel);
 
         Label commentLabel = new Label("备注");
+        asideMinHeight  = asideMinHeight + commentLabel.getHeight();
         configComboBox(ComboBoxType.COMMENT, COMMENT_COMBO_BOX, true);
 
         Label coverLabel = new Label("封面");
@@ -112,11 +119,13 @@ public class Aside {
 
         HBox coverPanelAndOptions = new HBox(3);
         coverPanelAndOptions.getChildren().addAll(COVER_PANEL, coverOptions);
+        asideMinHeight = asideMinHeight + coverPanelAndOptions.getHeight();
 
         initConfirmBox();
 
-        ASIDE.setMinWidth(265);
-        ASIDE.setMaxWidth(265);
+        ASIDE.setMinWidth(280);
+        ASIDE.setMaxWidth(280);
+        ASIDE.setMinHeight(asideMinHeight);
         ASIDE.getChildren().addAll(titleLabel, TITLE_COMBO_BOX, artistLabel, ARTIST_COMBO_BOX, albumLabel,
                 ALBUM_COMBO_BOX, dateLabel, DATE_COMBO_BOX, genreAndTrack, commentLabel, COMMENT_COMBO_BOX,
                 coverLabel, coverPanelAndOptions, CONFIRM_BOX);
@@ -126,9 +135,11 @@ public class Aside {
 
     private static void configComboBox(ComboBoxType type, ComboBox<String> comboBox, boolean defaultSize) {
         if (defaultSize) {
-            comboBox.setMinWidth(240);
-            comboBox.setMaxWidth(240);
+            comboBox.setMinWidth(250);
+            comboBox.setMaxWidth(250);
         }
+
+        asideMinHeight = asideMinHeight + comboBox.getHeight();
 
         comboBox.setEditable(true);
 
@@ -260,6 +271,7 @@ public class Aside {
         CONFIRM_BOX.setSpacing(50);
         CONFIRM_BOX.setPadding(new Insets(20, 0, 0, 0));
         CONFIRM_BOX.getChildren().addAll(CONFIRM_BUTTON, CANCEL_BUTTON);
+        asideMinHeight = asideMinHeight + CONFIRM_BOX.getHeight();
     }
 
     //  用来在通知中显示修改过的标签

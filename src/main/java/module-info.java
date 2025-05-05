@@ -5,6 +5,8 @@ module xyz.idaoteng.audiotag {
     requires java.desktop;
     requires java.net.http;
 
+    requires atlantafx.base;
+
     requires jaudiotagger;
     requires net.coobird.thumbnailator;
     requires com.google.gson;

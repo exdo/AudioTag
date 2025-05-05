@@ -1,5 +1,6 @@
 package xyz.idaoteng.audiotag;
 
+import atlantafx.base.theme.PrimerLight;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
@@ -19,16 +20,16 @@ public class StartUp extends Application {
         StartUp.stage = primaryStage;
 
         BorderPane root = new BorderPane();
-        root.setTop(Head.getHead());
         root.setCenter(Center.getCenter());
+        root.setTop(Head.getHead());
         root.setRight(Aside.getAside());
 
-        Scene scene = new Scene(root, 1131, 725);
+        Scene scene = new Scene(root, 1200, 725);
         primaryStage.setScene(scene);
         primaryStage.setTitle("音乐信息编辑器");
         primaryStage.getIcons().add(ImageInApp.getAppIcon());
         primaryStage.setMinHeight(root.getHeight());
-        primaryStage.setMinWidth(885);
+        primaryStage.setMinWidth(1000);
         primaryStage.show();
 
         Center.configWhenTableAlreadyRendered();
@@ -52,6 +53,8 @@ public class StartUp extends Application {
             System.out.println("读取日志配置失败");
             e.printStackTrace();
         }
+
+        Application.setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
 
         launch(args);
     }

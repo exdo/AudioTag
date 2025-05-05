@@ -1,5 +1,6 @@
 package xyz.idaoteng.audiotag.component;
 
+import atlantafx.base.theme.Styles;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -40,7 +41,6 @@ public class Center {
     private static final int ABOVE_VIEWPORT = -1;
     private static final int BLOW_VIEWPORT = -2;
     private static final int IN_VIEWPORT_BLANK = 0;
-    private static final double ROW_HEIGHT = 25;
     private static final  MenuItem ENABLE_DRAG_ROW_MENU_ITEM = new MenuItem("允许拖拽行");
     private static RadioButton enableDragRowRadioButton = null;
     private static final MenuItem RENAME_MENU_ITEM = new MenuItem("重命名");
@@ -58,22 +58,17 @@ public class Center {
 
     // 初始化表格
     static {
-        // 设置表格样式
-        TABLE_VIEW.setMinHeight(600); // 600 刚好可以将侧边栏（Aside）中的所有组件显示出来
-        // 添加一个右边框，其他几个方向不需要
-        TABLE_VIEW.setStyle("-fx-border-style: solid; -fx-border-color: #cccccc; -fx-border-width: 0 1 0 0");
+        // 设置行的样式
+        TABLE_VIEW.getStyleClass().add(Styles.BORDERED);
+        TABLE_VIEW.getStyleClass().add(Styles.DENSE);
 
         // 创建列
         createColumn();
 
-        // TableView 的行高不知道的怎么获取，故此手动设置为 ROW_HEIGHT
+        // 设置拖拽行
         TABLE_VIEW.setRowFactory(table -> {
             TableRow<AudioMetaData> row = new TableRow<>();
-            row.setMinHeight(ROW_HEIGHT);
-            row.setMaxHeight(ROW_HEIGHT);
-
             makeRowDraggable(row);
-
             return row;
         });
 
@@ -688,7 +683,7 @@ public class Center {
                     verticalScrollBar = scrollBar;
                 }
 
-                // 监听横向滚动条的高度（经测试横向滚动条的高度是会变化的）
+                // 监听横向滚动条的高度
                 if (scrollBar.getOrientation().equals(Orientation.HORIZONTAL)) {
                     scrollBar.heightProperty().addListener((ob, o, n) -> horizontalScrollBarHeight = n.doubleValue());
                 }
@@ -769,8 +764,9 @@ public class Center {
             return BLOW_VIEWPORT;
         }
 
+        double rowHeight = getRowHeight();
         // 内容的实际高度（以内容的顶部为原点，越向下，高度值递增，行号递增）
-        double contentHeight = ROW_HEIGHT * TABLE_VIEW.getItems().size();
+        double contentHeight = rowHeight * TABLE_VIEW.getItems().size();
         if (verticalScrollBar.isVisible()) { // 垂直滚动条可见时行高的计算方式
             // 除视口外的高度 = 表头的高度 + 水平滚动条的高度
             // 视口的高度 = 表格的高度 - 除视口外的高度
@@ -784,16 +780,39 @@ public class Center {
             // total: 鼠标相对于内容的实际高度
             double total = offset + (currentY - tableHeadRowHeight);
             // 行号 = 鼠标相对于内容的实际高度 / 行高 （向上取整）
-            return (int)Math.ceil(total / ROW_HEIGHT);
+            return (int)Math.ceil(total / rowHeight);
         } else {
             // 垂直滚动条不可见时行高的计算方式
             double validY = contentHeight + tableHeadRowHeight;
             if (currentY > validY) {
                 return IN_VIEWPORT_BLANK;
             } else {
-                return (int)Math.ceil((currentY - tableHeadRowHeight) / ROW_HEIGHT);
+                return (int)Math.ceil((currentY - tableHeadRowHeight) / rowHeight);
             }
         }
+    }
+
+    // 获取第一行的行高
+    private static double getRowHeight() {
+        // 确保表格有内容
+        if (TABLE_VIEW.getItems().isEmpty()) {
+            TABLE_VIEW.getItems().add(null); // 临时添加空项
+        }
+
+        // 获取第一行
+        TableRow<?> row = (TableRow<?>) TABLE_VIEW.lookup(".table-row-cell");
+
+        // 恢复表格状态
+        if (TABLE_VIEW.getItems().get(0) == null) {
+            TABLE_VIEW.getItems().remove(0);
+        }
+
+        if (row != null) {
+            return row.getHeight();
+        }
+
+        // 如果无法获取行，返回默认值或估算值
+        return 24; // 默认行高
     }
 
     private static void handlerPrimaryButtonClick(MouseEvent event) {

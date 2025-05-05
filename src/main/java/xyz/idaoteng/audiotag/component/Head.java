@@ -3,23 +3,24 @@ package xyz.idaoteng.audiotag.component;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
-import xyz.idaoteng.audiotag.bean.AudioMetaData;
 import xyz.idaoteng.audiotag.Session;
 import xyz.idaoteng.audiotag.StartUp;
+import xyz.idaoteng.audiotag.bean.AudioMetaData;
 import xyz.idaoteng.audiotag.core.MetaDataReader;
 import xyz.idaoteng.audiotag.core.SupportedFileTypes;
 import xyz.idaoteng.audiotag.dialog.Filter;
 import xyz.idaoteng.audiotag.exception.CantReadException;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class Head {
-    private static final HBox HEAD = new HBox(5);
+    private static final ToolBar HEAD = new ToolBar();
     private static final Button SELECT_FILE_BUTTON = new Button("选择文件");
     private static final MenuItem SELECT_FOLDER_WITH_CHILDREN = new MenuItem("选择文件夹<含子文件夹>");
     public static final MenuItem SELECT_FOLDER_WITHOUT_CHILDREN = new MenuItem("选择文件夹<不含子文件夹>");
@@ -28,11 +29,6 @@ public class Head {
     private static final ExtensionFilter EXTENSION_FILTER = new ExtensionFilter("audio file", SupportedFileTypes.getTypes());
 
     static {
-        HEAD.setMaxHeight(30);
-        HEAD.setMinHeight(30);
-        HEAD.setPadding(new Insets(5, 0, 0, 0));
-        HEAD.setStyle("-fx-border-style: solid; -fx-border-color: #cccccc; -fx-border-width: 0 0 1 0");
-
         try {
             Class.forName("xyz.idaoteng.audiotag.component.Center");
         } catch (Exception e) {
@@ -87,7 +83,7 @@ public class Head {
         enableDragRow.setPadding(new Insets(4, 0, 0, 0));
         Center.takeOverEnableDragRow(enableDragRow);
 
-        HEAD.getChildren().addAll(SELECT_FILE_BUTTON, menuButton, REFRESH_BUTTON, selectAll, filter,
+        HEAD.getItems().addAll(SELECT_FILE_BUTTON, menuButton, REFRESH_BUTTON, selectAll, filter,
                 renameBaseOnTag, addTag, delete, rename, other, enableDragRow);
     }
 
