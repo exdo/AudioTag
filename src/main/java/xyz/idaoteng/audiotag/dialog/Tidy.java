@@ -73,13 +73,14 @@ public class Tidy {
         });
         CANCEL_BUTTON.setOnAction(event -> STAGE.close());
         HBox buttons = new HBox(50);
-        buttons.setAlignment(Pos.CENTER);
+        buttons.setPadding(new Insets(0, 15, 0, 0));
+        buttons.setAlignment(Pos.CENTER_RIGHT);
         buttons.getChildren().addAll(OK_BUTTON, CANCEL_BUTTON);
 
         BODY.setPadding(new Insets(5, 0, 0, 15));
         BODY.getChildren().addAll(LABEL, textAndSelect, copyOrMove, buttons);
 
-        Scene scene = new Scene(BODY, 390, 140);
+        Scene scene = new Scene(BODY, 400, 185);
         STAGE.setScene(scene);
         STAGE.initModality(Modality.APPLICATION_MODAL);
         STAGE.setResizable(false);

@@ -14,6 +14,7 @@ import java.util.Optional;
 public class Delete {
     public static List<AudioMetaData> show(List<AudioMetaData> dataList) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setHeight(300);
         alert.setTitle("确认删除文件");
         alert.setGraphic(ImageInApp.getDeleteIcon());
         alert.setHeaderText("确认删除所有选中的文件？\n注意：文件会直接删除而不是移至回收站");

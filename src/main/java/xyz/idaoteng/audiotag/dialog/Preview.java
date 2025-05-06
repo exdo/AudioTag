@@ -1,5 +1,6 @@
 package xyz.idaoteng.audiotag.dialog;
 
+import atlantafx.base.theme.Styles;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -45,8 +46,9 @@ public class Preview {
         TableColumn<Filename, CheckBox> checkColumn = new TableColumn<>("确定重命名");
         checkColumn.setCellValueFactory(new PropertyValueFactory<>("checkBox"));
         checkColumn.setStyle("-fx-alignment: CENTER");
-        checkColumn.setPrefWidth(80);
+        checkColumn.setPrefWidth(100);
 
+        TABLE.getStyleClass().add(Styles.BORDERED);
         TABLE.getColumns().add(oldFilenameColumn);
         TABLE.getColumns().add(newFilenameColumn);
         TABLE.getColumns().add(checkColumn);
@@ -67,7 +69,7 @@ public class Preview {
         BODY.setBottom(confirmAndCancel);
 
         STAGE.initModality(Modality.APPLICATION_MODAL);
-        Scene scene = new Scene(BODY, 580, 350);
+        Scene scene = new Scene(BODY, 600, 350);
         STAGE.setMinWidth(580);
         STAGE.setTitle("预览");
         STAGE.setScene(scene);

@@ -19,14 +19,14 @@ import java.util.List;
 public class Filter {
     private static final Stage STAGE = new Stage();
     private static final VBox BODY = new VBox(10);
-    private static final CheckBox TITLE_CHECK_BOX = new CheckBox("标题 ：");
+    private static final CheckBox TITLE_CHECK_BOX = new CheckBox("标题：");
     private static final TextField TITLE_TEXT_FIELD = new TextField();
     private static final ComboBox<String> ARTIST_COMBO_BOX = new ComboBox<>();
-    private static final CheckBox ARTIST_CHECK_BOX = new CheckBox("艺术家=");
+    private static final CheckBox ARTIST_CHECK_BOX = new CheckBox("艺术家：");
     private static final ComboBox<String> ALBUM_COMBO_BOX = new ComboBox<>();
-    private static final CheckBox ALBUM_CHECK_BOX = new CheckBox("专辑 =");
+    private static final CheckBox ALBUM_CHECK_BOX = new CheckBox("专辑：");
     private static final ComboBox<String> GENRE_COMBO_BOX = new ComboBox<>();
-    private static final CheckBox GENRE_CHECK_BOX = new CheckBox("流派 =");
+    private static final CheckBox GENRE_CHECK_BOX = new CheckBox("流派：");
     private static final CheckBox COVER_CHECK_BOX = new CheckBox("封面为空");
 
     private static final Font FONT = new Font(13);
@@ -42,9 +42,9 @@ public class Filter {
         Label LABEL = new Label("请勾选需要参与过滤的条件");
         LABEL.setFont(FONT);
 
-        VBox allCheckBox = new VBox(18);
-        allCheckBox.setMinWidth(70);
-        allCheckBox.setMaxWidth(70);
+        VBox allCheckBox = new VBox(26);
+        allCheckBox.setMinWidth(100);
+        allCheckBox.setMaxWidth(100);
         allCheckBox.getChildren().addAll(TITLE_CHECK_BOX, ARTIST_CHECK_BOX, ALBUM_CHECK_BOX,
                 GENRE_CHECK_BOX, COVER_CHECK_BOX);
 
@@ -97,7 +97,7 @@ public class Filter {
 
         BODY.setPadding(new Insets(10, 15, 0, 15));
         BODY.getChildren().addAll(LABEL, mainContent, buttonHBox);
-        Scene scene = new Scene(BODY, 380, 270);
+        Scene scene = new Scene(BODY, 450, 330);
         STAGE.setScene(scene);
         STAGE.setTitle("过滤");
         STAGE.setResizable(false);
@@ -109,25 +109,25 @@ public class Filter {
             FILTERED_ITEMS.clear();
             List<AudioMetaData> filtered = ALL_ITEMS.stream().filter(metaData -> {
                 if (ARTIST_CHECK_BOX.isSelected()) {
-                    return metaData.getArtist().contains(ARTIST_COMBO_BOX.getValue());
+                    return metaData.getArtist().contains(ARTIST_COMBO_BOX.getValue().trim());
                 } else {
                     return true;
                 }
             }).filter(metaData -> {
                 if (ALBUM_CHECK_BOX.isSelected()) {
-                    return metaData.getAlbum().contains(ALBUM_COMBO_BOX.getValue());
+                    return metaData.getAlbum().contains(ALBUM_COMBO_BOX.getValue().trim());
                 } else {
                     return true;
                 }
             }).filter(metaData -> {
                 if (GENRE_CHECK_BOX.isSelected()) {
-                    return metaData.getGenre().contains(GENRE_COMBO_BOX.getValue());
+                    return metaData.getGenre().contains(GENRE_COMBO_BOX.getValue().trim());
                 } else {
                     return true;
                 }
             }).filter(metaData -> {
                 if (TITLE_CHECK_BOX.isSelected()) {
-                    if ("".equals(TITLE_TEXT_FIELD.getText())) {
+                    if ("".equals(TITLE_TEXT_FIELD.getText().trim())) {
                         return metaData.getTitle().equals("");
                     } else {
                         return metaData.getTitle().contains(TITLE_TEXT_FIELD.getText());

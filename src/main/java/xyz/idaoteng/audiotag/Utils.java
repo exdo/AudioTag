@@ -14,9 +14,7 @@ public class Utils {
             String regKey = "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\AudioTag.exe";
             String itemName = "history";
 
-            Process process = Runtime.getRuntime().exec(
-                    "reg query \"" + regKey + "\" /v " + itemName
-            );
+            Process process = Runtime.getRuntime().exec("reg query \"" + regKey + "\" /v " + itemName);
 
             try (BufferedReader reader = new BufferedReader(
                     new InputStreamReader(process.getInputStream(), Charset.forName("GBK")))

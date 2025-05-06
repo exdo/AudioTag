@@ -130,7 +130,7 @@ public class Center {
         genreColumn.setCellValueFactory(new PropertyValueFactory<>("genre"));
 
         TableColumn<AudioMetaData, String> trackColumn = new TableColumn<>("音轨序号");
-        trackColumn.setPrefWidth(55);
+        trackColumn.setPrefWidth(75);
         trackColumn.setId("track");
         trackColumn.setCellValueFactory(new PropertyValueFactory<>("track"));
 
@@ -140,7 +140,7 @@ public class Center {
         commentColumn.setCellValueFactory(new PropertyValueFactory<>("comment"));
 
         TableColumn<AudioMetaData, String> bitrateColumn = new TableColumn<>("比特率");
-        bitrateColumn.setPrefWidth(75);
+        bitrateColumn.setPrefWidth(105);
         bitrateColumn.setId("bitrate");
         bitrateColumn.setStyle("-fx-alignment: CENTER-RIGHT");
         bitrateColumn.setCellValueFactory(new PropertyValueFactory<>("bitrate"));

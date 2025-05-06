@@ -186,12 +186,16 @@ public class Aside {
         });
     }
 
+    private static final ImageView LIGHT_BOX = new ImageView();
     private static void configCoverPanelActionHandle() {
         COVER_PANEL.setOnMouseClicked(event -> {
             if (metaDataDisplayed == null) return;
 
             if (event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 1) {
-                updateCover(false);
+                if (metaDataDisplayed.getCover() != null) {
+                    LIGHT_BOX.setImage(new Image(new ByteArrayInputStream(metaDataDisplayed.getCover())));
+                    Modal.show(LIGHT_BOX);
+                }
             }
         });
     }

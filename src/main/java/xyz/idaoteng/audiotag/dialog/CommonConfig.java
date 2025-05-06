@@ -15,9 +15,7 @@ public class CommonConfig {
     public static HBox packageIntoHBox(TextField textField, MenuButton menuButton) {
         HBox hBox = new HBox();
 
-        textField.setMinWidth(350);
-        textField.setMaxHeight(25);
-        textField.setMinHeight(25);
+        textField.setMinWidth(365);
         textField.setText("`artist` - `title`");
 
         Button clear = new Button("", ImageInApp.getClearIcon());
@@ -34,14 +32,10 @@ public class CommonConfig {
         textField.textProperty().addListener((ob, o, n) -> clear.setVisible(ob.getValue().length() > 0));
 
         AnchorPane textFieldAndClear = new AnchorPane();
-        textFieldAndClear.setMaxWidth(350);
-        textFieldAndClear.setMinWidth(350);
+        textFieldAndClear.setMinWidth(365);
         AnchorPane.setTopAnchor(textField, 0.0);
         AnchorPane.setRightAnchor(clear, 0.0);
         textFieldAndClear.getChildren().addAll(textField, clear);
-
-        menuButton.setMinHeight(25);
-        menuButton.setMaxHeight(25);
 
         hBox.setSpacing(5);
         hBox.getChildren().addAll(textFieldAndClear, menuButton);

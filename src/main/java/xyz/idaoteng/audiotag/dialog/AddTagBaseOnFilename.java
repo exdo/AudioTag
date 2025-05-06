@@ -34,7 +34,7 @@ public class AddTagBaseOnFilename{
         VALID_PLACEHOLDERS.addAll(Arrays.asList(PLACEHOLDERS));
 
         VBox body = new VBox();
-        body.setPadding(new Insets(15, 30, 10, 30));
+        body.setPadding(new Insets(15, 20, 10, 20));
         body.setSpacing(10);
 
         Label model = new Label("文件名构成模板：");
@@ -70,7 +70,7 @@ public class AddTagBaseOnFilename{
 
         STAGE.initModality(Modality.APPLICATION_MODAL);
         STAGE.setTitle("基于文件名添加标签");
-        Scene scene = new Scene(body, 500, 200);
+        Scene scene = new Scene(body, 510, 240);
         STAGE.setResizable(false);
         STAGE.setScene(scene);
     }

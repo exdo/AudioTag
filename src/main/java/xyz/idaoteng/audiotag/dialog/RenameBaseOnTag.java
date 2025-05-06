@@ -30,7 +30,7 @@ public class RenameBaseOnTag {
 
     static {
         VBox body = new VBox();
-        body.setPadding(new Insets(15, 30, 10, 30));
+        body.setPadding(new Insets(15, 20, 10, 20));
         body.setSpacing(10);
 
         Label model = new Label("文件名构成模板：");
@@ -62,7 +62,7 @@ public class RenameBaseOnTag {
         body.getChildren().addAll(model, templateAndMenuButton, strategy,
                 GIVE_UP_RADIO_BUTTON, fillBlank, confirmAndCancel);
 
-        Scene scene = new Scene(body, 500, 200);
+        Scene scene = new Scene(body, 510, 240);
         STAGE.initModality(Modality.APPLICATION_MODAL);
         STAGE.setTitle("根据标签重命名");
         STAGE.setResizable(false);

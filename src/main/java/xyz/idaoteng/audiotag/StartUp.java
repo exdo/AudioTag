@@ -2,12 +2,16 @@ package xyz.idaoteng.audiotag;
 
 import atlantafx.base.theme.PrimerLight;
 import javafx.application.Application;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import xyz.idaoteng.audiotag.component.Aside;
 import xyz.idaoteng.audiotag.component.Center;
 import xyz.idaoteng.audiotag.component.Head;
+import xyz.idaoteng.audiotag.component.Modal;
 
 import java.io.InputStream;
 import java.util.logging.LogManager;
@@ -19,16 +23,22 @@ public class StartUp extends Application {
     public void start(Stage primaryStage) {
         StartUp.stage = primaryStage;
 
-        BorderPane root = new BorderPane();
-        root.setCenter(Center.getCenter());
-        root.setTop(Head.getHead());
-        root.setRight(Aside.getAside());
+        StackPane root = new StackPane();
+
+        BorderPane borderPane = new BorderPane();
+        borderPane.setCenter(Center.getCenter());
+        borderPane.setTop(Head.getHead());
+        borderPane.setRight(Aside.getAside());
+
+        Node modal = Modal.getModal();
+        root.getChildren().addAll(borderPane, modal);
+        StackPane.setAlignment(modal, Pos.CENTER);
 
         Scene scene = new Scene(root, 1200, 725);
         primaryStage.setScene(scene);
         primaryStage.setTitle("音乐信息编辑器");
         primaryStage.getIcons().add(ImageInApp.getAppIcon());
-        primaryStage.setMinHeight(root.getHeight());
+        primaryStage.setMinHeight(borderPane.getHeight());
         primaryStage.setMinWidth(1000);
         primaryStage.show();
 
