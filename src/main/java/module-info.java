@@ -1,4 +1,4 @@
-module xyz.idaoteng.audiotag {
+open module xyz.idaoteng.audiotag {
     requires javafx.controls;
 
     requires java.logging;
@@ -13,6 +13,4 @@ module xyz.idaoteng.audiotag {
 
     exports xyz.idaoteng.audiotag;
     exports xyz.idaoteng.audiotag.bean;
-
-    opens xyz.idaoteng.audiotag.api.timeless.dto to com.google.gson;
 }

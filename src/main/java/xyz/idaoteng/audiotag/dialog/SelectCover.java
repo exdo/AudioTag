@@ -13,9 +13,11 @@ import javafx.scene.layout.VBox;
 import xyz.idaoteng.audiotag.ImageInApp;
 import xyz.idaoteng.audiotag.Utils;
 import xyz.idaoteng.audiotag.api.Api;
+import xyz.idaoteng.audiotag.api.netease.NetEaseMusicApi;
 import xyz.idaoteng.audiotag.api.timeless.TimelessApi;
 
 import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,15 +26,21 @@ public class SelectCover {
     private static final ToggleGroup TOGGLE_GROUP = new ToggleGroup();
     private static final String TITLE = "选择封面";
     private static final VBox BODY = new VBox(10);
-    private static final Api API = new TimelessApi();
+    private static final Api API_TIMELESS = new TimelessApi();
+    private static final Api API_NET_EASE = new NetEaseMusicApi();
     
     static {
         DIALOG.setTitle(TITLE);
     }
     
     public static byte[] show(String title, String artist, String album) {
-        List<byte[]> coves = API.getCover(title, artist, album);
-        if (coves == null) {
+
+        List<byte[]> coves = new ArrayList<>(API_TIMELESS.getCover(title, artist, album));
+        if (coves.isEmpty()) {
+            coves.addAll(API_NET_EASE.getCover(title, artist, album));
+        }
+
+        if (coves.isEmpty()) {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("很遗憾");
             alert.setGraphic(ImageInApp.getSorryIcon());

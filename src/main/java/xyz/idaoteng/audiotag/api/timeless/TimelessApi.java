@@ -20,6 +20,8 @@ import java.util.List;
 
 public class TimelessApi implements Api {
     private static final String SEARCH_URL = "https://api.timelessq.com/music/tencent/search?keyword=%s&page=1&pageSize=10";
+    private static final Gson gson = new Gson();
+
     private static SongsResult searchSong(String keyword) throws ApiException {
         keyword = keyword.replaceAll(" ", "%20");
         String url = String.format(SEARCH_URL, keyword);
@@ -27,23 +29,10 @@ public class TimelessApi implements Api {
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
         try {
             HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
-            Gson gson = new Gson();
             return gson.fromJson(response.body(), SongsResult.class);
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
             throw new ApiException();
-        }
-    }
-
-    private static byte[] fetchCover(String url) {
-        HttpClient client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
-        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
-        try {
-            HttpResponse<byte[]> response = client.send(request, BodyHandlers.ofByteArray());
-            return response.body();
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-            return null;
         }
     }
 
@@ -55,7 +44,7 @@ public class TimelessApi implements Api {
         try {
             HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
             System.out.println(response.body());
-            Gson gson = new Gson();
+
             return gson.fromJson(response.body(), LyricResult.class);
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
@@ -83,7 +72,7 @@ public class TimelessApi implements Api {
         } catch (ApiException e) {
             return null;
         }
-        return covers.isEmpty() ? null : covers;
+        return covers;
     }
 
     @Override
