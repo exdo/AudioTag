@@ -10,6 +10,8 @@ import java.util.*;
 public class Session {
     private static final String PATH_SEPARATOR = "&#&";
 
+    private static boolean needRetouchCover = false;
+
     private static String folderPathOfTheLastSelectedFile;
     private static String pathToTheLastSelectedFolder;
     private static String folderPathOfTheLastSelectedImage;
@@ -84,6 +86,9 @@ public class Session {
 
                 String line6 = reader.readLine();
                 columnsOrder = processOrder(line6);
+
+                String line7 = reader.readLine();
+                needRetouchCover = line7.contains("true");
 
                 reader.close();
             } catch (Exception e) {
@@ -192,6 +197,10 @@ public class Session {
         return columnsOrder;
     }
 
+    public static boolean needRetouchCover() {
+        return needRetouchCover;
+    }
+
     private static void initHistoryFile() {
         try (FileOutputStream outputStream = new FileOutputStream(sessionHistoryFilePath)) {
             PrintWriter writer = new PrintWriter(outputStream, true, StandardCharsets.UTF_8);
@@ -201,6 +210,7 @@ public class Session {
             writer.println("last_selected_image_saving_path=");
             writer.println("current_tableview_content_paths=");
             writer.println("column_order=");
+            writer.println("needRetouchCover=");
             writer.flush();
             writer.close();
         } catch (IOException e) {
@@ -220,6 +230,7 @@ public class Session {
             writer.println("last_selected_image_saving_path=" + lastSelectedImageSavingPath);
             writer.println("current_tableview_content_paths=" + String.join(PATH_SEPARATOR, CURRENT_TABLEVIEW_CONTENT_PATHS));
             writer.println(generateColumnOrderString());
+            writer.println("needRetouchCover=" + needRetouchCover);
             writer.flush();
             writer.close();
         } catch (IOException e) {

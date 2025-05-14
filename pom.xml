@@ -57,6 +57,12 @@
             <artifactId>thumbnailator</artifactId>
             <version>0.1</version>
         </dependency>
+        <!-- 为 ImageIO 提供 webp 支持 -->
+        <dependency>
+            <groupId>org.sejda.imageio</groupId>
+            <artifactId>webp-imageio</artifactId>
+            <version>0.1.6</version>
+        </dependency>
 
         <dependency>
             <groupId>com.google.code.gson</groupId>

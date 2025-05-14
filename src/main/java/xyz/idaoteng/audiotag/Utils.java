@@ -76,10 +76,14 @@ public class Utils {
     public static byte[] retouchCover(File file) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try {
-            Thumbnails.of(ImageIO.read(file))
-                    .forceSize(360, 360)
-                    .outputFormat("jpg")
-                    .toOutputStream(outputStream);
+            if (Session.needRetouchCover()) {
+                Thumbnails.of(ImageIO.read(file))
+                        .forceSize(360, 360)
+                        .outputFormat("jpg")
+                        .toOutputStream(outputStream);
+            } else {
+                Thumbnails.of(ImageIO.read(file)).toOutputStream(outputStream);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -88,13 +92,19 @@ public class Utils {
 
     public static void saveCover(byte[] cover, File file) {
         try {
-            Thumbnails.of(new ByteArrayInputStream(cover)).size(360, 360).toFile(file);
+            if (Session.needRetouchCover()) {
+                Thumbnails.of(new ByteArrayInputStream(cover)).size(360, 360).toFile(file);
+            } else {
+                Thumbnails.of(new ByteArrayInputStream(cover)).toFile(file);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     public static byte[] retouchCover(byte[] cover) {
+        if (!Session.needRetouchCover()) return cover;
+
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try {
             Thumbnails.of(new ByteArrayInputStream(cover))

@@ -105,7 +105,7 @@ public class NetEaseMusicApi implements Api {
                 if (searchResult == null) continue;
 
                 for (Song song : searchResult.getResult().getSongs()) {
-                    if (song.getName().equals(title)) {
+                    if (song.getName().contains(title)) {
                         if (artist != null && artist.equals(song.getAr().get(0).getName())) {
                             if (song.getAl().getPicUrl() != null) {
                                 covers.add(fetchCover(song.getAl().getPicUrl()));

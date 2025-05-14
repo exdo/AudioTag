@@ -1,5 +1,6 @@
 package xyz.idaoteng.audiotag.component;
 
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -25,6 +26,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class Aside {
     private static final VBox ASIDE = new VBox();
@@ -61,8 +63,8 @@ public class Aside {
         String[] imageExtensions = new String[]{"*.jpg", "*.jpeg", "*.png", "*.bmp", "*.webp"};
         COVER_EXTENSION_FILTER = new FileChooser.ExtensionFilter("图片文件", imageExtensions);
 
-        // 设置侧边栏样式
         ASIDE.setPadding(new Insets(10, 10, 10, 10));
+        // 设置侧边栏样式
         ASIDE.setStyle("-fx-border-style: solid; -fx-border-color: #cccccc; -fx-border-width: 1 0 0 1");
         // 配置侧边栏组件（渲染效果与书写顺序一致）
         Label titleLabel = new Label("标题");
@@ -240,10 +242,15 @@ public class Aside {
         DELETE_COVER_BUTTON.setOnAction(event -> updateCover(true));
 
         SEARCH_COVER_BUTTON.setOnAction(event -> {
-            byte[] coverBytes = SelectCover.show(originalMetaData.getTitle(), originalMetaData.getArtist(), originalMetaData.getAlbum());
-            if (coverBytes != null) {
-                setCover(coverBytes);
-            }
+            String title = originalMetaData.getTitle();
+            String artist = originalMetaData.getArtist();
+            String album = originalMetaData.getAlbum();
+            Consumer<byte[]> setCover = coverBytes -> {
+                if (coverBytes != null) {
+                    Platform.runLater(() -> setCover(coverBytes));
+                }
+            };
+            SelectCover.show(title, artist, album, setCover);
         });
     }
 

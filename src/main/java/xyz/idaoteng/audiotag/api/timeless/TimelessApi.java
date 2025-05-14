@@ -60,7 +60,7 @@ public class TimelessApi implements Api {
             SongsResult result = searchSong(title);
             SongDetail[] details = result.getData().getList();
             for (SongDetail detail : details) {
-                if (detail.getSongname().equals(title)) {
+                if (detail.getSongname().contains(title)) {
                     if (!"".equals(detail.getAlbumcover())) {
                         byte[] cover = fetchCover(detail.getAlbumcover());
                         if (cover != null) {
