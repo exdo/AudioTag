@@ -121,7 +121,6 @@ public class SelectCover {
         stopButton.setOnAction(e -> {
             STAGE.close();
             loadTask.cancel();
-            searchingThread.stop();
         });
         HBox buttonBox = new HBox(stopButton);
         buttonBox.setAlignment(Pos.CENTER_RIGHT);

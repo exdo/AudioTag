@@ -7,6 +7,8 @@
           <option value="Appid" />
           <option value="Activityid" />
           <option value="Platform" />
+          <option value="X-Real-IP" />
+          <option value="Client-IP" />
         </set>
       </option>
     </inspection_tool>

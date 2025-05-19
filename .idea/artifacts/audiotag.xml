@@ -15,6 +15,21 @@
       <element id="archive" name="audiotag.jar">
         <element id="module-output" name="audiotag" />
       </element>
+      <element id="directory" name="lib">
+        <element id="library" level="project" name="jdk-17" />
+        <element id="library" level="project" name="Maven: com.google.code.gson:gson:2.11.0" />
+        <element id="library" level="project" name="Maven: com.google.errorprone:error_prone_annotations:2.27.0" />
+        <element id="library" level="project" name="Maven: io.github.mkpaz:atlantafx-base:2.0.1" />
+        <element id="library" level="project" name="Maven: net.coobird:thumbnailator:0.1" />
+        <element id="library" level="project" name="Maven: org.jaudiotagger:jaudiotagger:1.1.5" />
+        <element id="library" level="project" name="Maven: org.openjfx:javafx-base:17.0.1" />
+        <element id="library" level="project" name="Maven: org.openjfx:javafx-base:win:17.0.1" />
+        <element id="library" level="project" name="Maven: org.openjfx:javafx-controls:17.0.1" />
+        <element id="library" level="project" name="Maven: org.openjfx:javafx-controls:win:17.0.1" />
+        <element id="library" level="project" name="Maven: org.openjfx:javafx-graphics:17.0.1" />
+        <element id="library" level="project" name="Maven: org.openjfx:javafx-graphics:win:17.0.1" />
+        <element id="library" level="project" name="Maven: org.sejda.imageio:webp-imageio:0.1.6" />
+      </element>
     </root>
   </artifact>
 </component>

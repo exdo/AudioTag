@@ -10,7 +10,5 @@ open module xyz.idaoteng.audiotag {
     requires jaudiotagger;
     requires net.coobird.thumbnailator;
     requires com.google.gson;
-
-    exports xyz.idaoteng.audiotag;
-    exports xyz.idaoteng.audiotag.bean;
+    requires webp.imageio;
 }
