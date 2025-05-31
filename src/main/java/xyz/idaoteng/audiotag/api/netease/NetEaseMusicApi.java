@@ -68,10 +68,6 @@ public class NetEaseMusicApi implements Api {
 
         HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
 
-        if (response.statusCode() != 200) {
-            throw new IOException("Unexpected code: " + response.statusCode());
-        }
-
         return response.body();
     }
 

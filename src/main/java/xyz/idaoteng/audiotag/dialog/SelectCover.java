@@ -53,7 +53,9 @@ public class SelectCover {
     }
 
     private static byte[] result = null;
+
     public static void show(String title, String artist, String album, Consumer<byte[]> onResult) {
+        // 重置数据
         result = null;
         // 使用异步任务加载封面
         Task<Void> loadTask = new Task<>() {
@@ -129,6 +131,8 @@ public class SelectCover {
         PANE.getChildren().clear();
         PANE.getChildren().add(waitingPage);
         STAGE.show();
+
+        STAGE.setOnCloseRequest(event -> loadTask.cancel());
     }
 
     private static void refreshCovers(String title, String artist, String album) {
