@@ -27,7 +27,7 @@ public class AddTagBaseOnFilename{
 
     private static final List<AudioMetaData> DATA_LIST = new ArrayList<>();
 
-    private static final String[] PLACEHOLDERS = {"title", "artist", "album", "date", "track"};
+    private static final String[] PLACEHOLDERS = {"title", "artist", "album", "date", "track", "ignore"};
     private static final HashSet<String> VALID_PLACEHOLDERS = new HashSet<>();
 
     static {
@@ -42,7 +42,7 @@ public class AddTagBaseOnFilename{
 
         TEMPLATE_TEXT_FIELD.setMinWidth(350);
 
-        CommonConfig.configMenuButton(TEMPLATE_TEXT_FIELD, MENU_BUTTON);
+        CommonConfig.linkTextAndButton(TEMPLATE_TEXT_FIELD, MENU_BUTTON, true);
 
         HBox templateAndMenuButton = CommonConfig.packageIntoHBox(TEMPLATE_TEXT_FIELD, MENU_BUTTON);
 
@@ -86,7 +86,7 @@ public class AddTagBaseOnFilename{
             // 解析模板，找出所有分隔符和待添加的标签名
             if (parseTemplate(template)) {
                 for (AudioMetaData metaData : DATA_LIST) {
-                    parsFilename(metaData);
+                    parseFilename(metaData);
                 }
             } else {
                 Alert alert = Utils.generateBasicErrorAlert("模板不合法");
@@ -136,7 +136,7 @@ public class AddTagBaseOnFilename{
         return true;
     }
 
-    private static void parsFilename(AudioMetaData metaData) {
+    private static void parseFilename(AudioMetaData metaData) {
         String filename = Utils.getFilenameWithoutExtension(metaData.getFilename());
 
         ArrayDeque<String> tempTagNames = new ArrayDeque<>(TAG_NAMES);
@@ -226,6 +226,7 @@ public class AddTagBaseOnFilename{
                     MetaDataWriter.write(metaData);
                 }
             }
+            case "ignore" -> {}
         }
     }
 

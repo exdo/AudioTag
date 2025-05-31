@@ -43,7 +43,7 @@ public class CommonConfig {
     }
 
     // 点击菜单按钮中的某个选项后，在输入框中添加相应的 占位符
-    public static void configMenuButton(TextField textField, MenuButton menuButton) {
+    public static void linkTextAndButton(TextField textField, MenuButton menuButton, boolean includeIgnore) {
         MenuItem artist = new MenuItem("艺术家");
         artist.setOnAction(event -> textField.setText(textField.getText() + "`artist`"));
 
@@ -60,5 +60,11 @@ public class CommonConfig {
         trackNumber.setOnAction(event -> textField.setText(textField.getText() + "`track`"));
 
         menuButton.getItems().addAll(artist, title, album, date, trackNumber);
+
+        if (includeIgnore) {
+            MenuItem ignore = new MenuItem("忽略");
+            ignore.setOnAction(event -> textField.setText(textField.getText() + "`ignore`"));
+             menuButton.getItems().add(ignore);
+        }
     }
 }

@@ -36,7 +36,7 @@ public class RenameBaseOnTag {
         Label model = new Label("文件名构成模板：");
         model.setFont(FONT);
 
-        CommonConfig.configMenuButton(TEMPLATE_TEXT_FIELD, MENU_BUTTON);
+        CommonConfig.linkTextAndButton(TEMPLATE_TEXT_FIELD, MENU_BUTTON, false);
 
         HBox templateAndMenuButton = CommonConfig.packageIntoHBox(TEMPLATE_TEXT_FIELD, MENU_BUTTON);
 
