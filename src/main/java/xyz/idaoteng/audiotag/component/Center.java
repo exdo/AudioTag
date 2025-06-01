@@ -17,7 +17,7 @@ import javafx.scene.input.*;
 import xyz.idaoteng.audiotag.Session;
 import xyz.idaoteng.audiotag.Utils;
 import xyz.idaoteng.audiotag.bean.AudioMetaData;
-import xyz.idaoteng.audiotag.bean.EditableTag;
+import xyz.idaoteng.audiotag.constant.EditableTag;
 import xyz.idaoteng.audiotag.core.MetaDataReader;
 import xyz.idaoteng.audiotag.core.MetaDataWriter;
 import xyz.idaoteng.audiotag.dialog.*;

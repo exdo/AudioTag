@@ -8,11 +8,11 @@ import java.io.*;
 import java.nio.charset.Charset;
 
 public class Utils {
-    public static String getHistoryFilePathInRegistry() {
+    public static String getPreferencesFilePathInRegistry() {
         String result = "";
         try {
             String regKey = "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\AudioTag.exe";
-            String itemName = "history";
+            String itemName = "preferences";
 
             Process process = Runtime.getRuntime().exec("reg query \"" + regKey + "\" /v " + itemName);
 

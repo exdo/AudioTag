@@ -238,7 +238,7 @@ SectionEnd
 Section -Post
   WriteUninstaller "$INSTDIR\uninst.exe"
   WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "" "$INSTDIR\bin\AudioTag.exe"
-  WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "history" "$INSTDIR\session.history"
+  WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "preferences" "$INSTDIR\session.history"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayName" "$(^Name)"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString" "$INSTDIR\uninst.exe"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayIcon" "$INSTDIR\bin\AudioTag.exe"

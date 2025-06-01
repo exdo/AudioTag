@@ -1,4 +1,4 @@
-package xyz.idaoteng.audiotag.bean;
+package xyz.idaoteng.audiotag.constant;
 
 public enum EditableTag {
     TITLE,
