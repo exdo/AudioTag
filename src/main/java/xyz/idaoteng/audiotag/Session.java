@@ -147,6 +147,7 @@ public class Session {
         Center.turnOffFilter();
 
         try (FileWriter writer = new FileWriter(preferencesFilePath, StandardCharsets.UTF_8)) {
+            PREFERENCES.setColumnsOrder(Center.getColumnOrder());
             GSON.toJson(PREFERENCES, writer);
         } catch (IOException e) {
             showErrorThenExit("无法保存配置文件：\n" + e.getMessage());
