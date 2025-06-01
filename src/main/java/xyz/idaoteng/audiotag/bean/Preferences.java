@@ -18,7 +18,7 @@ public class Preferences {
     private ArrayList<String> currentPaths = new ArrayList<>();
     // 表头的顺序
     private HashMap<Integer, String> columnsOrder = DefaultColumnOrder.defaultOrder();
-    // 是否需要重绘封面（重绘的图片统一为 250 * 250 的 jpg）
+    // 是否需要重绘封面（重绘的图片统一为 360 * 360 的 jpg）
     private Boolean retouchCover = false;
 
     public String getLastSelectedFile() {

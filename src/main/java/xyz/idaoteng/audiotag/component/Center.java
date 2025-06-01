@@ -65,7 +65,7 @@ public class Center {
         // 创建列
         createColumn();
 
-        // 设置拖拽行
+        // 设置行，使之可拖拽
         TABLE_VIEW.setRowFactory(table -> {
             TableRow<AudioMetaData> row = new TableRow<>();
             makeRowDraggable(row);
@@ -85,10 +85,9 @@ public class Center {
         items.addListener((ListChangeListener<AudioMetaData>) listener -> {
             // 重命名按钮只在选中一个时可用
             RENAME_MENU_ITEM.setDisable(listener.getList().size() != 1);
-
             // 打开文件所在的目录按钮只在选中一个时可用
             OPEN_BY_BROWSER.setDisable(listener.getList().size() != 1);
-
+            // 删除特定标签菜单在未选择时不可用
             deleteSpecificTagMenu.setDisable(items.isEmpty());
         });
 
@@ -264,6 +263,7 @@ public class Center {
         MenuItem packageToAlbum = new MenuItem("设置成同一专辑");
         packageToAlbum.setOnAction(event -> packageToAlbum());
 
+        // 打开文件所在文件夹
         OPEN_BY_BROWSER.setOnAction(event -> {
             AudioMetaData audioMetaData = TABLE_VIEW.getSelectionModel().getSelectedItem();
             String path = audioMetaData.getAbsolutePath();
@@ -653,7 +653,7 @@ public class Center {
         paths.forEach(path -> {
             try {
                 audioMetaData.add(MetaDataReader.readFile(new File(path)));
-            } catch (CantReadException ignored) {}
+            } catch (CantReadException ignored) {} // 忽略无法读取的文件
         });
         updateTableView(audioMetaData);
     }
@@ -1013,12 +1013,14 @@ public class Center {
         TABLE_VIEW.getSelectionModel().select(index);
     }
 
+    // 同步右键菜单和顶部按钮关于是否允许重命名的状态
     public static void takeOverRenameButton(Button rename) {
         rename.disableProperty().bind(RENAME_MENU_ITEM.disableProperty());
 
         rename.setOnAction(event -> Rename.show(TABLE_VIEW.getSelectionModel().getSelectedItem()));
     }
 
+    // 同步右键菜单和顶部按钮关于是否允许拖拽行的状态
     public static void takeOverEnableDragRow(RadioButton radioButton) {
         enableDragRowRadioButton = radioButton;
         enableDragRowRadioButton.setOnAction(event -> {

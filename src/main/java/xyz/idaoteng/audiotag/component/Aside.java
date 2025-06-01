@@ -3,6 +3,7 @@ package xyz.idaoteng.audiotag.component;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -189,7 +190,27 @@ public class Aside {
     }
 
     private static final ImageView LIGHT_BOX = new ImageView();
+    static {
+        LIGHT_BOX.setPreserveRatio(true);
+        LIGHT_BOX.setFitHeight(StartUp.getPrimaryStage().getHeight() - 150);
+        LIGHT_BOX.setFitWidth(StartUp.getPrimaryStage().getWidth() - 150);
+        LIGHT_BOX.setSmooth(true);
+        LIGHT_BOX.setCache(true);
+    }
     private static void configCoverPanelActionHandle() {
+
+        // 鼠标进入时改变指针样式
+        COVER_PANEL.setOnMouseEntered(event -> {
+            if (metaDataDisplayed.getCover() == null) return;
+            COVER_PANEL.setCursor(Cursor.HAND); // 手型指针
+        });
+
+        // 鼠标离开时恢复默认样式
+        COVER_PANEL.setOnMouseExited(event -> {
+            if (metaDataDisplayed.getCover() == null) return;
+            COVER_PANEL.setCursor(Cursor.DEFAULT); // 默认指针
+        });
+
         COVER_PANEL.setOnMouseClicked(event -> {
             if (metaDataDisplayed == null) return;
 
