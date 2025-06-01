@@ -5,13 +5,16 @@ import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import xyz.idaoteng.audiotag.component.Aside;
 import xyz.idaoteng.audiotag.component.Center;
 import xyz.idaoteng.audiotag.component.Head;
 import xyz.idaoteng.audiotag.component.Modal;
+import xyz.idaoteng.audiotag.exception.PreferencesError;
 
 import java.io.InputStream;
 import java.util.logging.LogManager;
@@ -21,6 +24,19 @@ public class StartUp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        try {
+            Session.init();
+        } catch (PreferencesError e) {
+            Scene scene = new Scene(new StackPane());
+            primaryStage.setScene(scene);
+            primaryStage.initStyle(StageStyle.TRANSPARENT);
+            primaryStage.show();
+            Alert alert = Utils.generateBasicErrorAlert("程序运行时出现错误");
+            alert.setContentText(e.getMessage());
+            alert.showAndWait();
+            System.exit(555);
+        }
+
         StartUp.stage = primaryStage;
 
         StackPane root = new StackPane();

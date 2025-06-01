@@ -12,7 +12,7 @@ public class Utils {
         String result = "";
         try {
             String regKey = "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\AudioTag.exe";
-            String itemName = "preferences";
+            String itemName = "install_dir";
 
             Process process = Runtime.getRuntime().exec("reg query \"" + regKey + "\" /v " + itemName);
 

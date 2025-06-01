@@ -2,11 +2,14 @@ package xyz.idaoteng.audiotag;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import javafx.scene.control.Alert;
 import xyz.idaoteng.audiotag.bean.Preferences;
 import xyz.idaoteng.audiotag.component.Center;
+import xyz.idaoteng.audiotag.exception.PreferencesError;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +21,7 @@ public class Session {
 
     private static String preferencesFilePath;
 
-    static {
+    public static void init() throws PreferencesError {
         // 读取注册表中的 preferences 文件路径，
         // 该路径会在 InstallerGenerationScript.nsi 脚本中写入注册表
         String filePath = Utils.getPreferencesFilePathInRegistry();
@@ -31,7 +34,7 @@ public class Session {
         }
     }
 
-    private static void readPreferences(String path) {
+    private static void readPreferences(String path) throws PreferencesError {
         File file = new File(path, "preferences.json");
         if (!file.exists()) { // 文件不存在，一般见于程序第一次运行时
             try {
@@ -39,10 +42,10 @@ public class Session {
                 // 默认 new 出来的 Preferences 对象就是默认配置，
                 // 程序关闭时会保存该对象的 json 格式到此空白文件中
                 if (!file.createNewFile()) {
-                    showErrorThenExit("无法创建配置文件");
+                    throw new PreferencesError("无法创建配置文件");
                 }
             } catch (IOException e) {
-                showErrorThenExit("无法创建配置文件：\n" + e.getMessage());
+                throw new PreferencesError("无法创建配置文件：\n" + e.getMessage());
             }
         } else {
              try (FileReader reader = new FileReader(file, StandardCharsets.UTF_8)) {
@@ -56,22 +59,11 @@ public class Session {
                  PREFERENCES.setRetouchCover(fromJson.getRetouchCover());
 
              } catch (IOException e) {
-                 showErrorThenExit("无法读取配置文件：\n"  + e.getMessage());
+                 throw new PreferencesError("无法读取配置文件：\n"  + e.getMessage());
              }
         }
         // 确认配置文件的路径供保存时使用
         preferencesFilePath = file.getAbsolutePath();
-    }
-
-    private static void showErrorThenExit(String content) {
-        Alert alert = Utils.generateBasicErrorAlert("程序运行时出现错误");
-        alert.setContentText(content);
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        System.exit(555);
     }
 
     public static String getFolderPathOfTheLastSelectedFile() {
@@ -150,7 +142,7 @@ public class Session {
             PREFERENCES.setColumnsOrder(Center.getColumnOrder());
             GSON.toJson(PREFERENCES, writer);
         } catch (IOException e) {
-            showErrorThenExit("无法保存配置文件：\n" + e.getMessage());
+            throw new RuntimeException("无法保存配置文件：\n" + e.getMessage());
         }
     }
 }
