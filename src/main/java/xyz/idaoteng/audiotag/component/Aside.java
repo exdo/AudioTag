@@ -190,13 +190,6 @@ public class Aside {
     }
 
     private static final ImageView LIGHT_BOX = new ImageView();
-    static {
-        LIGHT_BOX.setPreserveRatio(true);
-        LIGHT_BOX.setFitHeight(StartUp.getPrimaryStage().getHeight() - 150);
-        LIGHT_BOX.setFitWidth(StartUp.getPrimaryStage().getWidth() - 150);
-        LIGHT_BOX.setSmooth(true);
-        LIGHT_BOX.setCache(true);
-    }
     private static void configCoverPanelActionHandle() {
 
         // 鼠标进入时改变指针样式
@@ -217,6 +210,11 @@ public class Aside {
             if (event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 1) {
                 if (metaDataDisplayed.getCover() != null) {
                     LIGHT_BOX.setImage(new Image(new ByteArrayInputStream(metaDataDisplayed.getCover())));
+                    LIGHT_BOX.setPreserveRatio(true);
+                    LIGHT_BOX.setFitHeight(StartUp.getPrimaryStage().getHeight() - 150);
+                    LIGHT_BOX.setFitWidth(StartUp.getPrimaryStage().getWidth() - 150);
+                    LIGHT_BOX.setSmooth(true);
+                    LIGHT_BOX.setCache(true);
                     Modal.show(LIGHT_BOX);
                 }
             }
