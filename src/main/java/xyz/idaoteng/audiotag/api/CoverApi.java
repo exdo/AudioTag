@@ -9,19 +9,12 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
 
-public interface Api {
+public interface CoverApi {
     List<byte[]> getCover(String title, String artist, String album);
-    
-    String getLyric(String title, String artist, String album);
 
-    HttpClient client = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofSeconds(10))
-            .build();
+    HttpClient client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
     default byte[] fetchCover(String url) {
-        HttpRequest request = java.net.http.HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .GET()
-                .build();
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
 
         try {
             HttpResponse<byte[]> response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());

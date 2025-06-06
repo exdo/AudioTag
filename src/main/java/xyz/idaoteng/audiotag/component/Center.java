@@ -150,22 +150,22 @@ public class Center {
         lengthColumn.setStyle("-fx-alignment: CENTER-RIGHT");
         lengthColumn.setCellValueFactory(new PropertyValueFactory<>("length"));
 
-        HashMap<String, TableColumn<AudioMetaData, String>> id_column = new HashMap<>(10);
-        id_column.put("filename", filenameColumn);
-        id_column.put("title", titleColumn);
-        id_column.put("artist", artistColumn);
-        id_column.put("album", albumColumn);
-        id_column.put("date", dateColumn);
-        id_column.put("genre", genreColumn);
-        id_column.put("track", trackColumn);
-        id_column.put("comment", commentColumn);
-        id_column.put("bitrate", bitrateColumn);
-        id_column.put("length", lengthColumn);
+        HashMap<String, TableColumn<AudioMetaData, String>> idToColumn = new HashMap<>(10);
+        idToColumn.put("filename", filenameColumn);
+        idToColumn.put("title", titleColumn);
+        idToColumn.put("artist", artistColumn);
+        idToColumn.put("album", albumColumn);
+        idToColumn.put("date", dateColumn);
+        idToColumn.put("genre", genreColumn);
+        idToColumn.put("track", trackColumn);
+        idToColumn.put("comment", commentColumn);
+        idToColumn.put("bitrate", bitrateColumn);
+        idToColumn.put("length", lengthColumn);
 
         HashMap<Integer, String> columnsOrder = Session.getColumnsOrder();
         for (int i = 0; i < 10; i++) {
             String id = columnsOrder.get(i);
-            TABLE_VIEW.getColumns().add(id_column.get(id));
+            TABLE_VIEW.getColumns().add(idToColumn.get(id));
         }
     }
 

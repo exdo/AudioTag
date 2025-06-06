@@ -1,7 +1,7 @@
 package xyz.idaoteng.audiotag.api.migu;
 
 import com.google.gson.Gson;
-import xyz.idaoteng.audiotag.api.Api;
+import xyz.idaoteng.audiotag.api.CoverApi;
 import xyz.idaoteng.audiotag.api.migu.dto.MiguSong;
 
 import javax.imageio.ImageIO;
@@ -17,7 +17,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MiguMusicApi implements Api {
+public class MiguMusicApi implements CoverApi {
     private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0";
     private static final HttpClient CLIENT = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(10))
@@ -80,10 +80,5 @@ public class MiguMusicApi implements Api {
             return covers;
         }
         return covers;
-    }
-
-    @Override
-    public String getLyric(String title, String artist, String album) {
-        return null;
     }
 }

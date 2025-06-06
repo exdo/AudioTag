@@ -57,7 +57,7 @@ public class AddTagBaseOnFilename{
         rewrite.setToggleGroup(strategyGroup);
 
         Button confirm = new Button("确定");
-        configConfirmButton(confirm);
+        setupConfirmButton(confirm);
         Button cancel = new Button("取消");
         cancel.setOnAction(event -> STAGE.close());
 
@@ -75,7 +75,7 @@ public class AddTagBaseOnFilename{
         STAGE.setScene(scene);
     }
 
-    private static void configConfirmButton(Button confirm) {
+    private static void setupConfirmButton(Button confirm) {
         confirm.setOnAction(event -> {
             String template = TEMPLATE_TEXT_FIELD.getText().trim();
             if (template.equals("")) {

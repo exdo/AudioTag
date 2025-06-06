@@ -1,7 +1,7 @@
 package xyz.idaoteng.audiotag.api.netease;
 
 import com.google.gson.Gson;
-import xyz.idaoteng.audiotag.api.Api;
+import xyz.idaoteng.audiotag.api.CoverApi;
 import xyz.idaoteng.audiotag.api.netease.dto.SearchResult;
 import xyz.idaoteng.audiotag.api.netease.dto.Song;
 
@@ -17,11 +17,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class NetEaseMusicApi implements Api {
+public class NetEaseMusicApi implements CoverApi {
     private static final Gson gson = new Gson();
-    private static final HttpClient CLIENT = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofSeconds(10))
-            .build();
+    private static final HttpClient CLIENT = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
 
 
     private SearchResult searchMusic(String keywords) throws Exception {
@@ -32,10 +30,11 @@ public class NetEaseMusicApi implements Api {
         data.put("type", 1);
 
         Map<String, String> encryptedData = ApiTool.encryptParams(data);
-        String response = sendRequest("https://music.163.com/weapi/cloudsearch/pc", encryptedData);
+        String response = sendRequest(encryptedData);
         return gson.fromJson(response, SearchResult.class);
     }
 
+    /* 歌词获取方法，目前暂未使用
     private String fetchLyric(String id) throws Exception {
         if (id == null || id.trim().isEmpty()) {
             throw new IllegalArgumentException("Song ID cannot be empty");
@@ -49,14 +48,15 @@ public class NetEaseMusicApi implements Api {
         Map<String, String> encryptedData = ApiTool.encryptParams(data);
         return sendRequest("https://music.163.com/weapi/song/lyric", encryptedData);
     }
+    */
 
-    private String sendRequest(String url, Map<String, String> data) throws IOException, InterruptedException {
+    private String sendRequest(Map<String, String> data) throws IOException, InterruptedException {
         String formData = data.entrySet().stream()
                 .map(entry -> entry.getKey() + "=" + entry.getValue())
                 .collect(Collectors.joining("&"));
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
+                .uri(URI.create("https://music.163.com/weapi/cloudsearch/pc"))
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .header("User-Agent", ApiTool.getRandomUserAgent())
                 .header("Referer", "https://music.163.com")
@@ -71,10 +71,10 @@ public class NetEaseMusicApi implements Api {
         return response.body();
     }
 
-
     @Override
     public List<byte[]> getCover(String title, String artist, String album) {
         ArrayList<byte[]> covers = new ArrayList<>();
+        // 由于未知的原因需要重复请求多次才能获取到封面
         for (int i = 0; i < 15; i++) {
             try {
                 SearchResult searchResult = searchMusic(title);
@@ -96,10 +96,5 @@ public class NetEaseMusicApi implements Api {
             if (!covers.isEmpty()) break;
         }
         return covers;
-    }
-
-    @Override
-    public String getLyric(String title, String artist, String album) {
-        return null;
     }
 }
