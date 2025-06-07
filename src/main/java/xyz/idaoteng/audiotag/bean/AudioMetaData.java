@@ -1,18 +1,35 @@
 package xyz.idaoteng.audiotag.bean;
 
 public class AudioMetaData {
+    // 文件的绝对路径
     private String absolutePath;
+    // 文件名(不包含拓展名)
     private String filename;
+
+    // 可编辑的元数据标签
+    // 艺术家
     private String artist = "";
+    // 标题
     private String title = "";
+    // 专辑
     private String album = "";
+    //专辑日期
     private String date = "";
+    // 风格
     private String genre = "";
+    // 音轨序号
     private String track = "";
+    // 评论(备注)
     private String comment = "";
-    private String bitrate;
-    private String length;
+    // 封面
     private byte[] cover = null;
+
+
+    // 不可编辑的元数据标签
+    // 比特率
+    private String bitrate;
+    // 时长
+    private String length;
 
     public String getAbsolutePath() {
         return absolutePath;

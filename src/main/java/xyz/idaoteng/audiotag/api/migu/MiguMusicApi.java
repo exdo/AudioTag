@@ -66,6 +66,8 @@ public class MiguMusicApi implements CoverApi {
 
                             if (imgUrl != null) {
                                 byte[] cover = fetchCover(imgUrl);
+                                // 从咪咕音乐获取的图片多为 webp 格式，
+                                // 需要转换成 jpg 格式才能在 ImagView 中显示
                                 BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(cover));
                                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                                 ImageIO.write(bufferedImage, "jpg", outputStream);

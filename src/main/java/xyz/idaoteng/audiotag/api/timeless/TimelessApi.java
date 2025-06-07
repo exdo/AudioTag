@@ -20,7 +20,6 @@ public class TimelessApi implements CoverApi {
     private static final Gson gson = new Gson();
     private static final HttpClient CLIENT = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
 
-
     private SongsResult searchSong(String keyword) throws IOException, InterruptedException {
         keyword = encodeKeyword(keyword);
         return gson.fromJson(sendRequest(keyword), SongsResult.class);
@@ -28,10 +27,7 @@ public class TimelessApi implements CoverApi {
 
     private String sendRequest(String arg) throws IOException, InterruptedException {
         String url = String.format(TimelessApi.SEARCH_URL, arg);
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .GET()
-                .build();
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
 
         HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
 
