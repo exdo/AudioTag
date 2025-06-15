@@ -14,6 +14,7 @@ import xyz.idaoteng.audiotag.component.Aside;
 import xyz.idaoteng.audiotag.component.Center;
 import xyz.idaoteng.audiotag.component.Head;
 import xyz.idaoteng.audiotag.component.Modal;
+import xyz.idaoteng.audiotag.core.TagOption;
 import xyz.idaoteng.audiotag.exception.PreferencesError;
 
 import java.io.InputStream;
@@ -24,18 +25,7 @@ public class StartUp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        try {
-            Session.init();
-        } catch (PreferencesError e) {
-            Scene scene = new Scene(new StackPane());
-            primaryStage.setScene(scene);
-            primaryStage.initStyle(StageStyle.TRANSPARENT);
-            primaryStage.show();
-            Alert alert = Utils.generateBasicErrorAlert("程序运行时出现错误");
-            alert.setContentText(e.getMessage());
-            alert.showAndWait();
-            System.exit(555);
-        }
+        initSession(primaryStage);
 
         StartUp.stage = primaryStage;
 
@@ -61,17 +51,54 @@ public class StartUp extends Application {
         Center.configWhenTableAlreadyRendered();
     }
 
+    /**
+     * 初始化Session
+     */
+    private void initSession(Stage primaryStage) {
+        try {
+            Session.init();
+        } catch (PreferencesError e) {
+            Scene scene = new Scene(new StackPane());
+            primaryStage.setScene(scene);
+            primaryStage.initStyle(StageStyle.TRANSPARENT);
+            primaryStage.show();
+            Alert alert = Utils.generateBasicErrorAlert("程序运行时出现错误");
+            alert.setContentText(e.getMessage());
+            alert.showAndWait();
+            System.exit(555);
+        }
+    }
+
     @Override
     public void stop() {
+        // 保存Session
         Session.saveSession();
     }
 
+    /**
+     * 获取主窗口
+     */
     public static Stage getPrimaryStage() {
         return stage;
     }
 
     public static void main(String[] args) {
-        // 关闭 jaudiotagger 的日志
+        // 禁用Jaudiotagger的日志
+        turnOffJaudiotaggerLog();
+
+        // 配置 Jaudiotagger 库的选项
+        TagOption.setupOptions();
+
+        // 设置主题
+        Application.setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
+
+        launch(args);
+    }
+
+    /**
+     * 禁用Jaudiotagger的日志
+     */
+    private static void turnOffJaudiotaggerLog() {
         LogManager logManager = LogManager.getLogManager();
         try (InputStream input = StartUp.class.getResourceAsStream("log.properties")) {
             logManager.readConfiguration(input);
@@ -79,9 +106,5 @@ public class StartUp extends Application {
             System.out.println("读取日志配置失败");
             e.printStackTrace();
         }
-
-        Application.setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
-
-        launch(args);
     }
 }

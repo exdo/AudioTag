@@ -2,15 +2,11 @@ package xyz.idaoteng.audiotag.core;
 
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
-import org.jaudiotagger.audio.wav.WavOptions;
-import org.jaudiotagger.audio.wav.WavSaveOptions;
 import org.jaudiotagger.tag.FieldDataInvalidException;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
-import org.jaudiotagger.tag.TagOptionSingleton;
 import org.jaudiotagger.tag.id3.ID3v23Tag;
 import org.jaudiotagger.tag.images.StandardArtwork;
-import org.jaudiotagger.tag.reference.ID3V2Version;
 import org.jaudiotagger.tag.wav.WavInfoTag;
 import org.jaudiotagger.tag.wav.WavTag;
 import xyz.idaoteng.audiotag.bean.AudioMetaData;
@@ -18,16 +14,10 @@ import xyz.idaoteng.audiotag.bean.AudioMetaData;
 import java.io.File;
 
 public class MetaDataWriter {
-    static {
-        // 默认使用ID3v2.3（目前ID3v2.3仍然是主流）
-        TagOptionSingleton optionSingleton = TagOptionSingleton.getInstance();
-        optionSingleton.setID3V2Version(ID3V2Version.ID3_V23);
-        // 只读取wav文件的ID3标签
-        optionSingleton.setWavOptions(WavOptions.READ_ID3_ONLY);
-        // 保存wav文件的ID3标签和INFO标签
-        optionSingleton.setWavSaveOptions(WavSaveOptions.SAVE_BOTH);
-    }
-
+    /** 
+     * 写入标签
+     * @param metaData 音频文件的元数据
+     */
     public static void write(AudioMetaData metaData) {
         File file = new File(metaData.getAbsolutePath());
         // 写入标签前先删除原始标签以统一标签版本
@@ -43,7 +33,7 @@ public class MetaDataWriter {
         }
 
         Tag tag = audioFile.createDefaultTag();
-        // 默认生成的WavTag 没有设置ID3Tag和WavInfoTag实例，需要手动设置
+        // 默认生成的 WavTag 没有设置 ID3Tag 和 WavInfoTag 实例，因此需要手动设置
         // 否则会报空指针异常
         if (tag instanceof WavTag wavTag) {
             wavTag.setID3Tag(new ID3v23Tag());
@@ -52,25 +42,25 @@ public class MetaDataWriter {
 
         // 部分 field 不允许为空，空标签值不写入也可减少IO操作
         try {
-            if (!"".equals(metaData.getTitle())) {
+            if (notBlank(metaData.getTitle())) {
                 tag.setField(FieldKey.TITLE, metaData.getTitle());
             }
-            if (!"".equals(metaData.getArtist())) {
+            if (notBlank(metaData.getArtist())) {
                 tag.setField(FieldKey.ARTIST, metaData.getArtist());
             }
-            if (!"".equals(metaData.getAlbum())) {
+            if (notBlank(metaData.getAlbum())) {
                 tag.setField(FieldKey.ALBUM, metaData.getAlbum());
             }
-            if (!"".equals(metaData.getDate())) {
+            if (notBlank(metaData.getDate())) {
                 tag.setField(FieldKey.YEAR, metaData.getDate());
             }
-            if (!"".equals(metaData.getGenre())) {
+            if (notBlank(metaData.getGenre())) {
                 tag.setField(FieldKey.GENRE, metaData.getGenre());
             }
-            if (!"".equals(metaData.getTrack())) {
+            if (notBlank(metaData.getTrack())) {
                 tag.setField(FieldKey.TRACK, metaData.getTrack());
             }
-            if (!"".equals(metaData.getComment())) {
+            if (notBlank(metaData.getComment())) {
                 tag.setField(FieldKey.COMMENT, metaData.getComment());
             }
             if (metaData.getCover() != null) {
@@ -92,7 +82,20 @@ public class MetaDataWriter {
         }
     }
 
-    // 写入图片时需要先包装成StandardArtwork
+    /**
+     * 判断字符串是否为空
+     * @param str 字符串
+     * @return true: 空 false: 非空
+     */
+    private static boolean notBlank(String str) {
+        return str != null && !"".equals(str.trim());
+    }
+
+    /** 
+     * 写入图片时需要先包装成 StandardArtwork
+     * @param binaryData 图片二进制数据
+     * @return StandardArtwork
+     */
     private static StandardArtwork generateArtwork(byte[] binaryData) {
         StandardArtwork artwork = new StandardArtwork();
         artwork.setBinaryData(binaryData);

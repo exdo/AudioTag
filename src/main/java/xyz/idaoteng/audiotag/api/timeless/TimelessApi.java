@@ -1,6 +1,7 @@
 package xyz.idaoteng.audiotag.api.timeless;
 
 import com.google.gson.Gson;
+import xyz.idaoteng.audiotag.Utils;
 import xyz.idaoteng.audiotag.api.CoverApi;
 import xyz.idaoteng.audiotag.api.timeless.dto.SongDetail;
 import xyz.idaoteng.audiotag.api.timeless.dto.SongsResult;
@@ -21,7 +22,7 @@ public class TimelessApi implements CoverApi {
     private static final HttpClient CLIENT = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
 
     private SongsResult searchSong(String keyword) throws IOException, InterruptedException {
-        keyword = encodeKeyword(keyword);
+        keyword = Utils.encodeKeyword(keyword);
         return gson.fromJson(sendRequest(keyword), SongsResult.class);
     }
 

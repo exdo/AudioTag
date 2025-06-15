@@ -23,7 +23,7 @@ import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
 
-public class Preview {
+public class PreviewRename {
     private static final Stage STAGE = new Stage();
     private static final BorderPane BODY = new BorderPane();
     private static final Font FONT = new Font(13);
@@ -71,7 +71,7 @@ public class Preview {
         STAGE.initModality(Modality.APPLICATION_MODAL);
         Scene scene = new Scene(BODY, 600, 350);
         STAGE.setMinWidth(580);
-        STAGE.setTitle("预览");
+        STAGE.setTitle("重命名预览");
         STAGE.setScene(scene);
     }
 
@@ -100,7 +100,11 @@ public class Preview {
                 for (String path : failedPath_Reason.keySet()) {
                     content.append(path).append(": ").append(failedPath_Reason.get(path)).append("\n");
                 }
-                alert.setContentText(content.toString());
+                TextArea textArea = new TextArea(content.toString());
+                textArea.setEditable(false);
+                textArea.setWrapText(true);
+                textArea.setMaxHeight(500);
+                alert.getDialogPane().setContent(textArea);
                 alert.show();
             } else {
                 Notification.showNotification("已成功重命名");

@@ -167,7 +167,6 @@ public class Aside {
 
     /**
      * 配置组合框
-     *
      * @param type        组合框类型
      * @param comboBox    要配置的组合框
      * @param defaultSize 是否使用默认尺寸
@@ -261,7 +260,6 @@ public class Aside {
 
     /**
      * 更新封面
-     *
      * @param delete 是否删除封面
      */
     private static void updateCover(boolean delete) {
@@ -362,7 +360,6 @@ public class Aside {
 
     /**
      * 获取修改过的标签名称列表
-     *
      * @return 修改过的标签名称列表
      */
     private static List<String> getChangedTags() {
@@ -398,7 +395,6 @@ public class Aside {
 
     /**
      * 交换两个元数据对象的可编辑值
-     *
      * @param from 源元数据对象
      * @param to   目标元数据对象
      */
@@ -415,7 +411,6 @@ public class Aside {
 
     /**
      * 显示元数据到侧边栏
-     *
      * @param original 要显示的音频元数据
      */
     public static void showMetaData(AudioMetaData original) {
@@ -480,7 +475,6 @@ public class Aside {
 
     /**
      * 设置封面图片
-     *
      * @param coverBytes 封面图片字节数组
      */
     private static void setCover(byte[] coverBytes) {
@@ -551,8 +545,7 @@ public class Aside {
 
     /**
      * 获取侧边栏主容器
-     *
-     * @return 侧边栏VBox组件
+     * @return 侧边栏 VBox 组件
      */
     public static VBox getAside() {
         return ASIDE;

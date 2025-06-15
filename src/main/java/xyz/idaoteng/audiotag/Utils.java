@@ -5,7 +5,9 @@ import net.coobird.thumbnailator.Thumbnails;
 
 import javax.imageio.ImageIO;
 import java.io.*;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 public class Utils {
     public static String getPreferencesFilePathInRegistry() {
@@ -115,5 +117,13 @@ public class Utils {
             throw new RuntimeException(e);
         }
         return outputStream.toByteArray();
+    }
+
+    public static String encodeKeyword(String original) {
+        if (original == null || original.trim().equals("")) {
+            return original;
+        }
+
+        return URLEncoder.encode(original, StandardCharsets.UTF_8);
     }
 }

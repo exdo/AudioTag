@@ -207,7 +207,6 @@ public class Center {
 
     /**
      * 使表格行可拖拽
-     *
      * @param row 表格行
      */
     private static void makeRowDraggable(TableRow<AudioMetaData> row) {
@@ -356,7 +355,6 @@ public class Center {
 
     /**
      * 启用/禁用行拖拽功能
-     *
      * @param enable 是否启用
      */
     private static void enableDragRow(boolean enable) {
@@ -376,7 +374,6 @@ public class Center {
 
     /**
      * 检查选中行，如果未选中任何行且NeedToSelectAll设为true，则返回全部行
-     *
      * @return 选中行列表，或null(如果未选中且不需要全选)
      */
     public static List<AudioMetaData> checkSelectedRows() {
@@ -389,7 +386,6 @@ public class Center {
 
     /**
      * 更新表格视图
-     *
      * @param dataList 新数据列表，如果为null则刷新当前表格
      */
     public static void updateTableView(List<AudioMetaData> dataList) {
@@ -409,7 +405,6 @@ public class Center {
 
     /**
      * 记录表格内容更新，生成备选艺术家和专辑集合
-     *
      * @param dataList 数据列表
      */
     private static void recordeUpdate(List<AudioMetaData> dataList) {
@@ -439,7 +434,6 @@ public class Center {
 
     /**
      * 获取备选艺术家列表
-     *
      * @return 艺术家列表
      */
     public static List<String> getAlternativeArtists() {
@@ -448,7 +442,6 @@ public class Center {
 
     /**
      * 获取备选专辑列表
-     *
      * @return 专辑列表
      */
     public static List<String> getAlternativeAlbums() {
@@ -514,7 +507,6 @@ public class Center {
 
     /**
      * 生成删除特定标签菜单
-     *
      * @return 删除标签菜单
      */
     public static Menu generateDeleteSpecificTagMenu() {
@@ -556,7 +548,6 @@ public class Center {
 
     /**
      * 删除指定类型标签
-     *
      * @param tag 标签类型
      */
     private static void deleteTag(EditableTag tag) {
@@ -618,7 +609,6 @@ public class Center {
 
     /**
      * 生成批量设置同一专辑选项菜单
-     *
      * @return 专辑选项菜单
      */
     public static Menu generateSameAlbumOptionMenu() {
@@ -1176,7 +1166,6 @@ public class Center {
 
     /**
      * 获取中央区域节点
-     *
      * @return 表格视图节点
      */
     public static Node getCenter() {
@@ -1185,7 +1174,6 @@ public class Center {
 
     /**
      * 选中指定项目
-     *
      * @param audioMetaData 要选中的音频元数据
      */
     public static void selectItem(AudioMetaData audioMetaData) {
@@ -1195,7 +1183,6 @@ public class Center {
 
     /**
      * 同步重命名按钮状态与右键菜单
-     *
      * @param rename 重命名按钮
      */
     public static void takeOverRenameButton(Button rename) {
@@ -1205,7 +1192,6 @@ public class Center {
 
     /**
      * 同步允许拖拽行选项与右键菜单
-     *
      * @param radioButton 单选按钮
      */
     public static void takeOverEnableDragRow(RadioButton radioButton) {
@@ -1224,7 +1210,6 @@ public class Center {
 
     /**
      * 同步删除特定标签菜单状态
-     *
      * @param menu 菜单
      */
     public static void configDeleteSpecificTagMenu(Menu menu) {
@@ -1251,7 +1236,6 @@ public class Center {
 
     /**
      * 获取当前列顺序
-     *
      * @return 列ID到顺序的映射
      */
     public static HashMap<Integer, String> getColumnOrder() {

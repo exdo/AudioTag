@@ -20,6 +20,11 @@ import java.util.List;
 public class MetaDataReader {
     private static final String BITRATE_UNIT = " kbit/s";
 
+    /**
+     * 读取文件元数据
+     * @param file 文件
+     * @return AudioMetaData 文件元数据
+     */
     public static AudioMetaData readFile(File file) throws CantReadException {
         AudioFile audioFile;
         try {
@@ -60,6 +65,12 @@ public class MetaDataReader {
         return audioMetaData;
     }
 
+    /**
+     * 读取文件夹下所有文件元数据
+     * @param directory 文件夹
+     * @param includeSubfolders 是否包含子文件夹
+     * @return List<AudioMetaData> 文件元数据列表
+     */
     public static List<AudioMetaData> readDirectory(File directory, boolean includeSubfolders) {
         if (includeSubfolders) {
             return getAudioMetaDataRecursively(directory);
@@ -68,6 +79,11 @@ public class MetaDataReader {
         }
     }
 
+    /**
+     * 读取文件夹下所有文件元数据（不包含子文件夹）
+     * @param directory 文件夹
+     * @return List<AudioMetaData> 文件元数据列表
+     */
     private static List<AudioMetaData> getAudioMetaData(File directory) {
         List<AudioMetaData> dataList = new ArrayList<>();
         try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(directory.toPath())) {
@@ -87,6 +103,11 @@ public class MetaDataReader {
         return dataList;
     }
 
+    /**
+     * 递归读取文件夹下所有文件元数据（包含子文件夹）
+     * @param directory 文件夹
+     * @return List<AudioMetaData> 文件元数据列表
+     */
     private static List<AudioMetaData> getAudioMetaDataRecursively(File directory) {
         List<AudioMetaData> dataList = new ArrayList<>();
         Path dirPath = directory.toPath();
@@ -111,6 +132,11 @@ public class MetaDataReader {
         return dataList;
     }
 
+    /**
+     * 读取文件夹下所有文件元数据（包含子文件夹）
+     * @param directory 文件夹
+     * @return List<AudioMetaData> 文件元数据列表
+     */
     private static List<AudioMetaData> readSubfolders(File directory) {
         return getAudioMetaDataRecursively(directory);
     }

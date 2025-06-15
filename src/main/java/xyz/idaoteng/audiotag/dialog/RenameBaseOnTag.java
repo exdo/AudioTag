@@ -51,7 +51,7 @@ public class RenameBaseOnTag {
         fillBlank.setToggleGroup(strategyGroup);
 
         Button confirm = new Button("确定");
-        configConfirmButton(confirm);
+        setupConfirmButton(confirm);
         Button cancel = new Button("取消");
         cancel.setOnAction(event -> STAGE.close());
 
@@ -69,7 +69,7 @@ public class RenameBaseOnTag {
         STAGE.setScene(scene);
     }
 
-    private static void configConfirmButton(Button confirm) {
+    private static void setupConfirmButton(Button confirm) {
         confirm.setOnAction(event -> {
             String template = TEMPLATE_TEXT_FIELD.getText().trim();
             if (template.equals("")) {
@@ -93,7 +93,7 @@ public class RenameBaseOnTag {
                 }
 
                 if (!previewList.isEmpty()) {
-                    Preview.show(previewList);
+                    PreviewRename.show(previewList);
                 }
 
                 STAGE.close();

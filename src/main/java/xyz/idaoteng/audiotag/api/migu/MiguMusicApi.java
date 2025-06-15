@@ -1,6 +1,7 @@
 package xyz.idaoteng.audiotag.api.migu;
 
 import com.google.gson.Gson;
+import xyz.idaoteng.audiotag.Utils;
 import xyz.idaoteng.audiotag.api.CoverApi;
 import xyz.idaoteng.audiotag.api.migu.dto.MiguSong;
 
@@ -26,8 +27,7 @@ public class MiguMusicApi implements CoverApi {
 
     private String sendRequest(String keyword) throws IOException, InterruptedException {
         String url = "https://app.u.nf.migu.cn/pc/resource/song/item/search/v1.0?text=" +
-                encodeKeyword(keyword) +
-                "&pageNo=1&pageSize=20";
+                Utils.encodeKeyword(keyword) + "&pageNo=1&pageSize=20";
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
