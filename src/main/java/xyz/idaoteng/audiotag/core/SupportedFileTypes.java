@@ -19,7 +19,7 @@ public class SupportedFileTypes {
 
     public static boolean isSupported(File file) {
         String extension = Utils.getExtension(file);
-        if ("dff".equals(extension)) {
+        if ("dff".equals(extension) || "mp4".equals(extension)) {
             return false;
         }
         return SUPPORTED_FILE_TYPES.contains(extension);
@@ -29,6 +29,7 @@ public class SupportedFileTypes {
         List<String> types = new ArrayList<>(5);
         SUPPORTED_FILE_TYPES.forEach(type -> types.add("*." + type));
         types.remove("*." + "dff");
+        types.remove("*." + "mp4");
         return types;
     }
 }
