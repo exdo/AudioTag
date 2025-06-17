@@ -327,7 +327,7 @@ public class Aside {
 
             exchangeEditableValue(metaDataDisplayed, originalMetaData); // 将修改同步到原始元数据
 
-            MetaDataWriter.write(originalMetaData, EditableTag.ALL); // 写入元数据到文件
+            MetaDataWriter.write(originalMetaData, changedTags); // 写入元数据到文件
 
             showMetaData(originalMetaData); // 刷新显示
             Center.updateTableView(null); // 更新中心区域的表格视图+

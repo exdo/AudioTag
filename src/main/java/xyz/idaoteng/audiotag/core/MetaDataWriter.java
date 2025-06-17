@@ -15,13 +15,24 @@ import xyz.idaoteng.audiotag.bean.AudioMetaData;
 import xyz.idaoteng.audiotag.constant.EditableTag;
 
 import java.io.File;
+import java.util.List;
 
 public class MetaDataWriter {
-    /** 
+    /**
      * 写入标签
-     * @param metaData 音频文件的元数据
+     * @param metaData 音频文件元数据
+     * @param tagName 可编辑标签类型
      */
     public static void write(AudioMetaData metaData, EditableTag tagName) {
+        write(metaData, List.of(tagName));
+    }
+
+    /**
+     * 写入标签
+     * @param metaData 音频文件元数据
+     * @param tagNames 可编辑标签类型列表
+     */
+    public static void write(AudioMetaData metaData, List<EditableTag> tagNames) {
         File file = new File(metaData.getAbsolutePath());
         AudioFile audioFile;
         Tag tag;
@@ -29,57 +40,31 @@ public class MetaDataWriter {
             audioFile = AudioFileIO.read(file);
             tag = getUnifiedVersionTag(audioFile);
         } catch (Exception e) {
-            System.out.println("读取或删除音频文件音频文件标签失败：" + metaData.getAbsolutePath());
-            System.out.println(e.getMessage());
-            e.printStackTrace();
+            handleReadError(metaData, e);
             return;
         }
 
-        try {
-            switch (tagName) {
-                case TITLE -> tag.setField(FieldKey.TITLE, metaData.getTitle());
-                case ARTIST -> tag.setField(FieldKey.ARTIST, metaData.getArtist());
-                case ALBUM -> tag.setField(FieldKey.ALBUM, metaData.getAlbum());
-                case DATE -> tag.setField(FieldKey.YEAR, metaData.getDate());
-                case GENRE -> tag.setField(FieldKey.GENRE, metaData.getGenre());
-                case TRACK -> tag.setField(FieldKey.TRACK, metaData.getTrack());
-                case COMMENT -> tag.setField(FieldKey.COMMENT, metaData.getComment());
-                case COVER -> {
-                    if (metaData.getCover() != null) {
-                        tag.setField(generateArtwork(metaData.getCover()));
-                    } else {
-                        tag.deleteArtworkField();
-                    }
-                }
-                case ALL -> {
-                    tag.setField(FieldKey.TITLE, metaData.getTitle());
-                    tag.setField(FieldKey.ARTIST, metaData.getArtist());
-                    tag.setField(FieldKey.ALBUM, metaData.getAlbum());
-                    tag.setField(FieldKey.YEAR, metaData.getDate());
-                    tag.setField(FieldKey.GENRE, metaData.getGenre());
-                    tag.setField(FieldKey.TRACK, metaData.getTrack());
-                    tag.setField(FieldKey.COMMENT, metaData.getComment());
-                    if (metaData.getCover() != null) {
-                        tag.deleteArtworkField();
-                        tag.setField(generateArtwork(metaData.getCover()));
-                    } else {
-                        tag.deleteArtworkField();
-                    }
-                }
-            }
-        } catch (FieldDataInvalidException e) {
-            e.printStackTrace();
-            System.out.println("写入标签时字段数据非法：" + metaData.getAbsolutePath());
-            System.out.println(e.getMessage());
+        for (EditableTag tagName : tagNames) {
+            setTagFiled(metaData, tag, tagName);
         }
 
         try {
             AudioFileIO.write(audioFile);
         } catch (Exception e) {
-            System.out.println("写入标签时IO异常: metaData.getAbsolutePath()");
-            System.out.println(e.getMessage());
-            e.printStackTrace();
+            handleWriteError(metaData, e);
         }
+    }
+
+    private static void handleReadError(AudioMetaData metaData, Exception e) {
+        System.out.println("读取或删除音频文件音频文件标签失败：" + metaData.getAbsolutePath());
+        System.out.println(e.getMessage());
+        e.printStackTrace();
+    }
+
+    private static void handleWriteError(AudioMetaData metaData, Exception e) {
+        System.out.println("写入标签时IO异常: " + metaData.getAbsolutePath());
+        System.out.println(e.getMessage());
+        e.printStackTrace();
     }
 
     /**
@@ -143,6 +128,47 @@ public class MetaDataWriter {
         }
         audioFile.setTag(tag);
         return tag;
+    }
+
+    private static void setTagFiled(AudioMetaData metaData, Tag tag, EditableTag tagName) {
+        try {
+            switch (tagName) {
+                case TITLE -> tag.setField(FieldKey.TITLE, metaData.getTitle());
+                case ARTIST -> tag.setField(FieldKey.ARTIST, metaData.getArtist());
+                case ALBUM -> tag.setField(FieldKey.ALBUM, metaData.getAlbum());
+                case DATE -> tag.setField(FieldKey.YEAR, metaData.getDate());
+                case GENRE -> tag.setField(FieldKey.GENRE, metaData.getGenre());
+                case TRACK -> tag.setField(FieldKey.TRACK, metaData.getTrack());
+                case COMMENT -> tag.setField(FieldKey.COMMENT, metaData.getComment());
+                case COVER -> {
+                    if (metaData.getCover() != null) {
+                        tag.deleteArtworkField();
+                        tag.setField(generateArtwork(metaData.getCover()));
+                    } else {
+                        tag.deleteArtworkField();
+                    }
+                }
+                case ALL -> {
+                    tag.setField(FieldKey.TITLE, metaData.getTitle());
+                    tag.setField(FieldKey.ARTIST, metaData.getArtist());
+                    tag.setField(FieldKey.ALBUM, metaData.getAlbum());
+                    tag.setField(FieldKey.YEAR, metaData.getDate());
+                    tag.setField(FieldKey.GENRE, metaData.getGenre());
+                    tag.setField(FieldKey.TRACK, metaData.getTrack());
+                    tag.setField(FieldKey.COMMENT, metaData.getComment());
+                    if (metaData.getCover() != null) {
+                        tag.deleteArtworkField();
+                        tag.setField(generateArtwork(metaData.getCover()));
+                    } else {
+                        tag.deleteArtworkField();
+                    }
+                }
+            }
+        } catch (FieldDataInvalidException e) {
+            e.printStackTrace();
+            System.out.println("写入标签时字段数据非法：" + metaData.getAbsolutePath());
+            System.out.println(e.getMessage());
+        }
     }
 
     /** 
