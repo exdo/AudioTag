@@ -7,11 +7,11 @@ import org.jaudiotagger.tag.reference.ID3V2Version;
 
 public class TagOption {
     public static void setupOptions() {
-        // 默认使用 ID3v2.3（目前 ID3v2.3 仍然是主流）
+        // 升级到 ID3V2.4
         TagOptionSingleton option = TagOptionSingleton.getInstance();
-        option.setID3V2Version(ID3V2Version.ID3_V23);
+        option.setID3V2Version(ID3V2Version.ID3_V24);
         // 只读取 wav文件的 ID3 标签
-        option.setWavOptions(WavOptions.READ_ID3_ONLY);
+        option.setWavOptions(WavOptions.READ_ID3_ONLY_AND_SYNC);
         // 保存 wav 文件的 ID3 标签和 INFO 标签
         option.setWavSaveOptions(WavSaveOptions.SAVE_BOTH);
     }

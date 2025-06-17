@@ -66,7 +66,7 @@ public class Center {
     private static boolean disableDragRow = true;
     // 删除特定标签的菜单
     private static Menu deleteSpecificTagMenu;
-    // 在 javafx 中一个完整的拖动事件也是单击事件
+
     // 鼠标是否进行过拖动：用来确认是到底是拖动还是单击
     private static boolean mouseDragged = false;
     // 起始行号：鼠标按下时的行号
@@ -579,7 +579,7 @@ public class Center {
                     item.setCover(null);
                 }
             }
-            MetaDataWriter.write(item); // 写入文件
+            MetaDataWriter.write(item, tag); // 写入文件
         }
 
         Aside.refresh();
@@ -600,7 +600,7 @@ public class Center {
         // 为所有选中项设置相同专辑名
         for (AudioMetaData selectedItem : selectedItems) {
             selectedItem.setAlbum(albumName);
-            MetaDataWriter.write(selectedItem);
+            MetaDataWriter.write(selectedItem, EditableTag.ALBUM);
         }
         Aside.refresh();
         updateTableView(null);
@@ -657,7 +657,7 @@ public class Center {
             if (!"".equals(album)) {
                 // 根据 专辑 找到 封面
                 selectedItem.setCover(albumCovers.get(album));
-                MetaDataWriter.write(selectedItem);
+                MetaDataWriter.write(selectedItem, EditableTag.COVER);
             }
         }
         Aside.refresh();
@@ -714,7 +714,7 @@ public class Center {
             if (!"".equals(album)) {
                 // 根据 专辑 找到 流派
                 item.setGenre(albumGenre.get(album));
-                MetaDataWriter.write(item);
+                MetaDataWriter.write(item, EditableTag.GENRE);
             }
         }
         Aside.refresh();
@@ -743,7 +743,7 @@ public class Center {
             if (!"".equals(album)) {
                 // 根据 专辑 找到 发行日期
                 selectedItem.setDate(albumDate.get(album));
-                MetaDataWriter.write(selectedItem);
+                MetaDataWriter.write(selectedItem, EditableTag.DATE);
             }
         }
         Aside.refresh();

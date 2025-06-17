@@ -19,6 +19,7 @@ import xyz.idaoteng.audiotag.StartUp;
 import xyz.idaoteng.audiotag.Utils;
 import xyz.idaoteng.audiotag.bean.AudioMetaData;
 import xyz.idaoteng.audiotag.constant.ComboBoxType;
+import xyz.idaoteng.audiotag.constant.EditableTag;
 import xyz.idaoteng.audiotag.constant.MusicGenre;
 import xyz.idaoteng.audiotag.core.MetaDataWriter;
 import xyz.idaoteng.audiotag.dialog.SelectCover;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * 音频文件元数据编辑侧边栏组件
@@ -65,8 +67,6 @@ public class Aside {
     // 元数据存储
     private static AudioMetaData originalMetaData = null; // 原始元数据
     private static AudioMetaData metaDataDisplayed = null; // 当前显示的元数据(可能包含编辑后的内容)
-    // 侧边栏最小高度
-    private static double asideMinHeight = 0;
 
     /*
       静态初始化块 - 初始化侧边栏UI组件
@@ -83,22 +83,18 @@ public class Aside {
         // 配置各个元数据组合框和对应的标签
         // 标题
         Label titleLabel = new Label("标题");
-        asideMinHeight = asideMinHeight + titleLabel.getHeight();
         configComboBox(ComboBoxType.TITLE, TITLE_COMBO_BOX, true);
 
         // 艺术家
         Label artistLabel = new Label("艺术家");
-        asideMinHeight = asideMinHeight + artistLabel.getHeight();
         configComboBox(ComboBoxType.ARTIST, ARTIST_COMBO_BOX, true);
 
         // 专辑
         Label albumLabel = new Label("专辑");
-        asideMinHeight = asideMinHeight + albumLabel.getHeight();
         configComboBox(ComboBoxType.ALBUM, ALBUM_COMBO_BOX, true);
 
         // 出版日期
         Label dateLabel = new Label("出版日期");
-        asideMinHeight = asideMinHeight + dateLabel.getHeight();
         configComboBox(ComboBoxType.DATE, DATE_COMBO_BOX, true);
 
         // 流派
@@ -124,7 +120,6 @@ public class Aside {
 
         // 备注
         Label commentLabel = new Label("备注");
-        asideMinHeight = asideMinHeight + commentLabel.getHeight();
         configComboBox(ComboBoxType.COMMENT, COMMENT_COMBO_BOX, true);
 
         // 封面面板
@@ -146,7 +141,6 @@ public class Aside {
         // 封面面板和操作按钮的水平布局
         HBox coverPanelAndOptions = new HBox(3);
         coverPanelAndOptions.getChildren().addAll(COVER_PANEL, coverOptions);
-        asideMinHeight = asideMinHeight + coverPanelAndOptions.getHeight();
 
         // 初始化确认按钮区域
         initConfirmBox();
@@ -154,7 +148,6 @@ public class Aside {
         // 设置侧边栏尺寸
         ASIDE.setMinWidth(280);
         ASIDE.setMaxWidth(280);
-        ASIDE.setMinHeight(asideMinHeight);
 
         // 将所有组件添加到侧边栏主容器中
         ASIDE.getChildren().addAll(titleLabel, TITLE_COMBO_BOX, artistLabel, ARTIST_COMBO_BOX, albumLabel,
@@ -177,7 +170,6 @@ public class Aside {
             comboBox.setMaxWidth(250);
         }
 
-        asideMinHeight = asideMinHeight + comboBox.getHeight();
         comboBox.setEditable(true); // 允许编辑
 
         // 值变化监听器 - 当组合框值变化时更新显示的元数据
@@ -330,18 +322,18 @@ public class Aside {
         CONFIRM_BUTTON.setOnAction(event -> {
             if (originalMetaData == null || metaDataDisplayed == null) return;
 
-            List<String> changedTagNames = getChangedTags(); // 获取修改过的标签
-            if (changedTagNames.isEmpty()) return; // 没有修改则不执行任何操作
+            List<EditableTag> changedTags = getChangedTags(); // 获取修改过的标签
+            if (changedTags.isEmpty()) return; // 没有修改则不执行任何操作
 
             exchangeEditableValue(metaDataDisplayed, originalMetaData); // 将修改同步到原始元数据
 
-            MetaDataWriter.write(originalMetaData); // 写入元数据到文件
+            MetaDataWriter.write(originalMetaData, EditableTag.ALL); // 写入元数据到文件
 
             showMetaData(originalMetaData); // 刷新显示
-            Center.updateTableView(null); // 更新中心区域的表格视图
+            Center.updateTableView(null); // 更新中心区域的表格视图+
             Center.selectItem(originalMetaData); // 选中当前项
-            String message = String.join("、", changedTagNames) + " 已修改";
-            Notification.showNotification(message); // 显示通知
+            String msg = changedTags.stream().map(EditableTag::getText).collect(Collectors.joining("、"));
+            Notification.showNotification(msg + " 已修改"); // 显示通知
         });
 
         // 取消按钮点击事件 - 丢弃修改
@@ -355,39 +347,38 @@ public class Aside {
         CONFIRM_BOX.setSpacing(50);
         CONFIRM_BOX.setPadding(new Insets(20, 0, 0, 0));
         CONFIRM_BOX.getChildren().addAll(CONFIRM_BUTTON, CANCEL_BUTTON);
-        asideMinHeight = asideMinHeight + CONFIRM_BOX.getHeight();
     }
 
     /**
      * 获取修改过的标签名称列表
      * @return 修改过的标签名称列表
      */
-    private static List<String> getChangedTags() {
-        List<String> changedTagNames = new ArrayList<>();
+    private static List<EditableTag> getChangedTags() {
+        List<EditableTag> changedTagNames = new ArrayList<>();
         if (originalMetaData != null && metaDataDisplayed != null) {
             if (!originalMetaData.getTitle().equals(metaDataDisplayed.getTitle())) {
-                changedTagNames.add("标题");
+                changedTagNames.add(EditableTag.TITLE);
             }
             if (!originalMetaData.getArtist().equals(metaDataDisplayed.getArtist())) {
-                changedTagNames.add("艺术家");
+                changedTagNames.add(EditableTag.ARTIST);
             }
             if (!originalMetaData.getAlbum().equals(metaDataDisplayed.getAlbum())) {
-                changedTagNames.add("专辑");
+                changedTagNames.add(EditableTag.ALBUM);
             }
             if (!originalMetaData.getDate().equals(metaDataDisplayed.getDate())) {
-                changedTagNames.add("日期");
+                changedTagNames.add(EditableTag.DATE);
             }
             if (!originalMetaData.getGenre().equals(metaDataDisplayed.getGenre())) {
-                changedTagNames.add("流派");
+                changedTagNames.add(EditableTag.GENRE);
             }
             if (!originalMetaData.getTrack().equals(metaDataDisplayed.getTrack())) {
-                changedTagNames.add("序号");
+                changedTagNames.add(EditableTag.TRACK);
             }
             if (!originalMetaData.getComment().equals(metaDataDisplayed.getComment())) {
-                changedTagNames.add("备注");
+                changedTagNames.add(EditableTag.COMMENT);
             }
             if (!Arrays.equals(originalMetaData.getCover(), metaDataDisplayed.getCover())) {
-                changedTagNames.add("封面");
+                changedTagNames.add(EditableTag.COVER);
             }
         }
         return changedTagNames;

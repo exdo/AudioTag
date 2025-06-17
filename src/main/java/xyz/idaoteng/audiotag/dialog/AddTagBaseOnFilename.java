@@ -13,6 +13,7 @@ import xyz.idaoteng.audiotag.Utils;
 import xyz.idaoteng.audiotag.bean.AudioMetaData;
 import xyz.idaoteng.audiotag.component.Aside;
 import xyz.idaoteng.audiotag.component.Center;
+import xyz.idaoteng.audiotag.constant.EditableTag;
 import xyz.idaoteng.audiotag.core.MetaDataWriter;
 import xyz.idaoteng.audiotag.component.Notification;
 
@@ -233,56 +234,56 @@ public class AddTagBaseOnFilename {
                     // 如果选择跳过已有值，则只在原值为空时添加
                     if ("".equals(metaData.getTitle())) {
                         metaData.setTitle(value);
-                        MetaDataWriter.write(metaData); // 写入元数据到文件
+                        MetaDataWriter.write(metaData, EditableTag.TITLE); // 写入元数据到文件
                     }
                 } else {
                     // 覆盖模式，直接设置值
                     metaData.setTitle(value);
-                    MetaDataWriter.write(metaData);
+                    MetaDataWriter.write(metaData, EditableTag.TITLE);
                 }
             }
             case "artist" -> {
                 if (SKIP_RADIO_BUTTON.isSelected()) {
                     if ("".equals(metaData.getArtist())) {
                         metaData.setArtist(value);
-                        MetaDataWriter.write(metaData);
+                        MetaDataWriter.write(metaData, EditableTag.ARTIST);
                     }
                 } else {
                     metaData.setArtist(value);
-                    MetaDataWriter.write(metaData);
+                    MetaDataWriter.write(metaData, EditableTag.ARTIST);
                 }
             }
             case "album" -> {
                 if (SKIP_RADIO_BUTTON.isSelected()) {
                     if ("".equals(metaData.getAlbum())) {
                         metaData.setAlbum(value);
-                        MetaDataWriter.write(metaData);
+                        MetaDataWriter.write(metaData,  EditableTag.ALBUM);
                     }
                 } else {
                     metaData.setAlbum(value);
-                    MetaDataWriter.write(metaData);
+                    MetaDataWriter.write(metaData,  EditableTag.ALBUM);
                 }
             }
             case "date" ->{
                 if (SKIP_RADIO_BUTTON.isSelected()) {
                     if ("".equals(metaData.getDate())) {
                         metaData.setDate(value);
-                        MetaDataWriter.write(metaData);
+                        MetaDataWriter.write(metaData, EditableTag.DATE);
                     }
                 } else {
                     metaData.setDate(value);
-                    MetaDataWriter.write(metaData);
+                    MetaDataWriter.write(metaData, EditableTag.DATE);
                 }
             }
             case "track" -> {
                 if (SKIP_RADIO_BUTTON.isSelected()) {
                     if ("".equals(metaData.getTrack())) {
                         metaData.setTrack(value);
-                        MetaDataWriter.write(metaData);
+                        MetaDataWriter.write(metaData, EditableTag.TRACK);
                     }
                 } else {
                     metaData.setTrack(value);
-                    MetaDataWriter.write(metaData);
+                    MetaDataWriter.write(metaData, EditableTag.TRACK);
                 }
             }
             case "ignore" -> {} // 忽略该部分

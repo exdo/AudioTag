@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import xyz.idaoteng.audiotag.component.Aside;
@@ -32,6 +33,10 @@ public class StartUp extends Application {
         StackPane root = new StackPane();
 
         BorderPane borderPane = new BorderPane();
+        borderPane.setMaxHeight(Screen.getPrimary().getVisualBounds().getHeight());
+        borderPane.setPrefHeight(735);
+        borderPane.setPrefWidth(1100);
+
         borderPane.setCenter(Center.getCenter());
         borderPane.setTop(Head.getHead());
         borderPane.setRight(Aside.getAside());
@@ -40,12 +45,12 @@ public class StartUp extends Application {
         root.getChildren().addAll(borderPane, modal);
         StackPane.setAlignment(modal, Pos.CENTER);
 
-        Scene scene = new Scene(root, 1200, 725);
+        Scene scene = new Scene(root);
         primaryStage.setScene(scene);
         primaryStage.setTitle("音乐信息编辑器");
         primaryStage.getIcons().add(ImageInApp.getAppIcon());
-        primaryStage.setMinHeight(borderPane.getHeight());
-        primaryStage.setMinWidth(1000);
+        primaryStage.sizeToScene();
+
         primaryStage.show();
 
         Center.configWhenTableAlreadyRendered();
