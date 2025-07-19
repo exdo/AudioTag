@@ -7,18 +7,43 @@ public class SongDetail {
     private String songmid;
     private String songname;
 
-    public String getAlbumcover() { return albumcover; }
-    public void setAlbumcover(String value) { this.albumcover = value; }
+    public String getAlbumcover() {
+        return albumcover;
+    }
 
-    public String getAlbumname() { return albumname; }
-    public void setAlbumname(String value) { this.albumname = value; }
+    public void setAlbumcover(String value) {
+        this.albumcover = value;
+    }
 
-    public Singer[] getSinger() { return singer; }
-    public void setSinger(Singer[] value) { this.singer = value; }
+    public String getAlbumname() {
+        return albumname;
+    }
 
-    public String getSongmid() { return songmid; }
-    public void setSongmid(String value) { this.songmid = value; }
+    public void setAlbumname(String value) {
+        this.albumname = value;
+    }
 
-    public String getSongname() { return songname; }
-    public void setSongname(String value) { this.songname = value; }
+    public Singer[] getSinger() {
+        return singer;
+    }
+
+    public void setSinger(Singer[] value) {
+        this.singer = value;
+    }
+
+    public String getSongmid() {
+        return songmid;
+    }
+
+    public void setSongmid(String value) {
+        this.songmid = value;
+    }
+
+    public String getSongname() {
+        return songname;
+    }
+
+    public void setSongname(String value) {
+        this.songname = value;
+    }
 }

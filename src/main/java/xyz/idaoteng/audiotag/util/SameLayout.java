@@ -1,4 +1,4 @@
-package xyz.idaoteng.audiotag.dialog;
+package xyz.idaoteng.audiotag.util;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuButton;
@@ -6,10 +6,8 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
-import xyz.idaoteng.audiotag.ImageInApp;
 
-
-public class CommonConfig {
+public class SameLayout {
     // 在输入框最右边添加 X 号按钮，用于清空输入框
     // 将输入框和菜单按钮组合成一个 HBox
     public static HBox packageIntoHBox(TextField textField, MenuButton menuButton) {
@@ -64,7 +62,7 @@ public class CommonConfig {
         if (includeIgnore) {
             MenuItem ignore = new MenuItem("忽略");
             ignore.setOnAction(event -> textField.setText(textField.getText() + "`ignore`"));
-             menuButton.getItems().add(ignore);
+            menuButton.getItems().add(ignore);
         }
     }
 }

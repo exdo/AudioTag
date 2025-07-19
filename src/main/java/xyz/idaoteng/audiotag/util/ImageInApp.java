@@ -1,4 +1,4 @@
-package xyz.idaoteng.audiotag;
+package xyz.idaoteng.audiotag.util;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -9,13 +9,13 @@ import java.io.InputStream;
 
 public class ImageInApp {
     private static final ByteArrayOutputStream DEFAULT_COVER = new ByteArrayOutputStream();
-    private static final ByteArrayOutputStream RENAME_ICON = new ByteArrayOutputStream();
     private static final ByteArrayOutputStream DELETE_ICON = new ByteArrayOutputStream();
     private static final ByteArrayOutputStream ERROR_ICON = new ByteArrayOutputStream();
-    private static final ByteArrayOutputStream SELECT_ALL_ICON = new ByteArrayOutputStream();
     private static final ByteArrayOutputStream CLEAR_ICON = new ByteArrayOutputStream();
     private static final ByteArrayOutputStream ALBUM_ICON = new ByteArrayOutputStream();
     private static final ByteArrayOutputStream APP_ICON = new ByteArrayOutputStream();
+    private static final ByteArrayOutputStream LYRIC_ICON = new ByteArrayOutputStream();
+    private static final ByteArrayOutputStream SEARCH_EMPTY_ICON = new ByteArrayOutputStream();
 
     static {
         try (InputStream inputStream = ImageInApp.class.getResourceAsStream("cover.png")) {
@@ -23,13 +23,6 @@ public class ImageInApp {
             inputStream.transferTo(DEFAULT_COVER);
         } catch (Exception e) {
             throw new RuntimeException("无法加载默认封面图片");
-        }
-
-        try (InputStream inputStream = ImageInApp.class.getResourceAsStream("rename.png")) {
-            if (inputStream == null) throw new RuntimeException("无法加载重命名图标");
-            inputStream.transferTo(RENAME_ICON);
-        } catch (Exception e) {
-            throw new RuntimeException("无法加载重命名图标");
         }
 
         try (InputStream inputStream = ImageInApp.class.getResourceAsStream("delete.png")) {
@@ -44,13 +37,6 @@ public class ImageInApp {
             inputStream.transferTo(ERROR_ICON);
         } catch (Exception e) {
             throw new RuntimeException("无法加载错误图标");
-        }
-
-        try (InputStream inputStream = ImageInApp.class.getResourceAsStream("select_all.png")) {
-            if (inputStream == null) throw new RuntimeException("无法加载全选图标");
-            inputStream.transferTo(SELECT_ALL_ICON);
-        } catch (Exception e) {
-            throw new RuntimeException("无法加载全选图标");
         }
 
         try (InputStream inputStream = ImageInApp.class.getResourceAsStream("clear.png")) {
@@ -73,6 +59,20 @@ public class ImageInApp {
         } catch (Exception e) {
             throw new RuntimeException("无法加载应用图标");
         }
+
+        try (InputStream inputStream = ImageInApp.class.getResourceAsStream("lyric.png")) {
+            if (inputStream == null) throw new RuntimeException("无法加载歌词图标");
+            inputStream.transferTo(LYRIC_ICON);
+        } catch (Exception e) {
+            throw new RuntimeException("无法加载歌词图标");
+        }
+
+        try (InputStream inputStream = ImageInApp.class.getResourceAsStream("search-empty.png")) {
+            if (inputStream == null) throw new RuntimeException("无法加载搜索为空图标");
+            inputStream.transferTo(LYRIC_ICON);
+        } catch (Exception e) {
+            throw new RuntimeException("无法加载搜索为空图标");
+        }
     }
 
     public static ImageView getDefaultCover() {
@@ -81,14 +81,6 @@ public class ImageInApp {
         cover.setFitHeight(90);
         cover.setImage(new Image(new ByteArrayInputStream(DEFAULT_COVER.toByteArray())));
         return cover;
-    }
-
-    public static ImageView getRenameIcon() {
-        ImageView icon = new ImageView();
-        icon.setFitWidth(30);
-        icon.setFitHeight(30);
-        icon.setImage(new Image(new ByteArrayInputStream(RENAME_ICON.toByteArray())));
-        return icon;
     }
 
     public static ImageView getDeleteIcon() {
@@ -107,14 +99,6 @@ public class ImageInApp {
         return icon;
     }
 
-    public static ImageView getSelectAllIcon() {
-        ImageView icon = new ImageView();
-        icon.setFitWidth(35);
-        icon.setFitHeight(35);
-        icon.setImage(new Image(new ByteArrayInputStream(SELECT_ALL_ICON.toByteArray())));
-        return icon;
-    }
-
     public static ImageView getClearIcon() {
         ImageView icon = new ImageView();
         icon.setFitWidth(20);
@@ -128,6 +112,22 @@ public class ImageInApp {
         icon.setFitWidth(35);
         icon.setFitHeight(35);
         icon.setImage(new Image(new ByteArrayInputStream(ALBUM_ICON.toByteArray())));
+        return icon;
+    }
+
+    public static ImageView getLyricIcon() {
+        ImageView icon = new ImageView();
+        icon.setFitWidth(20);
+        icon.setFitHeight(20);
+        icon.setImage(new Image(new ByteArrayInputStream(LYRIC_ICON.toByteArray())));
+        return icon;
+    }
+
+    public static ImageView getSearchEmptyIcon() {
+        ImageView icon = new ImageView();
+        icon.setFitWidth(35);
+        icon.setFitHeight(35);
+        icon.setImage(new Image(new ByteArrayInputStream(SEARCH_EMPTY_ICON.toByteArray())));
         return icon;
     }
 

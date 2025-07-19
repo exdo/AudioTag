@@ -16,27 +16,29 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import xyz.idaoteng.audiotag.Utils;
-import xyz.idaoteng.audiotag.api.CoverApi;
+import xyz.idaoteng.audiotag.api.MusicApi;
 import xyz.idaoteng.audiotag.api.migu.MiguMusicApi;
 import xyz.idaoteng.audiotag.api.netease.NetEaseMusicApi;
 import xyz.idaoteng.audiotag.api.timeless.TimelessApi;
+import xyz.idaoteng.audiotag.util.Utils;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.function.Consumer;
 
 /**
- *  SelectCover 类用于显示一个选择封面的对话框
- *  它从多个音乐平台（QQ音乐、网易云音乐、咪咕音乐）获取封面，并允许用户选择其中一个
- *  使用线程池和 CountDownLatch 来优化并发任务
+ * SearchCover 类用于显示一个选择封面的对话框
+ * 它从音乐平台：QQ音乐、网易云音乐、咪咕音乐获取封面，并允许用户选择其中一个
  */
-public class SelectCover {
+public class SearchCover {
     // 常量定义
     private static final double IMAGE_SIZE = 150.0;
-    private static final double PREVIEW_IMAGE_MAX_SIZE = 600.0; // 预览图片的最大尺寸
+    private static final double PREVIEW_IMAGE_MAX_SIZE = 600.0;
     private static final double WAITING_PAGE_PROGRESS_SIZE = 75.0;
     private static final int PANE_SPACING = 8;
     private static final int CONTENT_SPACING = 10;
@@ -47,7 +49,6 @@ public class SelectCover {
     private static final int PADDING_SMALL = 10;
     private static final int PADDING_MEDIUM = 15;
     private static final int PADDING_LARGE = 20;
-
     private static final String STYLE_BOLD_FONT = "-fx-font-weight: bold";
 
     private static final Stage STAGE = new Stage();
@@ -55,11 +56,11 @@ public class SelectCover {
     private static final Scene SCENE = new Scene(PANE);
 
     private static final ToggleGroup TOGGLE_GROUP = new ToggleGroup();
-    private static final CoverApi COVER_API_TIMELESS = new TimelessApi();
-    private static final CoverApi COVER_API_NET_EASE = new NetEaseMusicApi();
-    private static final CoverApi COVER_API_MIGU = new MiguMusicApi();
+    private static final MusicApi QQ_MUSIC_API = new TimelessApi();
+    private static final MusicApi NET_EASE_API = new NetEaseMusicApi();
+    private static final MusicApi MIGU_MUSIC_API = new MiguMusicApi();
 
-    private static final List<byte[]> COVERS_FROM_TIMELESS = new ArrayList<>();
+    private static final List<byte[]> COVERS_FROM_QQ = new ArrayList<>();
     private static final List<byte[]> COVERS_FROM_NET_EASE = new ArrayList<>();
     private static final List<byte[]> COVERS_FROM_MIGU = new ArrayList<>();
 
@@ -73,10 +74,11 @@ public class SelectCover {
     static {
         COVER_SEARCH_EXECUTOR = Executors.newFixedThreadPool(4, new ThreadFactory() {
             private int counter = 0;
+
             @Override
             public Thread newThread(Runnable r) {
                 Thread thread = new Thread(r, "CoverSearchThread-" + counter++);
-                thread.setDaemon(true); // 设置为守护线程
+                thread.setDaemon(true);
                 return thread;
             }
         });
@@ -94,11 +96,12 @@ public class SelectCover {
     private static byte[] result = null;
 
     /**
-     *  显示选择封面的对话框
-     *  @param title    歌曲标题
-     *  @param artist   歌曲艺术家
-     *  @param album    歌曲专辑
-     *  @param onResult  选择封面后的回调函数，传递封面数据
+     * 显示选择封面的对话框
+     *
+     * @param title    歌曲标题
+     * @param artist   歌曲艺术家
+     * @param album    歌曲专辑
+     * @param onResult 选择封面后的回调函数，传递封面数据
      */
     public static void show(String title, String artist, String album, Consumer<byte[]> onResult) {
         // 重置数据
@@ -111,25 +114,26 @@ public class SelectCover {
         showWaitingPage(loadTask);
 
         // 启动后台任务
-        COVER_SEARCH_EXECUTOR.submit(loadTask); // 使用线程池
+        COVER_SEARCH_EXECUTOR.submit(loadTask);
 
         // 窗口关闭时取消任务
         STAGE.setOnCloseRequest(event -> loadTask.cancel());
     }
 
     /**
-     *  创建异步任务，用于加载封面图片
-     *  @param title    歌曲标题
-     *  @param artist   歌曲艺术家
-     *  @param album    歌曲专辑
-     *  @param onResult  加载完成后的回调函数，传递封面数据
-     *  @return 异步任务
+     * 创建异步任务，用于加载封面图片
+     *
+     * @param title    歌曲标题
+     * @param artist   歌曲艺术家
+     * @param album    歌曲专辑
+     * @param onResult 加载完成后的回调函数，传递封面数据
+     * @return 异步任务
      */
     private static Task<Void> createLoadTask(String title, String artist, String album, Consumer<byte[]> onResult) {
         return new Task<>() {
             @Override
             protected Void call() throws Exception {
-                refreshCovers(title, artist, album);
+                searchCovers(title, artist, album);
                 return null;
             }
 
@@ -143,11 +147,9 @@ public class SelectCover {
                 Platform.runLater(() -> {
                     // 异常处理
                     Throwable ex = getException();
-                    System.err.println("封面加载失败: " + ex.getMessage());
                     ex.printStackTrace();
                     // 提示用户加载失败
-                    Alert alert = Utils.generateBasicErrorAlert("封面加载失败");
-                    alert.showAndWait();
+                    Utils.errorAlert("封面加载失败").show();
                     STAGE.close();
                 });
             }
@@ -155,8 +157,9 @@ public class SelectCover {
     }
 
     /**
-     *  显示等待页面。
-     *  @param loadTask 异步加载任务
+     * 显示等待页面。
+     *
+     * @param loadTask 异步加载任务
      */
     private static void showWaitingPage(Task<?> loadTask) {
         VBox waitingPage = new VBox(PADDING_MEDIUM);
@@ -184,12 +187,13 @@ public class SelectCover {
     }
 
     /**
-     *  刷新从不同 API 获取的封面列表
-     *  @param title  歌曲标题
-     *  @param artist 歌曲艺术家
-     *  @param album  歌曲专辑
+     * 刷新从不同 API 获取的封面列表
+     *
+     * @param title  歌曲标题
+     * @param artist 歌曲艺术家
+     * @param album  歌曲专辑
      */
-    private static void refreshCovers(String title, String artist, String album) throws Exception {
+    private static void searchCovers(String title, String artist, String album) throws Exception {
         // 使用 CountDownLatch 等待所有封面搜索任务完成
         CountDownLatch latch = new CountDownLatch(3);
         List<byte[]> timelessCovers = new ArrayList<>();
@@ -199,7 +203,7 @@ public class SelectCover {
         // 提交封面搜索任务到线程池
         COVER_SEARCH_EXECUTOR.submit(() -> {
             try {
-                timelessCovers.addAll(COVER_API_TIMELESS.getCover(title, artist, album));
+                timelessCovers.addAll(QQ_MUSIC_API.getCover(title, artist, album));
             } finally {
                 latch.countDown(); // 确保 countDown 总是被调用
             }
@@ -207,7 +211,7 @@ public class SelectCover {
 
         COVER_SEARCH_EXECUTOR.submit(() -> {
             try {
-                netEaseCovers.addAll(COVER_API_NET_EASE.getCover(title, artist, album));
+                netEaseCovers.addAll(NET_EASE_API.getCover(title, artist, album));
             } finally {
                 latch.countDown();
             }
@@ -215,7 +219,7 @@ public class SelectCover {
 
         COVER_SEARCH_EXECUTOR.submit(() -> {
             try {
-                miguCovers.addAll(COVER_API_MIGU.getCover(title, artist, album));
+                miguCovers.addAll(MIGU_MUSIC_API.getCover(title, artist, album));
             } finally {
                 latch.countDown();
             }
@@ -224,8 +228,8 @@ public class SelectCover {
         latch.await();
 
         // 将结果设置到对应的列表
-        COVERS_FROM_TIMELESS.clear();
-        COVERS_FROM_TIMELESS.addAll(timelessCovers);
+        COVERS_FROM_QQ.clear();
+        COVERS_FROM_QQ.addAll(timelessCovers);
         COVERS_FROM_NET_EASE.clear();
         COVERS_FROM_NET_EASE.addAll(netEaseCovers);
         COVERS_FROM_MIGU.clear();
@@ -233,13 +237,14 @@ public class SelectCover {
     }
 
     /**
-     *  显示搜索结果页面
-     *  @param onResult 选择封面后的回调函数，传递封面数据
+     * 显示搜索结果页面
+     *
+     * @param onResult 选择封面后的回调函数，传递封面数据
      */
     private static void showResultPage(Consumer<byte[]> onResult) {
         // 数据加载完成后更新 UI, 确保在 JavaFX 应用程序线程中执行
         Platform.runLater(() -> {
-            Node qq = generateCard(COVERS_FROM_TIMELESS, "来自QQ音乐", ID_PREFIX[0]);
+            Node qq = generateCard(COVERS_FROM_QQ, "来自QQ音乐", ID_PREFIX[0]);
             Node netEase = generateCard(COVERS_FROM_NET_EASE, "来自网易云音乐", ID_PREFIX[1]);
             Node migu = generateCard(COVERS_FROM_MIGU, "来自咪咕音乐", ID_PREFIX[2]);
 
@@ -278,14 +283,15 @@ public class SelectCover {
     }
 
     /**
-     *  根据ID获取封面图片数据。
-     *  @param id  封面图片的ID
-     *  @return  封面图片数据
+     * 根据ID获取封面图片数据。
+     *
+     * @param id 封面图片的ID
+     * @return 封面图片数据
      */
     private static byte[] getCoverById(String id) {
         String[] split = id.split("-");
         return switch (split[0]) {
-            case "qq" -> COVERS_FROM_TIMELESS.get(Integer.parseInt(split[1]));
+            case "qq" -> COVERS_FROM_QQ.get(Integer.parseInt(split[1]));
             case "netEase" -> COVERS_FROM_NET_EASE.get(Integer.parseInt(split[1]));
             case "migu" -> COVERS_FROM_MIGU.get(Integer.parseInt(split[1]));
             default -> null;
@@ -293,11 +299,12 @@ public class SelectCover {
     }
 
     /**
-     *  生成包含封面列表的卡片
-     *  @param covers  封面图片数据列表
-     *  @param title   卡片标题
-     *  @param tag     卡片标签
-     *  @return  卡片节点
+     * 生成包含封面列表的卡片
+     *
+     * @param covers 封面图片数据列表
+     * @param title  卡片标题
+     * @param tag    卡片标签
+     * @return 卡片节点
      */
     private static Node generateCard(List<byte[]> covers, String title, String tag) {
         VBox card = new VBox();
@@ -329,10 +336,11 @@ public class SelectCover {
     }
 
     /**
-     *  生成单个封面图片的选择节点
-     *  @param cover  封面图片数据
-     *  @param id     节点ID
-     *  @return  封面图片选择节点
+     * 生成单个封面图片的选择节点
+     *
+     * @param cover 封面图片数据
+     * @param id    节点ID
+     * @return 封面图片选择节点
      */
     private static Node generateAlternativeImageNode(byte[] cover, String id) {
         AnchorPane pane = new AnchorPane();
@@ -365,8 +373,9 @@ public class SelectCover {
     }
 
     /**
-     *  显示图片预览窗口
-     *  @param image  要显示的图片
+     * 显示图片预览窗口
+     *
+     * @param image 要显示的图片
      */
     private static void showImagePreview(Image image) {
         if (previewStage == null) {
@@ -381,7 +390,7 @@ public class SelectCover {
         previewImageView.setCache(true);        // 缓存图片
 
         // 根据图片大小调整预览窗口大小
-        double width  = Math.min(image.getWidth(), PREVIEW_IMAGE_MAX_SIZE);
+        double width = Math.min(image.getWidth(), PREVIEW_IMAGE_MAX_SIZE);
         double height = Math.min(image.getHeight(), PREVIEW_IMAGE_MAX_SIZE);
         previewImageView.setFitWidth(width);
         previewImageView.setFitHeight(height);

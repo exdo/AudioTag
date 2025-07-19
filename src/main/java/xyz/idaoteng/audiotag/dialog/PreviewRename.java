@@ -12,14 +12,15 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import xyz.idaoteng.audiotag.Utils;
-import xyz.idaoteng.audiotag.bean.AudioMetaData;
+import xyz.idaoteng.audiotag.UiCoordinator;
+import xyz.idaoteng.audiotag.bean.AudioFileData;
 import xyz.idaoteng.audiotag.bean.Filename;
-import xyz.idaoteng.audiotag.component.Center;
-import xyz.idaoteng.audiotag.component.Notification;
+import xyz.idaoteng.audiotag.util.Utils;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.List;
 
@@ -52,10 +53,9 @@ public class PreviewRename {
         TABLE.getColumns().add(oldFilenameColumn);
         TABLE.getColumns().add(newFilenameColumn);
         TABLE.getColumns().add(checkColumn);
-        TABLE.setOnMouseClicked(event -> TABLE.refresh());
 
         Button confirm = new Button("开始重命名");
-        configConfirmButton(confirm);
+        confirm.setOnAction(event -> startRename());
         Button cancel = new Button("取消");
         cancel.setOnAction(event -> STAGE.close());
 
@@ -75,56 +75,57 @@ public class PreviewRename {
         STAGE.setScene(scene);
     }
 
-    private static void configConfirmButton(Button confirm) {
-        confirm.setOnAction(event -> {
-            ObservableList<Filename> list = TABLE.getItems();
-            HashMap<String, String> failedPath_Reason = new HashMap<>(list.size());
-            for (Filename f : list) {
-                if (f.isNeedToRename()) {
-                    AudioMetaData metaData = f.getMetaData();
-                    String message = rename(metaData, f.getFile());
-                    if (message != null) {
-                        failedPath_Reason.put(metaData.getAbsolutePath(), message);
-                    } else {
-                        metaData.setFilename(f.getNewName());
-                        metaData.setAbsolutePath(f.getFile().getAbsolutePath());
-                    }
+    private static void startRename() {
+        ObservableList<Filename> list = TABLE.getItems();
+        HashMap<String, String> failedPath_Reason = new HashMap<>(list.size());
+        for (Filename f : list) {
+            if (f.isNeedToRename()) {
+                AudioFileData data = f.getMetaData();
+                String message = rename(data.getAbsolutePath(), f.getFile().getAbsolutePath());
+                if (message != null) {
+                    failedPath_Reason.put(data.getAbsolutePath(), message);
+                } else {
+                    data.setFilename(f.getNewName());
+                    data.setAbsolutePath(f.getFile().getAbsolutePath());
                 }
             }
-
-            Center.updateTableView(null);
-
-            if (!failedPath_Reason.isEmpty()) {
-                Alert alert = Utils.generateBasicErrorAlert("以下文件重命名失败");
-                StringBuilder content = new StringBuilder();
-                for (String path : failedPath_Reason.keySet()) {
-                    content.append(path).append(": ").append(failedPath_Reason.get(path)).append("\n");
-                }
-                TextArea textArea = new TextArea(content.toString());
-                textArea.setEditable(false);
-                textArea.setWrapText(true);
-                textArea.setMaxHeight(500);
-                alert.getDialogPane().setContent(textArea);
-                alert.show();
-            } else {
-                Notification.showNotification("已成功重命名");
-            }
-
-            STAGE.close();
-        });
-    }
-
-    private static String rename(AudioMetaData data, File newFile) {
-        File originalFile = new File(data.getAbsolutePath());
-
-        if (data.getFilename().equals(newFile.getName())) {
-            return null;
         }
 
+        if (!failedPath_Reason.isEmpty()) {
+            Alert alert = Utils.errorAlert("以下文件重命名失败");
+            StringBuilder content = new StringBuilder();
+            for (String path : failedPath_Reason.keySet()) {
+                content.append(path).append(": ").append(failedPath_Reason.get(path)).append("\n");
+            }
+            TextArea textArea = new TextArea(content.toString());
+            textArea.setEditable(false);
+            textArea.setWrapText(true);
+            textArea.setMaxHeight(500);
+            alert.getDialogPane().setContent(textArea);
+            alert.show();
+        } else {
+            UiCoordinator.showNotification("已全部重命名");
+        }
+        STAGE.close();
+    }
+
+    private static String rename(String originPath, String targetPath) {
+        if (originPath == null || targetPath == null) throw new RuntimeException();
+
+        if ("".equals(originPath) || "".equals(targetPath)) throw new RuntimeException();
+
+        if (originPath.equals(targetPath)) return null;
+
+        File origin = new File(originPath);
+        if (!origin.exists()) return "无法找到源文件";
+
+        File target = new File(targetPath);
+        if (target.exists()) return "目标路径已有相同文件名的文件";
+
         try {
-            Files.move(originalFile.toPath(), newFile.toPath());
+            Files.move(origin.toPath(), target.toPath(), StandardCopyOption.ATOMIC_MOVE);
             return null;
-        } catch (Exception e) {
+        } catch (IOException e) {
             return e.getMessage();
         }
     }

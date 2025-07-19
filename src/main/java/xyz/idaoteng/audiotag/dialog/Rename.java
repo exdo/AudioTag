@@ -1,51 +1,160 @@
 package xyz.idaoteng.audiotag.dialog;
 
-import javafx.scene.control.Alert;
-import javafx.scene.control.TextInputDialog;
-import xyz.idaoteng.audiotag.ImageInApp;
-import xyz.idaoteng.audiotag.Utils;
-import xyz.idaoteng.audiotag.bean.AudioMetaData;
-import xyz.idaoteng.audiotag.component.Center;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import xyz.idaoteng.audiotag.bean.AudioFileData;
+import xyz.idaoteng.audiotag.bean.Filename;
+import xyz.idaoteng.audiotag.exception.InvalidPlaceholderException;
+import xyz.idaoteng.audiotag.util.SameLayout;
+import xyz.idaoteng.audiotag.util.Utils;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Rename {
-    public static void show(AudioMetaData metaData) {
-        File originalFile = new File(metaData.getAbsolutePath());
-        String filenameWithoutExtension = Utils.getFilenameWithoutExtension(metaData.getFilename());
+    private static final TextField TEMPLATE_TEXT_FIELD = new TextField();
+    private static final MenuButton MENU_BUTTON = new MenuButton("选择标签");
+    private static final Font FONT = new Font(13);
+    private static final RadioButton GIVE_UP_RADIO_BUTTON = new RadioButton("放弃重命名");
 
-        TextInputDialog dialog = new TextInputDialog(filenameWithoutExtension);
-        dialog.setTitle("确认重命名");
-        dialog.setHeaderText("原文件名：" + filenameWithoutExtension);
-        dialog.setContentText("新文件名：");
-        dialog.setGraphic(ImageInApp.getRenameIcon());
+    private static final Stage STAGE = new Stage();
 
-        Optional<String> newName = dialog.showAndWait();
-        if (newName.isPresent()) {
-            if (!newName.get().equals(metaData.getFilename())) {
-                String newFilename = newName.get() + "."  + Utils.getExtension(originalFile);
-                File newFile = new File(originalFile.getParentFile(), newFilename);
-                if (newFile.exists()) {
-                    Alert alert = Utils.generateBasicErrorAlert("文件重命名失败");
-                    alert.setContentText("文件："  + newFilename + "已存在");
-                    alert.show();
-                } else {
-                    try {
-                        Files.move(originalFile.toPath(), newFile.toPath());
+    private static final List<AudioFileData> DATA_LIST = new ArrayList<>();
 
-                        metaData.setAbsolutePath(newFile.getAbsolutePath());
-                        metaData.setFilename(newFilename);
-                        Center.updateTableView(null);
-                    } catch (IOException e) {
-                        Alert alert = Utils.generateBasicErrorAlert("文件重命名失败");
-                        alert.setContentText(metaData.getAbsolutePath() + "：\n" + e.getMessage() + "\n");
-                        alert.show();
+    static {
+        VBox body = new VBox();
+        body.setPadding(new Insets(15, 20, 10, 20));
+        body.setSpacing(10);
+
+        Label model = new Label("文件名构成模板：");
+        model.setFont(FONT);
+
+        SameLayout.linkTextAndButton(TEMPLATE_TEXT_FIELD, MENU_BUTTON, false);
+
+        HBox templateAndMenuButton = SameLayout.packageIntoHBox(TEMPLATE_TEXT_FIELD, MENU_BUTTON);
+
+        Label strategy = new Label("重命名策略-当模板中某标签为空时：");
+        strategy.setFont(FONT);
+        ToggleGroup strategyGroup = new ToggleGroup();
+        GIVE_UP_RADIO_BUTTON.setFont(FONT);
+        GIVE_UP_RADIO_BUTTON.setToggleGroup(strategyGroup);
+        GIVE_UP_RADIO_BUTTON.setSelected(true);
+        RadioButton fillBlank = new RadioButton("填入空字符串");
+        fillBlank.setFont(FONT);
+        fillBlank.setToggleGroup(strategyGroup);
+
+        Button confirm = new Button("确定");
+        confirm.setOnAction(event -> generatePreview());
+        Button cancel = new Button("取消");
+        cancel.setOnAction(event -> STAGE.close());
+
+        HBox confirmAndCancel = new HBox(15);
+        confirmAndCancel.setAlignment(Pos.CENTER_RIGHT);
+        confirmAndCancel.getChildren().addAll(confirm, cancel);
+
+        body.getChildren().addAll(model, templateAndMenuButton, strategy,
+                GIVE_UP_RADIO_BUTTON, fillBlank, confirmAndCancel);
+
+        Scene scene = new Scene(body, 510, 240);
+        STAGE.initModality(Modality.APPLICATION_MODAL);
+        STAGE.setTitle("根据标签重命名");
+        STAGE.setResizable(false);
+        STAGE.setScene(scene);
+    }
+
+    private static void generatePreview() {
+        String template = TEMPLATE_TEXT_FIELD.getText().trim();
+        if (template.equals("")) {
+            Utils.errorAlert("模板不能为空").show();
+        } else {
+            List<Filename> previewList = new ArrayList<>(DATA_LIST.size());
+            try {
+                for (AudioFileData data : DATA_LIST) {
+                    String newFilename = buildNameByTemplateOfTag(template, data);
+                    if (newFilename != null) {
+                        File originalFile = new File(data.getAbsolutePath());
+                        File newFile = new File(originalFile.getParentFile(), newFilename);
+                        previewList.add(new Filename(data, newFile));
                     }
                 }
+            } catch (InvalidPlaceholderException e) {
+                Utils.errorAlert(e.getMessage()).show();
+                return;
+            }
+
+            if (!previewList.isEmpty()) {
+                PreviewRename.show(previewList);
+            }
+
+            STAGE.close();
+        }
+    }
+
+    public static String buildNameByTemplateOfTag(String template, AudioFileData data) throws InvalidPlaceholderException {
+        StringBuilder sb = new StringBuilder(template.length());
+
+        int i = 0;
+        while (i < template.length()) {
+            if (template.charAt(i) == '`') {
+                int end = template.indexOf('`', i + 1);
+                if (end > i) {
+                    String placeholder = template.substring(i + 1, end);
+                    String actualValue = convertToActualValue(placeholder, data);
+
+                    if (actualValue == null) {
+                        throw new InvalidPlaceholderException(placeholder);
+                    }
+
+                    if ("".equals(actualValue)) {
+                        if (GIVE_UP_RADIO_BUTTON.isSelected()) {
+                            // 来自标签的实际值为空且策略为放弃重命名，则返回 null
+                            return null;
+                        } else {
+                            // 来自标签的实际值为空且策略为填充空字符串，则用空格填充
+                            sb.append(' ');
+                        }
+                    } else {
+                        // 将两个 ` 间的 占位符 替换成来自标签的实际值
+                        sb.append(actualValue);
+                    }
+                    i = end + 1;
+                } else {
+                    // 模板中存在未闭合的占位符，原样保留
+                    sb.append('`');
+                    i++;
+                }
+            } else {
+                // 占位符以外的字符原样保留
+                sb.append(template.charAt(i));
+                i++;
             }
         }
+
+        return sb + "." + data.getFormat();
+    }
+
+    private static String convertToActualValue(String placeholder, AudioFileData data) {
+        return switch (placeholder) {
+            case "title" -> data.getTitle();
+            case "artist" -> data.getArtist();
+            case "album" -> data.getAlbum();
+            case "date" -> data.getDate();
+            case "track" -> data.getTrack();
+            default -> null;
+        };
+    }
+
+    public static void show(List<AudioFileData> dataList) {
+        DATA_LIST.clear();
+        DATA_LIST.addAll(dataList);
+        STAGE.show();
     }
 }

@@ -1,9 +1,8 @@
 package xyz.idaoteng.audiotag.api.migu;
 
-import com.google.gson.Gson;
-import xyz.idaoteng.audiotag.Utils;
-import xyz.idaoteng.audiotag.api.CoverApi;
+import xyz.idaoteng.audiotag.api.MusicApi;
 import xyz.idaoteng.audiotag.api.migu.dto.MiguSong;
+import xyz.idaoteng.audiotag.api.migu.dto.SingerList;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -11,23 +10,19 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
-import java.net.http.HttpClient;
+import java.net.URLEncoder;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
-public class MiguMusicApi implements CoverApi {
+public class MiguMusicApi implements MusicApi {
     private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0";
-    private static final HttpClient CLIENT = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofSeconds(10))
-            .build();
-    private final Gson gson = new Gson();
 
-    private String sendRequest(String keyword) throws IOException, InterruptedException {
-        String url = "https://app.u.nf.migu.cn/pc/resource/song/item/search/v1.0?text=" +
-                Utils.encodeKeyword(keyword) + "&pageNo=1&pageSize=20";
+    private List<MiguSong> searchSongs(String keyword) {
+        String url = "https://app.u.nf.migu.cn/pc/resource/song/item/search/v1.0?text="
+                + URLEncoder.encode(keyword, StandardCharsets.UTF_8)
+                + "&pageNo=1&pageSize=20";
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
@@ -39,48 +34,88 @@ public class MiguMusicApi implements CoverApi {
                 .GET()
                 .build();
 
-        HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-
-        return response.body();
+        HttpResponse<String> response;
+        try {
+            response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            MiguSong[] songs = GSON.fromJson(response.body(), MiguSong[].class);
+            return new ArrayList<>(Arrays.asList(songs));
+        } catch (IOException | InterruptedException e) {
+            return Collections.emptyList();
+        }
     }
-
 
     @Override
     public List<byte[]> getCover(String title, String artist, String album) {
-        ArrayList<byte[]> covers = new ArrayList<>();
-        try {
-            String response = sendRequest(title);
-            if (!response.trim().isEmpty()) {
-                MiguSong[] songs = gson.fromJson(response, MiguSong[].class);
-                if (songs != null && songs.length > 0) {
-                    for (MiguSong song : songs) {
-                        if (song.getSongName().contains(title)) {
-                            String imgUrl = null;
-                            if (song.getImg3() != null && song.getImg3().startsWith("http")) {
-                                imgUrl = song.getImg3();
-                            } else if (song.getImg2() != null && song.getImg2().startsWith("http")) {
-                                imgUrl = song.getImg2();
-                            } else if (song.getImg1() != null && song.getImg1().startsWith("http")) {
-                                imgUrl = song.getImg1();
-                            }
+        if (title == null || title.trim().equals("")) {
+            return Collections.emptyList();
+        }
 
-                            if (imgUrl != null) {
-                                byte[] cover = fetchCover(imgUrl);
-                                // 从咪咕音乐获取的图片多为 webp 格式，
-                                // 需要转换成 jpg 格式才能在 ImagView 中显示
-                                BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(cover));
-                                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                                ImageIO.write(bufferedImage, "jpg", outputStream);
-                                covers.add(outputStream.toByteArray());
-                            }
-                        }
+        ArrayList<byte[]> covers = new ArrayList<>();
+        List<MiguSong> songs = searchSongs(title);
+        for (MiguSong song : songs) {
+            if (song.getSongName().contains(title)) {
+                Optional<String> bestUrl = getBestImgUrl(song);
+                if (bestUrl.isPresent()) {
+                    Optional<byte[]> jpgCover = getJpgCover(bestUrl.get());
+                    jpgCover.ifPresent(covers::add);
+                }
+            }
+        }
+        return covers;
+    }
+
+    @Override
+    public List<String> getLyric(String title, String artist, String album) {
+        if (title == null || title.trim().equals("")) {
+            return Collections.emptyList();
+        }
+
+        List<String> lyrics = new ArrayList<>();
+        List<MiguSong> miguSongs = searchSongs(title);
+        for (MiguSong song : miguSongs) {
+            if (song.getSongName().contains(title) && artist != null && !artist.trim().isEmpty()) {
+                boolean match = Arrays.stream(song.getSingerList())
+                        .map(SingerList::getName)
+                        .anyMatch(name -> name.contains(artist));
+
+                if (match) {
+                    if (song.getExt().getLrcURL() != null) {
+                        Optional<byte[]> optionalBytes = getBytes(song.getExt().getLrcURL());
+                        optionalBytes.ifPresent(bytes -> lyrics.add(new String(bytes)));
                     }
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return covers;
         }
-        return covers;
+        return lyrics;
+    }
+
+    private Optional<String> getBestImgUrl(MiguSong song) {
+        if (song.getImg3() != null && song.getImg3().startsWith("http")) {
+            return Optional.of(song.getImg3());
+        } else if (song.getImg2() != null && song.getImg2().startsWith("http")) {
+            return Optional.of(song.getImg2());
+        } else if (song.getImg1() != null && song.getImg1().startsWith("http")) {
+            return Optional.of(song.getImg1());
+        }
+        return Optional.empty();
+    }
+
+    private Optional<byte[]> getJpgCover(String url) {
+        Optional<byte[]> optionalBytes = getBytes(url);
+        if (optionalBytes.isPresent()) {
+            // 从咪咕音乐获取的图片多为 webp 格式，
+            // 需要转换成 jpg 格式才能在 ImagView 中显示
+            BufferedImage bufferedImage;
+            try {
+                bufferedImage = ImageIO.read(new ByteArrayInputStream(optionalBytes.get()));
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                ImageIO.write(bufferedImage, "jpg", outputStream);
+                return Optional.of(outputStream.toByteArray());
+            } catch (IOException e) {
+                return Optional.empty();
+            }
+        } else {
+            return Optional.empty();
+        }
     }
 }

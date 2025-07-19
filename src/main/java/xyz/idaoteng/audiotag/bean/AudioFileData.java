@@ -1,12 +1,17 @@
 package xyz.idaoteng.audiotag.bean;
 
-public class AudioMetaData {
+public class AudioFileData {
+    // 文件信息
     // 文件的绝对路径
     private String absolutePath;
     // 文件名(不包含拓展名)
     private String filename;
+    // 音频格式（文件拓展名)
+    private String format;
+    // 音频文件大小
+    private String size;
 
-    // 可编辑的元数据标签
+    // 可编辑的标签数据
     // 艺术家
     private String artist = "";
     // 标题
@@ -19,13 +24,14 @@ public class AudioMetaData {
     private String genre = "";
     // 音轨序号
     private String track = "";
-    // 评论(备注)
+    // 备注
     private String comment = "";
     // 封面
     private byte[] cover = null;
+    // 歌词
+    private String lyric = "";
 
-
-    // 不可编辑的元数据标签
+    // 不可编辑数据
     // 比特率
     private String bitrate;
     // 时长
@@ -45,6 +51,22 @@ public class AudioMetaData {
 
     public void setFilename(String filename) {
         this.filename = filename;
+    }
+
+    public String getFormat() {
+        return format;
+    }
+
+    public void setFormat(String format) {
+        this.format = format;
+    }
+
+    public String getSize() {
+        return size;
+    }
+
+    public void setSize(String size) {
+        this.size = size;
     }
 
     public String getArtist() {
@@ -103,6 +125,22 @@ public class AudioMetaData {
         this.comment = comment;
     }
 
+    public byte[] getCover() {
+        return cover;
+    }
+
+    public void setCover(byte[] cover) {
+        this.cover = cover;
+    }
+
+    public String getLyric() {
+        return lyric;
+    }
+
+    public void setLyric(String lyric) {
+        this.lyric = lyric;
+    }
+
     public String getBitrate() {
         return bitrate;
     }
@@ -117,13 +155,5 @@ public class AudioMetaData {
 
     public void setLength(String length) {
         this.length = length;
-    }
-
-    public byte[] getCover() {
-        return cover;
-    }
-
-    public void setCover(byte[] cover) {
-        this.cover = cover;
     }
 }

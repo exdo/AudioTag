@@ -5,12 +5,27 @@ public class LyricResult {
     private String errmsg;
     private long errno;
 
-    public Lyric getLyric() { return lyric; }
-    public void setLyric(Lyric value) { this.lyric = value; }
+    public Lyric getLyric() {
+        return lyric;
+    }
 
-    public String getErrmsg() { return errmsg; }
-    public void setErrmsg(String value) { this.errmsg = value; }
+    public void setLyric(Lyric value) {
+        this.lyric = value;
+    }
 
-    public long getErrno() { return errno; }
-    public void setErrno(long value) { this.errno = value; }
+    public String getErrmsg() {
+        return errmsg;
+    }
+
+    public void setErrmsg(String value) {
+        this.errmsg = value;
+    }
+
+    public long getErrno() {
+        return errno;
+    }
+
+    public void setErrno(long value) {
+        this.errno = value;
+    }
 }

@@ -10,13 +10,12 @@ import javafx.scene.text.Font;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import xyz.idaoteng.audiotag.bean.AudioMetaData;
+import xyz.idaoteng.audiotag.UiCoordinator;
+import xyz.idaoteng.audiotag.bean.AudioFileData;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,19 +23,16 @@ import java.util.List;
 
 public class Tidy {
     private static final Stage STAGE = new Stage();
-    private static final VBox BODY = new VBox(15);
-    private static final Label LABEL = new Label("将文件整理至：");
     private static final TextField TEXT_FIELD = new TextField();
     private static final RadioButton COPY = new RadioButton("复制");
     private static final RadioButton MOVE = new RadioButton("移动");
-    private static final Button OK_BUTTON = new Button("确定");
-    private static final Button CANCEL_BUTTON = new Button("取消");
 
-    private static final ArrayList<AudioMetaData> DATA_LIST = new ArrayList<>();
+    private static final ArrayList<AudioFileData> DATA_LIST = new ArrayList<>();
     private static boolean isTidyByArtist;
 
     static {
-        LABEL.setFont(Font.font(13));
+        Label locationLabel = new Label("将文件整理至：");
+        locationLabel.setFont(Font.font(13));
 
         TEXT_FIELD.setMinWidth(270);
         TEXT_FIELD.setMaxWidth(270);
@@ -55,15 +51,16 @@ public class Tidy {
         HBox textAndSelect = new HBox(5);
         textAndSelect.getChildren().addAll(TEXT_FIELD, selectFolder);
 
-        Label isCopyOrMove = new Label("对源文件的处理方式：");
+        Label isCopyOrMoveLabel = new Label("对源文件的处理方式：");
         ToggleGroup toggleGroup = new ToggleGroup();
         COPY.setToggleGroup(toggleGroup);
         COPY.setSelected(true);
         MOVE.setToggleGroup(toggleGroup);
         HBox copyOrMove = new HBox(10);
-        copyOrMove.getChildren().addAll(isCopyOrMove, COPY, MOVE);
+        copyOrMove.getChildren().addAll(isCopyOrMoveLabel, COPY, MOVE);
 
-        OK_BUTTON.setOnAction(event -> {
+        Button okButton = new Button("确定");
+        okButton.setOnAction(event -> {
             if (isTidyByArtist) {
                 tidyFileByArtist();
             } else {
@@ -71,24 +68,62 @@ public class Tidy {
             }
             STAGE.close();
         });
-        CANCEL_BUTTON.setOnAction(event -> STAGE.close());
+
+        Button cancelButton = new Button("取消");
+        cancelButton.setOnAction(event -> STAGE.close());
+
         HBox buttons = new HBox(50);
         buttons.setPadding(new Insets(0, 15, 0, 0));
         buttons.setAlignment(Pos.CENTER_RIGHT);
-        buttons.getChildren().addAll(OK_BUTTON, CANCEL_BUTTON);
+        buttons.getChildren().addAll(okButton, cancelButton);
 
-        BODY.setPadding(new Insets(5, 0, 0, 15));
-        BODY.getChildren().addAll(LABEL, textAndSelect, copyOrMove, buttons);
+        VBox body = new VBox(15);
+        body.setPadding(new Insets(5, 0, 0, 15));
+        body.getChildren().addAll(locationLabel, textAndSelect, copyOrMove, buttons);
 
-        Scene scene = new Scene(BODY, 400, 185);
+        Scene scene = new Scene(body, 400, 185);
         STAGE.setScene(scene);
         STAGE.initModality(Modality.APPLICATION_MODAL);
         STAGE.setResizable(false);
     }
 
+    private static void copyOrMoveFiles(HashMap<String, HashSet<AudioFileData>> files) {
+        for (String artist : files.keySet()) {
+            File artistOrAlbumDir = new File(TEXT_FIELD.getText(), artist);
+            if (!artistOrAlbumDir.exists()) {
+                boolean success = artistOrAlbumDir.mkdir();
+                if (!success) {
+                    String msg = "无法创建目录:" + TEXT_FIELD.getText() + File.separator + artist;
+                    UiCoordinator.showNotification(msg);
+                    continue;
+                }
+            }
+
+            for (AudioFileData data : files.get(artist)) {
+                Path source = Path.of(data.getAbsolutePath());
+                Path target = Path.of(artistOrAlbumDir.getAbsolutePath(), data.getFilename());
+                if (COPY.isSelected()) {
+                    try {
+                        Files.copy(source, target);
+                    } catch (Exception e) {
+                        String msg = data.getFilename() + " 复制失败: " + e.getMessage();
+                        UiCoordinator.showNotification(msg);
+                    }
+                } else {
+                    try {
+                        Files.move(source, target);
+                    } catch (Exception e) {
+                        String msg = data.getFilename() + " 移动失败" + e.getMessage();
+                        UiCoordinator.showNotification(msg);
+                    }
+                }
+            }
+        }
+    }
+
     private static void tidyFileByArtist() {
-        HashMap<String, HashSet<AudioMetaData>> sameArtistFiles = new HashMap<>();
-        for (AudioMetaData selectedItem : DATA_LIST) {
+        HashMap<String, HashSet<AudioFileData>> sameArtistFiles = new HashMap<>();
+        for (AudioFileData selectedItem : DATA_LIST) {
             String artist = selectedItem.getArtist();
             sameArtistFiles.computeIfAbsent(artist, k -> new HashSet<>());
             sameArtistFiles.get(artist).add(selectedItem);
@@ -97,44 +132,9 @@ public class Tidy {
         copyOrMoveFiles(sameArtistFiles);
     }
 
-    public static void copyOrMoveFiles(HashMap<String, HashSet<AudioMetaData>> files) {
-        for (String artist : files.keySet()) {
-            File artistOrAlbumDir = new File(TEXT_FIELD.getText(), artist);
-            if (!artistOrAlbumDir.exists()) {
-                boolean success = artistOrAlbumDir.mkdir();
-                if (!success) {
-                    System.out.println("创建目录 " + artist + " 失败");
-                    continue;
-                }
-            }
-
-            for (AudioMetaData data : files.get(artist)) {
-                Path source = Path.of(data.getAbsolutePath());
-                Path target = Path.of(artistOrAlbumDir.getAbsolutePath(), data.getFilename());
-                if (COPY.isSelected()) {
-                    try {
-                        Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        System.out.println("文件 " + data.getFilename() + " 复制失败");
-                        System.out.println(e.getMessage());
-                    }
-                } else {
-                    try {
-                        Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        System.out.println("文件 " + data.getFilename() + " 移动失败");
-                        System.out.println(e.getMessage());
-                    }
-                }
-            }
-        }
-    }
-
     private static void tidyFileByAlbum() {
-        HashMap<String, HashSet<AudioMetaData>> sameAlbumFiles = new HashMap<>();
-        for (AudioMetaData selectedItem : DATA_LIST) {
+        HashMap<String, HashSet<AudioFileData>> sameAlbumFiles = new HashMap<>();
+        for (AudioFileData selectedItem : DATA_LIST) {
             String album = selectedItem.getAlbum();
             sameAlbumFiles.computeIfAbsent(album, k -> new HashSet<>());
             sameAlbumFiles.get(album).add(selectedItem);
@@ -143,7 +143,7 @@ public class Tidy {
         copyOrMoveFiles(sameAlbumFiles);
     }
 
-    public static void show(List<AudioMetaData> dataList, boolean isTidyByArtist) {
+    public static void show(List<AudioFileData> dataList, boolean isTidyByArtist) {
         DATA_LIST.clear();
         DATA_LIST.addAll(dataList);
         Tidy.isTidyByArtist = isTidyByArtist;

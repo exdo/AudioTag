@@ -1,7 +1,7 @@
 package xyz.idaoteng.audiotag.dialog;
 
 import javafx.scene.control.TextInputDialog;
-import xyz.idaoteng.audiotag.ImageInApp;
+import xyz.idaoteng.audiotag.util.ImageInApp;
 
 import java.util.Optional;
 
