@@ -44,16 +44,16 @@ public class TableViewUtil {
      * 此方法会配置 TableView 的鼠标事件监听器，并管理拖拽选择过程中的所有状态
      *
      * @param tableView     TableView 实例
-     * @param processor     用户的自定义回调
+     * @param callback     用户的自定义回调
      * @param fixedCellSize 表格的固定行高。若行高不固定则无法通过此方法实现拖拽功能，若值不为正数则取默认值：24.0
      * @param <T>           TableView 中存储的数据类型
      * @return DragSelectSwitch 框选功能开关，默认打开
      */
-    public static <T> DragSelectSwitch enableDragSelection(TableView<T> tableView, DragSelectCallback processor, double fixedCellSize) {
+    public static <T> DragSelectSwitch enableDragSelection(TableView<T> tableView, DragSelectCallback callback, double fixedCellSize) {
         DragSelectSwitch dragSelectSwitch = new DragSelectSwitch();
         fixedCellSize = fixedCellSize > 0 ? fixedCellSize : DEFAULT_ROW_HEIGHT;
         tableView.setFixedCellSize(fixedCellSize);
-        new EnableDragSelection<>(tableView, processor, dragSelectSwitch);
+        new EnableDragSelection<>(tableView, callback, dragSelectSwitch);
         return dragSelectSwitch;
     }
 }

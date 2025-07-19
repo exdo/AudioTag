@@ -1,17 +1,23 @@
 package xyz.idaoteng.audiotag.component;
 
 import atlantafx.base.controls.ModalPane;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.layout.StackPane;
 
 public class Modal {
-    private static final ModalPane MODAL_PANE = new ModalPane();
+    private final ModalPane modalPane = new ModalPane();
 
-    public static Node getModal() {
-        return MODAL_PANE;
+    public Modal() {
+        StackPane.setAlignment(modalPane, Pos.CENTER);
     }
 
-    public static void show(Node node) {
-        MODAL_PANE.show(node);
-        MODAL_PANE.requestFocus();
+    public Node getNode() {
+        return modalPane;
+    }
+
+    public void show(Node node) {
+        modalPane.show(node);
+        modalPane.requestFocus();
     }
 }

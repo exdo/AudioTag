@@ -2,8 +2,6 @@ package xyz.idaoteng.audiotag;
 
 import atlantafx.base.theme.PrimerLight;
 import javafx.application.Application;
-import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.BorderPane;
@@ -55,12 +53,12 @@ public class App extends Application {
         borderPane.setRight(aside.getNode());
 
         Message message = new Message();
-        UiCoordinator.setComponent(head, center, aside, message);
 
-        Node modal = Modal.getModal();
-        StackPane.setAlignment(modal, Pos.CENTER);
+        Modal modal = new Modal();
 
-        root.getChildren().addAll(borderPane, message.getNode(), modal);
+        UiCoordinator.setComponent(head, center, aside, message, modal);
+
+        root.getChildren().addAll(borderPane, message.getNode(), modal.getNode());
         return root;
     }
 

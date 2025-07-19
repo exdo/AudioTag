@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class EnableDragSelection<T> {
     private final TableView<T> tableView;
-    private final DragSelectCallback processor;
+    private final DragSelectCallback callback;
     private final DragSelectSwitch dragSelectSwitch;
 
     // 行位置常量
@@ -55,10 +55,10 @@ public class EnableDragSelection<T> {
 
     public EnableDragSelection(
             TableView<T> tableView,
-            DragSelectCallback processor,
+            DragSelectCallback callback,
             DragSelectSwitch dragSelectSwitch) {
         this.tableView = tableView;
-        this.processor = processor;
+        this.callback = callback;
         this.dragSelectSwitch = dragSelectSwitch;
 
         // 监听 TableView 的 skin 属性，确保在皮肤可用时初始化内部组件
@@ -128,7 +128,7 @@ public class EnableDragSelection<T> {
                 mouseDragged = false; // 在每次按下时重置拖动状态
             }
             // 调用相应的自定义逻辑
-            processor.onMousePressed(event);
+            callback.onMousePressed(event);
         });
 
         tableView.setOnMouseDragged(event -> {
@@ -137,7 +137,7 @@ public class EnableDragSelection<T> {
             }
             mouseDragged = true; // 标记为拖动行为
             // 调用相应的自定义逻辑
-            processor.onMouseDragged(event);
+            callback.onMouseDragged(event);
         });
 
         tableView.setOnMouseReleased(event -> {
@@ -145,7 +145,7 @@ public class EnableDragSelection<T> {
             // 拖动结束后，重置起始行号，避免下次单击被误判为拖动
             indexWhenDragStart = null;
             // 调用相应的自定义逻辑
-            processor.onMouseReleased(event);
+            callback.onMouseReleased(event);
         });
 
         // 处理点击事件，调用相应的自定义逻辑的时机更为复杂
@@ -232,7 +232,7 @@ public class EnableDragSelection<T> {
                 tableView.getSelectionModel().clearSelection();
             }
         }
-        processor.onMouseClicked(event, itemIndex >= 0 ? itemIndex : null);
+        callback.onMouseClicked(event, itemIndex >= 0 ? itemIndex : null);
     }
 
     /**
@@ -295,7 +295,7 @@ public class EnableDragSelection<T> {
                 throw new RuntimeException("未能按预期结果运行");
             }
             selectIndices(indexWhenDragStart, currentIndexWhileDragging);
-            processor.onRowSelectedDuringDrag(currentIndexWhileDragging);
+            callback.onRowSelectedDuringDrag(currentIndexWhileDragging);
         }
     }
 
@@ -325,7 +325,7 @@ public class EnableDragSelection<T> {
         }
 
         selectIndices(indexWhenDragStart, effectiveDraggedIndex);
-        processor.onRowSelectedDuringDrag(effectiveDraggedIndex);
+        callback.onRowSelectedDuringDrag(effectiveDraggedIndex);
     }
 
     /**
@@ -352,12 +352,12 @@ public class EnableDragSelection<T> {
             // 当有滚动条时，经过 +\- SCROLL_EDGE_OFFSET 的调整，
             // 框选动作总是从某一行开始到某一行结束，
             // 所以 currentIndexWhileDragging 应总是 > 0
-            if (currentIndexWhileDragging < 0) {
+            if (currentIndexWhileDragging <= 0) {
                 throw new RuntimeException("未能按预期结果运行");
             }
 
             selectIndices(indexWhenDragStart, currentIndexWhileDragging);
-            processor.onRowSelectedDuringDrag(currentIndexWhileDragging);
+            callback.onRowSelectedDuringDrag(currentIndexWhileDragging);
         }), 0, SCROLL_RATE_MS, TimeUnit.MILLISECONDS);
     }
 

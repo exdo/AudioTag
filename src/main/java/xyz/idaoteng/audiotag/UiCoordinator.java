@@ -1,10 +1,8 @@
 package xyz.idaoteng.audiotag;
 
+import javafx.scene.Node;
 import xyz.idaoteng.audiotag.bean.AudioFileData;
-import xyz.idaoteng.audiotag.component.Aside;
-import xyz.idaoteng.audiotag.component.Center;
-import xyz.idaoteng.audiotag.component.Head;
-import xyz.idaoteng.audiotag.component.Message;
+import xyz.idaoteng.audiotag.component.*;
 import xyz.idaoteng.audiotag.dialog.Filter;
 
 import java.util.ArrayList;
@@ -15,14 +13,14 @@ public class UiCoordinator {
     private static Center center;
     private static Aside aside;
     private static Message message;
+    private static Modal modal;
 
-    private static final List<AudioFileData> itemsBeforeFilter = new ArrayList<>();
-
-    public static void setComponent(Head head, Center center, Aside aside, Message message) {
+    public static void setComponent(Head head, Center center, Aside aside, Message message, Modal modal) {
         UiCoordinator.head = head;
         UiCoordinator.center = center;
         UiCoordinator.aside = aside;
         UiCoordinator.message = message;
+        UiCoordinator.modal = modal;
     }
 
     public static void showSelectedItem(AudioFileData audioFileData) {
@@ -53,6 +51,7 @@ public class UiCoordinator {
         center.refreshTableView();
     }
 
+    private static final List<AudioFileData> itemsBeforeFilter = new ArrayList<>();
     public static void openFilterDialog() {
         List<AudioFileData> allItems = center.getAllItems();
         itemsBeforeFilter.clear();
@@ -78,5 +77,9 @@ public class UiCoordinator {
 
     public static void showNotification(String msg) {
         message.showMessage(msg);
+    }
+
+    public static void showModal(Node node) {
+        modal.show(node);
     }
 }

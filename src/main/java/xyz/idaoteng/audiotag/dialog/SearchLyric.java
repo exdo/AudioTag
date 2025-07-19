@@ -144,7 +144,7 @@ public class SearchLyric {
     private static void showLyricSelectionPage(Consumer<String> onResult) {
         Platform.runLater(() -> {
             STAGE.close();
-            LyricSelection selection = new LyricSelection(LYRICS);
+            SelectLyric selection = new SelectLyric(LYRICS);
             Optional<String> lyric = selection.showAndGetSelection();
             onResult.accept(lyric.orElse(null));
         });

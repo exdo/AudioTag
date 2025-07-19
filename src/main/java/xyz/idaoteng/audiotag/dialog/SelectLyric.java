@@ -9,7 +9,7 @@ import javafx.scene.layout.VBox;
 import java.util.List;
 import java.util.Optional;
 
-public class LyricSelection extends Dialog<String> {
+public class SelectLyric extends Dialog<String> {
     private final List<String> allLyricVersions;
     private int currentIndex;
 
@@ -24,7 +24,7 @@ public class LyricSelection extends Dialog<String> {
      *
      * @param lyricVersions 待选择的歌词版本列表
      */
-    public LyricSelection(List<String> lyricVersions) {
+    public SelectLyric(List<String> lyricVersions) {
         this.allLyricVersions = lyricVersions;
         this.currentIndex = 0; // 默认从第一个版本开始
 

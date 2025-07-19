@@ -264,7 +264,7 @@ public class Aside {
                     lightBox.setFitWidth(App.getPrimaryStage().getWidth() - 150);
                     lightBox.setSmooth(true);
                     lightBox.setCache(true);
-                    Modal.show(lightBox); // 在模态框中显示大图
+                    UiCoordinator.showModal(lightBox); // 在模态框中显示大图
                 }
             }
         });
