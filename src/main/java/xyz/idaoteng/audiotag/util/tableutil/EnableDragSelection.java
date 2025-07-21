@@ -15,6 +15,7 @@ import javafx.scene.input.MouseEvent;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -48,7 +49,8 @@ public class EnableDragSelection<T> {
     private ScrollBar hScrollBar = null; // 水平滚动条
     private double hScrollBarHeight = 0; // 水平滚动条高度
     private boolean moveScrollBarUp; // 竖直滚动条是否向上滚动
-    private ScheduledExecutorService executorService; // 竖直滚动条自动滚动线程
+    private final ScheduledExecutorService executorService; // 竖直滚动条自动滚动线程
+    private ScheduledFuture<?> autoScrollFuture; // 用于取消当前自动滚动任务的 Future
 
     private double tableHeadRowHeight = 0; // 表头高度
     private final double rowHeight; // 行高
@@ -60,6 +62,8 @@ public class EnableDragSelection<T> {
         this.tableView = tableView;
         this.callback = callback;
         this.dragSelectSwitch = dragSelectSwitch;
+
+        this.executorService = Executors.newSingleThreadScheduledExecutor();
 
         // 监听 TableView 的 skin 属性，确保在皮肤可用时初始化内部组件
         ChangeListener<Skin<?>> skinChangeListener = (obs, oldSkin, newSkin) -> {
@@ -141,9 +145,9 @@ public class EnableDragSelection<T> {
         });
 
         tableView.setOnMouseReleased(event -> {
-            stopAutoScrolling();
+            stopAutoScrolling(); // 停止自动滚动任务
             // 拖动结束后，重置起始行号，避免下次单击被误判为拖动
-            indexWhenDragStart = null;
+            indexWhenDragStart = null; // 确保在任务停止后才清空
             // 调用相应的自定义逻辑
             callback.onMouseReleased(event);
         });
@@ -329,11 +333,9 @@ public class EnableDragSelection<T> {
 
     private void autoScrollingTask() {
         Platform.runLater(() -> {
-            // 在使用 indexWhenDragStart 之前进行 null 检查
+            // 这是为了防止在任务被调度到 JavaFX 线程执行前，indexWhenDragStart 已经被置为 null 的情况。
             if (indexWhenDragStart == null) {
-                // 如果 indexWhenDragStart 已经为 null，说明拖动已经结束或被取消，
-                // 此时不应再执行选择逻辑
-                stopAutoScrolling(); // 确保自动滚动彻底停止
+                stopAutoScrolling(); // 如果已经没有起始点，则停止自动滚动
                 return;
             }
 
@@ -361,26 +363,28 @@ public class EnableDragSelection<T> {
 
     /**
      * 启动竖直滚动条自动滚动线程。
+     * 如果已有任务在运行，先取消它。
      */
     private void startAutoScrolling() {
-        // 定时任务存在时不再创建新的
-        if (executorService != null && !executorService.isShutdown()) {
-            return;
+        if (autoScrollFuture != null && !autoScrollFuture.isDone()) {
+            // true 表示如果任务正在运行，尝试中断它
+            autoScrollFuture.cancel(true);
         }
 
-        executorService = Executors.newSingleThreadScheduledExecutor();
         Runnable task = this::autoScrollingTask;
-        executorService.scheduleAtFixedRate(task, 0, SCROLL_RATE_MS, TimeUnit.MILLISECONDS);
+        autoScrollFuture = executorService.scheduleAtFixedRate(task, 0, SCROLL_RATE_MS, TimeUnit.MILLISECONDS);
     }
 
 
     /**
-     * 强制终止滚动条自动滚动线程
+     * 终止滚动条自动滚动线程
      */
     private void stopAutoScrolling() {
-        if (executorService != null) {
-            executorService.shutdownNow();
-            executorService = null;
+        if (autoScrollFuture != null) {
+            // true 表示如果任务正在运行，尝试中断它
+            autoScrollFuture.cancel(true);
+            autoScrollFuture = null; // 清除引用
         }
     }
+
 }
