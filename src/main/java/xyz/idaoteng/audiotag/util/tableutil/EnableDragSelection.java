@@ -165,7 +165,6 @@ public class EnableDragSelection<T> {
     public int getItemIndex(double currentY) {
         // 当鼠标位于视口上方，返回 ABOVE_VIEWPORT
         if (currentY <= tableHeadRowHeight) {
-
             return ABOVE_VIEWPORT;
         }
         // 视口底部的 y 坐标
@@ -186,7 +185,7 @@ public class EnableDragSelection<T> {
             double heightExceptViewport = tableHeadRowHeight + hScrollBarHeight;
             double viewportHeight = tableView.getHeight() - heightExceptViewport;
             // 最大偏移量 = 内容的实际高度 - 视口的高度
-            double maxOffset = Math.max(0, contentHeight - viewportHeight); // 确保不为负
+            double maxOffset = contentHeight - viewportHeight;
             // 偏移量 = 最大偏移量 * 滚动条的偏移比例
             double proportion = vScrollBar.getValue() / vScrollBar.getMax();
             double offset = maxOffset * proportion;
@@ -351,8 +350,8 @@ public class EnableDragSelection<T> {
 
             // 当有滚动条时，经过 +\- SCROLL_EDGE_OFFSET 的调整，
             // 框选动作总是从某一行开始到某一行结束，
-            // 所以 currentIndexWhileDragging 应总是 > 0
-            if (currentIndexWhileDragging <= 0) {
+            // 所以 currentIndexWhileDragging 应总是 >= 0
+            if (currentIndexWhileDragging < 0) {
                 throw new RuntimeException("未能按预期结果运行");
             }
 

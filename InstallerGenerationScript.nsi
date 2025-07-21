@@ -2,7 +2,7 @@
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "AudioTag"
-!define PRODUCT_VERSION "1.3.3"
+!define PRODUCT_VERSION "1.3.4"
 !define PRODUCT_PUBLISHER "exdo"
 !define PRODUCT_WEB_SITE "https://github.com/exdo/AudioTag"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\AudioTag.exe"
