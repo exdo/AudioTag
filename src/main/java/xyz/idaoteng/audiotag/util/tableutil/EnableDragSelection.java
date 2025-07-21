@@ -327,17 +327,16 @@ public class EnableDragSelection<T> {
         callback.onRowSelectedDuringDrag(effectiveDraggedIndex);
     }
 
-    /**
-     * 启动竖直滚动条自动滚动线程。
-     */
-    private void startAutoScrolling() {
-        // 定时任务存在时不再创建新的
-        if (executorService != null && !executorService.isShutdown()) {
-            return;
-        }
+    private void autoScrollingTask() {
+        Platform.runLater(() -> {
+            // 在使用 indexWhenDragStart 之前进行 null 检查
+            if (indexWhenDragStart == null) {
+                // 如果 indexWhenDragStart 已经为 null，说明拖动已经结束或被取消，
+                // 此时不应再执行选择逻辑
+                stopAutoScrolling(); // 确保自动滚动彻底停止
+                return;
+            }
 
-        executorService = Executors.newSingleThreadScheduledExecutor();
-        executorService.scheduleAtFixedRate(() -> Platform.runLater(() -> {
             int currentIndexWhileDragging;
             if (moveScrollBarUp) {
                 vScrollBar.decrement();
@@ -357,7 +356,21 @@ public class EnableDragSelection<T> {
 
             selectIndices(indexWhenDragStart, currentIndexWhileDragging);
             callback.onRowSelectedDuringDrag(currentIndexWhileDragging);
-        }), 0, SCROLL_RATE_MS, TimeUnit.MILLISECONDS);
+        });
+    }
+
+    /**
+     * 启动竖直滚动条自动滚动线程。
+     */
+    private void startAutoScrolling() {
+        // 定时任务存在时不再创建新的
+        if (executorService != null && !executorService.isShutdown()) {
+            return;
+        }
+
+        executorService = Executors.newSingleThreadScheduledExecutor();
+        Runnable task = this::autoScrollingTask;
+        executorService.scheduleAtFixedRate(task, 0, SCROLL_RATE_MS, TimeUnit.MILLISECONDS);
     }
 
 
