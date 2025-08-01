@@ -33,6 +33,7 @@ public class UiCoordinator {
 
     public static void setTableViewItems(List<AudioFileData> dataList) {
         center.setTableViewItems(dataList, false);
+        aside.showBlank();
     }
 
     public static void enableDragRow(boolean isEnableDragRow) {

@@ -2,17 +2,17 @@ package xyz.idaoteng.audiotag;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import xyz.idaoteng.audiotag.bean.AudioFileData;
 import xyz.idaoteng.audiotag.bean.Configuration;
 import xyz.idaoteng.audiotag.bean.HistorySession;
 import xyz.idaoteng.audiotag.constant.ColumnsDefaultStatus;
+import xyz.idaoteng.audiotag.constant.DaemonExecutor;
 import xyz.idaoteng.audiotag.exception.FileCreationException;
 import xyz.idaoteng.audiotag.util.InstallLocationFinder;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -205,13 +205,42 @@ public class Session {
         }
     }
 
+    private static final HashMap<byte[], ImageView> CACHED_IMAGE_VIEW = new HashMap<>();
+    public static ImageView getImageView(byte[] cover) {
+        ImageView imageView = CACHED_IMAGE_VIEW.get(cover);
+        if (imageView == null) {
+            imageView = new ImageView();
+            imageView.setFitWidth(200);
+            imageView.setFitHeight(200);
+            imageView.setImage(new Image(new ByteArrayInputStream(cover)));
+        }
+        return imageView;
+    }
+
     private static final HashSet<String> ALTERNATIVE_ARTISTS = new HashSet<>();
     private static final HashSet<String> ALTERNATIVE_ALBUMS = new HashSet<>();
 
-    public static void recordItems(List<AudioFileData> dataList) {
-        openedPaths.clear();
-        ALTERNATIVE_ARTISTS.clear();
-        ALTERNATIVE_ALBUMS.clear();
+    public static void recordItems(List<AudioFileData> dataList, boolean isAdditional) {
+        if (!isAdditional) {
+            openedPaths.clear();
+            CACHED_IMAGE_VIEW.clear();
+            ALTERNATIVE_ARTISTS.clear();
+            ALTERNATIVE_ALBUMS.clear();
+        }
+
+        DaemonExecutor.TIME_CONSUMING_TASK_EXECUTOR.submit(() -> {
+            for (AudioFileData data : dataList) {
+                byte[] cover = data.getCover();
+                if (cover != null && CACHED_IMAGE_VIEW.get(cover) == null) {
+                    ImageView imageView = new ImageView();
+                    imageView.setFitWidth(200);
+                    imageView.setFitHeight(200);
+                    imageView.setImage(new Image(new ByteArrayInputStream(cover)));
+                    CACHED_IMAGE_VIEW.put(cover, imageView);
+                }
+            }
+        });
+
         for (AudioFileData data : dataList) {
             openedPaths.add(data.getAbsolutePath());
 

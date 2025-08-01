@@ -20,6 +20,7 @@ import xyz.idaoteng.audiotag.api.MusicApi;
 import xyz.idaoteng.audiotag.api.migu.MiguMusicApi;
 import xyz.idaoteng.audiotag.api.netease.NetEaseMusicApi;
 import xyz.idaoteng.audiotag.api.timeless.TimelessApi;
+import xyz.idaoteng.audiotag.constant.DaemonExecutor;
 import xyz.idaoteng.audiotag.util.Utils;
 
 import java.io.ByteArrayInputStream;
@@ -27,8 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 import java.util.function.Consumer;
 
 /**
@@ -56,10 +55,10 @@ public class SearchCover {
     private static final Scene SCENE = new Scene(PANE);
 
     private static final ToggleGroup TOGGLE_GROUP = new ToggleGroup();
+    private static final ExecutorService COVER_SEARCH_EXECUTOR = DaemonExecutor.TIME_CONSUMING_TASK_EXECUTOR;
     private static final MusicApi QQ_MUSIC_API = new TimelessApi();
     private static final MusicApi NET_EASE_API = new NetEaseMusicApi();
     private static final MusicApi MIGU_MUSIC_API = new MiguMusicApi();
-
     private static final List<byte[]> COVERS_FROM_QQ = new ArrayList<>();
     private static final List<byte[]> COVERS_FROM_NET_EASE = new ArrayList<>();
     private static final List<byte[]> COVERS_FROM_MIGU = new ArrayList<>();
@@ -69,20 +68,8 @@ public class SearchCover {
     private static Stage previewStage; // 预览窗口
 
     // 线程池，用于并发执行封面搜索任务
-    private static final ExecutorService COVER_SEARCH_EXECUTOR;
 
     static {
-        COVER_SEARCH_EXECUTOR = Executors.newFixedThreadPool(4, new ThreadFactory() {
-            private int counter = 0;
-
-            @Override
-            public Thread newThread(Runnable r) {
-                Thread thread = new Thread(r, "CoverSearchThread-" + counter++);
-                thread.setDaemon(true);
-                return thread;
-            }
-        });
-
         PANE.setMaxHeight(600);
         PANE.setPadding(new Insets(0, PADDING_MEDIUM, 0, PADDING_MEDIUM));
         STAGE.setScene(SCENE);

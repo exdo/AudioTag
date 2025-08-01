@@ -84,6 +84,8 @@ public class App extends Application {
     }
 
     public static void main(String[] args) {
+        ImageInApp.loadAllImage();
+
         // 配置 Jaudiotagger 库
         setupJaudiotagger();
 

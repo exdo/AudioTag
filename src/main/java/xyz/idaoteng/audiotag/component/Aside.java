@@ -30,9 +30,7 @@ import xyz.idaoteng.audiotag.util.Utils;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -499,14 +497,9 @@ public class Aside {
             return;
         }
 
-        coverPanel.getChildren().clear();
-        ImageView cover = new ImageView();
-        cover.setFitWidth(200);
-        cover.setFitHeight(200);
-        cover.setImage(new Image(new ByteArrayInputStream(coverBytes)));
-        coverPanel.getChildren().add(cover);
-
         displayedData.setCover(coverBytes); // 更新显示的元数据中的封面
+        coverPanel.getChildren().clear();
+        coverPanel.getChildren().add(Session.getImageView(coverBytes));
 
         // 启用在有封面时可用的按钮
         changeCoverButton.setDisable(false);
@@ -518,10 +511,11 @@ public class Aside {
     /**
      * 展示默认封面
      */
+    private static final ImageView DEFAULT_COVER =  ImageInApp.getDefaultCover();
     private void showDefaultCover() {
         coverPanel.getChildren().clear();
         coverPanel.setAlignment(Pos.CENTER);
-        coverPanel.getChildren().add(ImageInApp.getDefaultCover());
+        coverPanel.getChildren().add(DEFAULT_COVER);
 
         // 设置按钮状态：更换和搜索只在有原始数据时可用，提取和删除在无封面时不可用
         changeCoverButton.setDisable(originalData == null);

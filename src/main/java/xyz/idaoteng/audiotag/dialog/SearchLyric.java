@@ -14,6 +14,7 @@ import xyz.idaoteng.audiotag.api.MusicApi;
 import xyz.idaoteng.audiotag.api.migu.MiguMusicApi;
 import xyz.idaoteng.audiotag.api.netease.NetEaseMusicApi;
 import xyz.idaoteng.audiotag.api.timeless.TimelessApi;
+import xyz.idaoteng.audiotag.constant.DaemonExecutor;
 import xyz.idaoteng.audiotag.util.ImageInApp;
 import xyz.idaoteng.audiotag.util.Utils;
 
@@ -22,8 +23,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 import java.util.function.Consumer;
 
 public class SearchLyric {
@@ -36,7 +35,7 @@ public class SearchLyric {
 
     private static final VBox WAITING_PAGE = new VBox(PADDING_MEDIUM);
     private static final ToggleGroup TOGGLE_GROUP = new ToggleGroup();
-
+    private static final ExecutorService LYRIC_SEARCH_EXECUTOR = DaemonExecutor.TIME_CONSUMING_TASK_EXECUTOR;
     private static final MusicApi QQ_MUSIC_API = new TimelessApi();
     private static final MusicApi NET_EASE_API = new NetEaseMusicApi();
     private static final MusicApi MIGU_MUSIC_API = new MiguMusicApi();
@@ -44,20 +43,8 @@ public class SearchLyric {
     private static final Stage STAGE = new Stage();
     private static final VBox BODY = new VBox(PANE_SPACING);
     private static final Scene SCENE = new Scene(BODY);
-    private static final ExecutorService LYRIC_SEARCH_EXECUTOR;
 
     static {
-        LYRIC_SEARCH_EXECUTOR = Executors.newFixedThreadPool(4, new ThreadFactory() {
-            private int counter = 0;
-
-            @Override
-            public Thread newThread(Runnable r) {
-                Thread thread = new Thread(r, "LyricSearchThread-" + counter++);
-                thread.setDaemon(true);
-                return thread;
-            }
-        });
-
         BODY.setMaxHeight(600);
         BODY.setPadding(new Insets(0, PADDING_MEDIUM, 0, PADDING_MEDIUM));
         STAGE.setScene(SCENE);

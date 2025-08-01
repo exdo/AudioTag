@@ -104,13 +104,10 @@ public class Center {
             public void onMouseClicked(MouseEvent event, Integer rowIndex) {
                 if (event.getButton().equals(MouseButton.PRIMARY) && rowIndex != null && rowIndex >= 0) {
                     AudioFileData audioFileData = tableView.getItems().get(rowIndex);
-                    // 将当前行选中并展示其可编辑部分
-                    tableView.getSelectionModel().select(rowIndex);
                     UiCoordinator.showSelectedItem(audioFileData);
 
                     // 左键双击：使用系统默认方式打开文件
                     if (event.getClickCount() == 2) {
-                        // 获取当前行对应的数据
                         try {
                             Desktop.getDesktop().open(new File(audioFileData.getAbsolutePath()));
                         } catch (IOException e) {
@@ -143,7 +140,7 @@ public class Center {
             tableView.getItems().clear();
         }
         tableView.getItems().addAll(dataList);
-        Session.recordItems(dataList);
+        Session.recordItems(dataList, isAdditional);
     }
 
     public void enableDragRowOrDragSelection(boolean isEnableDragRow) {
@@ -175,23 +172,10 @@ public class Center {
 
     public void refreshTableView() {
         tableView.refresh();
-        Session.recordItems(tableView.getItems());
+        Session.recordItems(tableView.getItems(), false);
     }
 
     public List<AudioFileData> getAllItems() {
         return tableView.getItems();
-    }
-
-    public void reloadItems() {
-        for (String path : Session.getOpenedPaths()) {
-            AudioFileData data = AudioFileReader.readFile(new File(path));
-            if (data != null) {
-                tableView.getItems().add(data);
-            }
-        }
-    }
-
-    public void selectItem(AudioFileData originalData) {
-        tableView.getSelectionModel().select(originalData);
     }
 }
