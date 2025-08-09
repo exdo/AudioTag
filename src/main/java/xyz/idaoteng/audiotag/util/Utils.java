@@ -4,7 +4,7 @@ import javafx.scene.control.Alert;
 import net.coobird.thumbnailator.Thumbnails;
 import xyz.idaoteng.audiotag.Session;
 import xyz.idaoteng.audiotag.UiCoordinator;
-import xyz.idaoteng.audiotag.bean.Configuration;
+import xyz.idaoteng.audiotag.bean.AppConfiguration;
 
 import javax.imageio.ImageIO;
 import java.io.*;
@@ -41,7 +41,7 @@ public class Utils {
 
     public static byte[] retouchedOrItself(File file) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        Configuration config = Session.getConfig();
+        AppConfiguration config = Session.getConfig();
         try {
             if (config.getNeedRetouch()) {
                 Thumbnails.of(ImageIO.read(file))
@@ -59,7 +59,7 @@ public class Utils {
     }
 
     public static byte[] retouchedOrItself(byte[] cover) {
-        Configuration config = Session.getConfig();
+        AppConfiguration config = Session.getConfig();
         if (config.getNeedRetouch()) {
             try {
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -80,7 +80,7 @@ public class Utils {
     private static final HashSet<String> SUPPORTED_IMG = new HashSet<>(List.of("jpg", "jpeg", "bmp", "png"));
     public static void saveCover(byte[] cover, File file) {
         try {
-            Configuration config = Session.getConfig();
+            AppConfiguration config = Session.getConfig();
 
             String extension = getExtension(file.getName());
             if (!SUPPORTED_IMG.contains(extension)) {

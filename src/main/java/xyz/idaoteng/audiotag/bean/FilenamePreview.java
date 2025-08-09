@@ -5,7 +5,7 @@ import javafx.scene.control.CheckBox;
 import java.io.File;
 
 // 批量重命名时生成的预览的文件名
-public class Filename {
+public class FilenamePreview {
     // 原始的音频元数据
     private final AudioFileData metaData;
     // 重命名后的文件(此时文件尚未创建)
@@ -19,7 +19,7 @@ public class Filename {
     // 是否需要重命名
     private boolean needToRename = true;
 
-    public Filename(AudioFileData data, File newFile) {
+    public FilenamePreview(AudioFileData data, File newFile) {
         metaData = data;
         file = newFile;
         oldName = data.getFilename();

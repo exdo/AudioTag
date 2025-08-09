@@ -16,8 +16,7 @@ public class InstallLocationFinder {
     private static final String ITEM_NAME = "install_dir";
     public static final String COMPLETE_REG_COMMAND = REG_COMMAND + REG_KEY + REG_ARG + ITEM_NAME;
 
-    // --- Cross-Platform Configuration File Paths ---
-    // 注意：这里的 APP_NAME_LOWER 应该与你的 macOS/Linux 安装程序中使用的名称保持一致
+    // 注意：这里的 APP_NAME_LOWER 应该与 macOS/Linux 安装程序中使用的名称保持一致
     private static final String APP_NAME_LOWER = "audiotag";
     private static final String INSTALL_INFO_FILENAME = "install_info.properties"; // 约定一个配置文件名
     private static final String INSTALL_DIR_PROPERTY_KEY = "install_dir"; // 配置文件中存储安装路径的键名

@@ -10,7 +10,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import xyz.idaoteng.audiotag.bean.AudioFileData;
-import xyz.idaoteng.audiotag.bean.Filename;
+import xyz.idaoteng.audiotag.bean.FilenamePreview;
 import xyz.idaoteng.audiotag.exception.InvalidPlaceholderException;
 import xyz.idaoteng.audiotag.util.SameLayout;
 import xyz.idaoteng.audiotag.util.Utils;
@@ -75,14 +75,14 @@ public class Rename {
         if (template.equals("")) {
             Utils.errorAlert("模板不能为空").show();
         } else {
-            List<Filename> previewList = new ArrayList<>(DATA_LIST.size());
+            List<FilenamePreview> previewList = new ArrayList<>(DATA_LIST.size());
             try {
                 for (AudioFileData data : DATA_LIST) {
                     String newFilename = buildNameByTemplateOfTag(template, data);
                     if (newFilename != null) {
                         File originalFile = new File(data.getAbsolutePath());
                         File newFile = new File(originalFile.getParentFile(), newFilename);
-                        previewList.add(new Filename(data, newFile));
+                        previewList.add(new FilenamePreview(data, newFile));
                     }
                 }
             } catch (InvalidPlaceholderException e) {

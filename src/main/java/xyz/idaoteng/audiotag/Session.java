@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import xyz.idaoteng.audiotag.bean.AudioFileData;
-import xyz.idaoteng.audiotag.bean.Configuration;
+import xyz.idaoteng.audiotag.bean.AppConfiguration;
 import xyz.idaoteng.audiotag.bean.HistorySession;
 import xyz.idaoteng.audiotag.constant.ColumnsDefaultStatus;
 import xyz.idaoteng.audiotag.constant.DaemonExecutor;
@@ -38,7 +38,7 @@ public class Session {
     private static HashMap<Integer, String> columnsOrder = ColumnsDefaultStatus.order();
     private static HashMap<String, Boolean> columnsVisibleStatus = ColumnsDefaultStatus.visible();
 
-    private static Configuration cfg;
+    private static AppConfiguration cfg;
     private static String configFilePath;
 
     public static void init() throws FileCreationException {
@@ -65,14 +65,14 @@ public class Session {
         File file = new File(path, "config.json");
         if (file.exists()) {
             try (FileReader reader = new FileReader(file, StandardCharsets.UTF_8)) {
-                cfg = GSON.fromJson(reader, Configuration.class);
+                cfg = GSON.fromJson(reader, AppConfiguration.class);
             } catch (IOException e) {
                 throw new FileCreationException("无法读取配置文件：\n" + e.getMessage());
             }
         } else {
             try {
                 if (file.createNewFile()) {
-                    cfg = new Configuration();
+                    cfg = new AppConfiguration();
                 } else {
                     throw new FileCreationException("无法创建配置文件");
                 }
@@ -272,7 +272,7 @@ public class Session {
         columnsOrder = map;
     }
 
-    public static Configuration getConfig() {
+    public static AppConfiguration getConfig() {
         return cfg;
     }
 }

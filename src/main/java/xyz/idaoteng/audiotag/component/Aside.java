@@ -51,6 +51,9 @@ public class Aside {
     private final ComboBox<String> trackComboBox = new ComboBox<>();
     private final ComboBox<String> commentComboBox = new ComboBox<>();
 
+    // 查看歌词按钮
+    private final Button viewLyricButton = new Button("查看歌词");
+
     // 封面面板和相关按钮
     private final HBox coverPanel = new HBox();
     private final Button changeCoverButton = new Button("更换");
@@ -116,7 +119,6 @@ public class Aside {
         configComboBox(EditableTag.COMMENT, commentComboBox, true);
 
         // 歌词
-        Button viewLyricButton = new Button("查看歌词");
         viewLyricButton.setGraphic(ImageInApp.getLyricIcon());
         viewLyricButton.getStyleClass().add(Styles.FLAT);
         viewLyricButton.setOnAction(event -> EditLyric.show(originalData));
@@ -440,6 +442,9 @@ public class Aside {
         trackComboBox.setDisable(false);
         commentComboBox.setDisable(false);
 
+        // 允许查看歌词
+        viewLyricButton.setDisable(false);
+
         // 设置各个组合框的值和选项
         // 标题
         titleComboBox.getItems().clear();
@@ -537,6 +542,7 @@ public class Aside {
         genreComboBox.setDisable(true);
         trackComboBox.setDisable(true);
         commentComboBox.setDisable(true);
+        viewLyricButton.setDisable(true);
         showDefaultCover();
     }
 

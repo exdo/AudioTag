@@ -14,7 +14,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import xyz.idaoteng.audiotag.UiCoordinator;
 import xyz.idaoteng.audiotag.bean.AudioFileData;
-import xyz.idaoteng.audiotag.bean.Filename;
+import xyz.idaoteng.audiotag.bean.FilenamePreview;
 import xyz.idaoteng.audiotag.util.Utils;
 
 import java.io.File;
@@ -29,22 +29,22 @@ public class PreviewRename {
     private static final BorderPane BODY = new BorderPane();
     private static final Font FONT = new Font(13);
 
-    private static final TableView<Filename> TABLE = new TableView<>();
+    private static final TableView<FilenamePreview> TABLE = new TableView<>();
 
     static {
         Label resultLabel = new Label("预览:");
         resultLabel.setPadding(new Insets(3, 0, 3, 2));
         resultLabel.setFont(FONT);
 
-        TableColumn<Filename, String> oldFilenameColumn = new TableColumn<>("原文件名");
+        TableColumn<FilenamePreview, String> oldFilenameColumn = new TableColumn<>("原文件名");
         oldFilenameColumn.setCellValueFactory(new PropertyValueFactory<>("oldName"));
         oldFilenameColumn.setPrefWidth(235);
 
-        TableColumn<Filename, String> newFilenameColumn = new TableColumn<>("新文件名");
+        TableColumn<FilenamePreview, String> newFilenameColumn = new TableColumn<>("新文件名");
         newFilenameColumn.setCellValueFactory(new PropertyValueFactory<>("newName"));
         newFilenameColumn.setPrefWidth(235);
 
-        TableColumn<Filename, CheckBox> checkColumn = new TableColumn<>("确定重命名");
+        TableColumn<FilenamePreview, CheckBox> checkColumn = new TableColumn<>("确定重命名");
         checkColumn.setCellValueFactory(new PropertyValueFactory<>("checkBox"));
         checkColumn.setStyle("-fx-alignment: CENTER");
         checkColumn.setPrefWidth(100);
@@ -76,17 +76,17 @@ public class PreviewRename {
     }
 
     private static void startRename() {
-        ObservableList<Filename> list = TABLE.getItems();
-        HashMap<String, String> failedPath_Reason = new HashMap<>(list.size());
-        for (Filename f : list) {
-            if (f.isNeedToRename()) {
-                AudioFileData data = f.getMetaData();
-                String message = rename(data.getAbsolutePath(), f.getFile().getAbsolutePath());
+        ObservableList<FilenamePreview> previews = TABLE.getItems();
+        HashMap<String, String> failedPath_Reason = new HashMap<>(previews.size());
+        for (FilenamePreview preview : previews) {
+            if (preview.isNeedToRename()) {
+                AudioFileData data = preview.getMetaData();
+                String message = rename(data.getAbsolutePath(), preview.getFile().getAbsolutePath());
                 if (message != null) {
                     failedPath_Reason.put(data.getAbsolutePath(), message);
                 } else {
-                    data.setFilename(f.getNewName());
-                    data.setAbsolutePath(f.getFile().getAbsolutePath());
+                    data.setFilename(preview.getNewName());
+                    data.setAbsolutePath(preview.getFile().getAbsolutePath());
                 }
             }
         }
@@ -130,9 +130,9 @@ public class PreviewRename {
         }
     }
 
-    public static void show(List<Filename> filenames) {
+    public static void show(List<FilenamePreview> filenamePreviews) {
         TABLE.getItems().clear();
-        TABLE.getItems().addAll(filenames);
+        TABLE.getItems().addAll(filenamePreviews);
         TABLE.refresh();
         STAGE.show();
     }
