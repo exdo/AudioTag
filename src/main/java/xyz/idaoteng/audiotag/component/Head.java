@@ -13,6 +13,7 @@ import xyz.idaoteng.audiotag.Session;
 import xyz.idaoteng.audiotag.UiCoordinator;
 import xyz.idaoteng.audiotag.bean.AudioFileData;
 import xyz.idaoteng.audiotag.constant.ExtensionFilters;
+import xyz.idaoteng.audiotag.dialog.SetupAppConfig;
 import xyz.idaoteng.audiotag.jaudiotagger.AudioFileReader;
 
 import java.io.File;
@@ -66,11 +67,15 @@ public class Head {
 
         ToggleSwitch toggleSwitch = toggleSwitch();
 
+        Button setupConfigButton = new Button("设置");
+        setupConfigButton.setOnAction(event -> SetupAppConfig.show());
+
         toolBar.getItems().addAll(
                 fileMenuButton,
                 editMenuButton,
                 filterButton,
                 refreshButton,
+                setupConfigButton,
                 toggleSwitch
         );
     }

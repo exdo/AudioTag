@@ -23,14 +23,6 @@ public class InstallLocationFinder {
 
     /**
      * 获取此软件的安装位置，同时适配 Windows, macOS, Linux。
-     * <p>
-     * 对于 macOS 和 Linux，我们假设其安装程序会将安装路径写入一个特定位置的 properties 文件中。
-     * 例如：
-     * - macOS: ~/Library/Application Support/audiotag/install_info.properties
-     * - Linux: ~/.config/audiotag/install_info.properties 或 /etc/audiotag/install_info.properties
-     * <p>
-     * install_info.properties 文件内容示例：
-     * install_dir=/path/to/your/application
      *
      * @return 软件的安装目录，如果无法找到则返回 null。
      */

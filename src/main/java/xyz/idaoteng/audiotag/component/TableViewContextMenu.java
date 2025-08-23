@@ -1,6 +1,5 @@
 package xyz.idaoteng.audiotag.component;
 
-import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.scene.control.*;
 import xyz.idaoteng.audiotag.UiCoordinator;
@@ -47,7 +46,7 @@ public class TableViewContextMenu {
     }
 
     private BooleanBinding noSelectedItem() {
-        return Bindings.isNull(tableView.getSelectionModel().selectedItemProperty());
+        return tableView.getSelectionModel().selectedItemProperty().isNull();
     }
 
     public void addContextMenu() {

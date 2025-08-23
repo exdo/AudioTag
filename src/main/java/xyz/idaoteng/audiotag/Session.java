@@ -213,6 +213,7 @@ public class Session {
             imageView.setFitWidth(200);
             imageView.setFitHeight(200);
             imageView.setImage(new Image(new ByteArrayInputStream(cover)));
+            CACHED_IMAGE_VIEW.put(cover, imageView);
         }
         return imageView;
     }
@@ -274,5 +275,9 @@ public class Session {
 
     public static AppConfiguration getConfig() {
         return cfg;
+    }
+
+    public static void setConfig(AppConfiguration config) {
+        cfg = new AppConfiguration(config);
     }
 }

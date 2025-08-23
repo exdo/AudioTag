@@ -14,6 +14,21 @@ public class AppConfiguration {
     private boolean writeInFile = true; // 写入 .lrc 文件中
     private boolean createLyricsFolder = false; // 将歌词文件放在 lyrics 文件夹中（否则放在歌曲文件所在文件夹）
 
+    public AppConfiguration() {
+    }
+
+    public AppConfiguration(AppConfiguration other) {
+        if (other != null) {
+            this.needRetouch = other.needRetouch;
+            this.format = other.format;
+            this.width = other.width;
+            this.height = other.height;
+            this.writeInTag = other.writeInTag;
+            this.writeInFile = other.writeInFile;
+            this.createLyricsFolder = other.createLyricsFolder;
+        }
+    }
+
     public Boolean getNeedRetouch() {
         return needRetouch;
     }
