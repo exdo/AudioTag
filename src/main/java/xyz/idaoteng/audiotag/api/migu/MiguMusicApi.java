@@ -2,7 +2,6 @@ package xyz.idaoteng.audiotag.api.migu;
 
 import xyz.idaoteng.audiotag.api.MusicApi;
 import xyz.idaoteng.audiotag.api.migu.dto.MiguSong;
-import xyz.idaoteng.audiotag.api.migu.dto.SingerList;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -10,10 +9,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URLEncoder;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class MiguMusicApi implements MusicApi {
@@ -21,7 +18,7 @@ public class MiguMusicApi implements MusicApi {
 
     private List<MiguSong> searchSongs(String keyword) {
         String url = "https://app.u.nf.migu.cn/pc/resource/song/item/search/v1.0?text="
-                + URLEncoder.encode(keyword, StandardCharsets.UTF_8)
+                + encodeURIComponent(keyword)
                 + "&pageNo=1&pageSize=20";
 
         HttpRequest request = HttpRequest.newBuilder()
@@ -73,16 +70,10 @@ public class MiguMusicApi implements MusicApi {
         List<String> lyrics = new ArrayList<>();
         List<MiguSong> miguSongs = searchSongs(title);
         for (MiguSong song : miguSongs) {
-            if (song.getSongName().contains(title) && artist != null && !artist.trim().isEmpty()) {
-                boolean match = Arrays.stream(song.getSingerList())
-                        .map(SingerList::getName)
-                        .anyMatch(name -> name.contains(artist));
-
-                if (match) {
-                    if (song.getExt().getLrcURL() != null) {
-                        Optional<byte[]> optionalBytes = getBytes(song.getExt().getLrcURL());
-                        optionalBytes.ifPresent(bytes -> lyrics.add(new String(bytes)));
-                    }
+            if (song.getSongName().contains(title)) {
+                if (song.getExt().getLrcURL() != null) {
+                    Optional<byte[]> optionalBytes = getBytes(song.getExt().getLrcURL());
+                    optionalBytes.ifPresent(bytes -> lyrics.add(new String(bytes)));
                 }
             }
         }

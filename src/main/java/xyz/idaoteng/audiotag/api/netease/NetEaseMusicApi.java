@@ -2,7 +2,6 @@ package xyz.idaoteng.audiotag.api.netease;
 
 import com.google.gson.JsonObject;
 import xyz.idaoteng.audiotag.api.MusicApi;
-import xyz.idaoteng.audiotag.api.netease.dto.Artist;
 import xyz.idaoteng.audiotag.api.netease.dto.SearchResult;
 import xyz.idaoteng.audiotag.api.netease.dto.Song;
 
@@ -74,7 +73,7 @@ public class NetEaseMusicApi implements MusicApi {
      * @param songName 歌曲名称
      * @return 歌曲信息列表，如果搜索失败或无结果则返回空列表
      */
-    public static List<Song> searchSongs(String songName) {
+    public List<Song> searchSongs(String songName) {
         String encodedSongName = encodeURIComponent(songName);
         String url = String.format("%s&s=%s&type=1&offset=0&limit=10", SEARCH_API_URL, encodedSongName);
 
@@ -116,11 +115,9 @@ public class NetEaseMusicApi implements MusicApi {
         List<String> lyricList = new ArrayList<>();
         List<Song> songs = searchSongs(title);
         for (Song song : songs) {
-            if (song.getName().contains(title) && artist != null && !artist.trim().isEmpty()) {
-                if (song.getAr().stream().map(Artist::getName).anyMatch(name -> name.contains(artist))) {
-                    Optional<String> lyrics = fetchLyrics(Long.parseLong(song.getId()));
-                    lyrics.ifPresent(lyricList::add);
-                }
+            if (song.getName().contains(title)) {
+                Optional<String> lyrics = fetchLyrics(song.getId());
+                lyrics.ifPresent(lyricList::add);
             }
         }
         return lyricList;
@@ -132,7 +129,7 @@ public class NetEaseMusicApi implements MusicApi {
      * @param songId 歌曲ID
      * @return 歌词文本，如果获取失败或无歌词则返回 Optional.empty()
      */
-    public static Optional<String> fetchLyrics(long songId) {
+    public static Optional<String> fetchLyrics(String songId) {
         JsonObject requestData = new JsonObject();
         requestData.addProperty("csrf_token", "");
         requestData.addProperty("id", songId);
@@ -218,22 +215,5 @@ public class NetEaseMusicApi implements MusicApi {
             e.printStackTrace();
             return null;
         }
-    }
-
-    /**
-     * 模拟JavaScript的encodeURIComponent，对URL组件进行编码。
-     * URLEncoder.encode默认会将空格转为'+'，这里转回'%20'，并保留一些特殊字符。
-     *
-     * @param s 待编码字符串
-     * @return 编码后的字符串
-     */
-    private static String encodeURIComponent(String s) {
-        return URLEncoder.encode(s, StandardCharsets.UTF_8)
-                .replaceAll("\\+", "%20") // 空格
-                .replaceAll("\\*", "%2A") // 星号
-                .replaceAll("%21", "!")   // 感叹号
-                .replaceAll("%27", "'")   // 单引号
-                .replaceAll("%28", "(")   // 左括号
-                .replaceAll("%29", ")");  // 右括号
     }
 }

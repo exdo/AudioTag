@@ -7,10 +7,8 @@ import xyz.idaoteng.audiotag.api.timeless.dto.SongsResult;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URLEncoder;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -24,8 +22,7 @@ public class TimelessApi implements MusicApi {
             return Optional.empty();
         }
 
-        keyword = URLEncoder.encode(keyword, StandardCharsets.UTF_8);
-        String url = String.format(TimelessApi.SEARCH_URL, keyword);
+        String url = String.format(TimelessApi.SEARCH_URL, encodeURIComponent(keyword));
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).GET().build();
 
         HttpResponse<String> response;
@@ -66,7 +63,7 @@ public class TimelessApi implements MusicApi {
         if (optionalResult.isPresent()) {
             SongDetail[] details = optionalResult.get().getData().getList();
             for (SongDetail detail : details) {
-                if (detail.getSongname().contains(title) && artist != null && !artist.trim().isEmpty()) {
+                if (detail.getSongname().contains(title)) {
                     Optional<String> lyric = fetchLyric(detail.getSongmid());
                     lyric.ifPresent(lyrics::add);
                 }
