@@ -77,6 +77,9 @@ public class UiCoordinator {
     }
 
     public static void showNotification(String msg) {
+        if (message == null) return;
+        UiCoordinator.refreshTableView();
+        UiCoordinator.refreshAsideData();
         message.showMessage(msg);
     }
 

@@ -1,6 +1,7 @@
 package xyz.idaoteng.audiotag.bean;
 
 import javafx.scene.control.CheckBox;
+import xyz.idaoteng.audiotag.util.Utils;
 
 import java.io.File;
 
@@ -23,7 +24,7 @@ public class FilenamePreview {
         metaData = data;
         file = newFile;
         oldName = data.getFilename();
-        newName = newFile.getName();
+        newName = Utils.getFilenameWithoutExtension(newFile.getName());
         checkBox.setSelected(true);
         checkBox.setOnAction(event -> needToRename = checkBox.isSelected());
     }

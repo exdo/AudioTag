@@ -17,14 +17,10 @@ import xyz.idaoteng.audiotag.bean.AudioFileData;
 import xyz.idaoteng.audiotag.bean.FilenamePreview;
 import xyz.idaoteng.audiotag.util.Utils;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.List;
 
-public class PreviewRename {
+public class PreviewBatchRename {
     private static final Stage STAGE = new Stage();
     private static final BorderPane BODY = new BorderPane();
     private static final Font FONT = new Font(13);
@@ -81,7 +77,7 @@ public class PreviewRename {
         for (FilenamePreview preview : previews) {
             if (preview.isNeedToRename()) {
                 AudioFileData data = preview.getMetaData();
-                String message = rename(data.getAbsolutePath(), preview.getFile().getAbsolutePath());
+                String message = Utils.rename(data.getAbsolutePath(), preview.getNewName());
                 if (message != null) {
                     failedPath_Reason.put(data.getAbsolutePath(), message);
                 } else {
@@ -107,27 +103,6 @@ public class PreviewRename {
             UiCoordinator.showNotification("已全部重命名");
         }
         STAGE.close();
-    }
-
-    private static String rename(String originPath, String targetPath) {
-        if (originPath == null || targetPath == null) throw new RuntimeException();
-
-        if ("".equals(originPath) || "".equals(targetPath)) throw new RuntimeException();
-
-        if (originPath.equals(targetPath)) return null;
-
-        File origin = new File(originPath);
-        if (!origin.exists()) return "无法找到源文件";
-
-        File target = new File(targetPath);
-        if (target.exists()) return "目标路径已有相同文件名的文件";
-
-        try {
-            Files.move(origin.toPath(), target.toPath(), StandardCopyOption.ATOMIC_MOVE);
-            return null;
-        } catch (IOException e) {
-            return e.getMessage();
-        }
     }
 
     public static void show(List<FilenamePreview> filenamePreviews) {

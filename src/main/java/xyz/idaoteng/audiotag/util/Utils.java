@@ -9,6 +9,7 @@ import xyz.idaoteng.audiotag.bean.AppConfiguration;
 import javax.imageio.ImageIO;
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.HashSet;
 import java.util.List;
 
@@ -27,6 +28,29 @@ public class Utils {
             return filename;
         } else {
             return filename.substring(0, index);
+        }
+    }
+
+    public static String rename(String originPath, String name) {
+        if (originPath == null || name == null) throw new RuntimeException();
+
+        if ("".equals(originPath) || "".equals(name)) throw new RuntimeException();
+
+        File origin = new File(originPath);
+        if (!origin.exists()) return "无法找到源文件";
+        if (getFilenameWithoutExtension(origin.getName()).equals(name)) {
+            return null;
+        }
+
+        String child = name + "." + getExtension(origin.getName());
+        File target = new File(origin.getParentFile(), child);
+        if (target.exists()) return "目标路径已有相同文件名的文件";
+
+        try {
+            Files.move(origin.toPath(), target.toPath(), StandardCopyOption.ATOMIC_MOVE);
+            return null;
+        } catch (IOException e) {
+            return e.getMessage();
         }
     }
 

@@ -6,15 +6,17 @@ import xyz.idaoteng.audiotag.util.ImageInApp;
 import java.util.Optional;
 
 public class PackageToAlbum {
+    private static final TextInputDialog DIALOG = new TextInputDialog("");
+    static {
+        DIALOG.setTitle("设为同一专辑");
+        DIALOG.setHeaderText("请输入专辑名");
+        DIALOG.setGraphic(ImageInApp.getAlbumIcon());
+        DIALOG.setContentText("专辑名：");
+        DIALOG.getEditor().setMinWidth(235);
+    }
     public static String show() {
-        TextInputDialog dialog = new TextInputDialog("");
-        dialog.setTitle("设为同一专辑");
-        dialog.setHeaderText("请输入专辑名");
-        dialog.setGraphic(ImageInApp.getAlbumIcon());
-        dialog.setContentText("专辑名：");
-        dialog.getEditor().setMinWidth(235);
-
-        Optional<String> albumName = dialog.showAndWait();
+        DIALOG.getEditor().setText(null);
+        Optional<String> albumName = DIALOG.showAndWait();
         return albumName.orElse(null);
     }
 }

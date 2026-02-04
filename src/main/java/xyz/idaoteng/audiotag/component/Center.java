@@ -120,7 +120,7 @@ public class Center {
     }
 
     private void addContextMenu() {
-        new TableViewContextMenu(tableView).addContextMenu();
+        new TableViewContextMenu(tableView);
     }
 
     private void initItems() {

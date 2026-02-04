@@ -14,6 +14,7 @@ public class ImageInApp {
     private static Image APP_ICON;
     private static Image LYRIC_ICON;
     private static Image SEARCH_EMPTY_ICON;
+    private static Image RENAME;
 
     public static void loadAllImage() {
         try (InputStream inputStream = ImageInApp.class.getResourceAsStream("cover.png")) {
@@ -71,6 +72,13 @@ public class ImageInApp {
         } catch (Exception e) {
             throw new RuntimeException("无法加载搜索为空图标");
         }
+
+        try (InputStream inputStream = ImageInApp.class.getResourceAsStream("rename.png")) {
+            if (inputStream == null) throw new RuntimeException("无法加载重命名图标");
+            RENAME = new Image(inputStream);
+        } catch (Exception e) {
+            throw new RuntimeException("无法加载重命名图标");
+        }
     }
 
     public static ImageView getDefaultCover() {
@@ -126,6 +134,14 @@ public class ImageInApp {
         icon.setFitWidth(35);
         icon.setFitHeight(35);
         icon.setImage(SEARCH_EMPTY_ICON);
+        return icon;
+    }
+
+    public static ImageView getRenameIcon() {
+        ImageView icon = new ImageView();
+        icon.setFitWidth(35);
+        icon.setFitHeight(35);
+        icon.setImage(RENAME);
         return icon;
     }
 

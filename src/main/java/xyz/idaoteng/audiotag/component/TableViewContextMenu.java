@@ -1,5 +1,6 @@
 package xyz.idaoteng.audiotag.component;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.scene.control.*;
 import xyz.idaoteng.audiotag.UiCoordinator;
@@ -21,11 +22,19 @@ public class TableViewContextMenu {
 
     public TableViewContextMenu(TableView<AudioFileData> tableView) {
         this.tableView = tableView;
+        buildMenu();
+    }
+
+    private BooleanBinding noSelectedItem() {
+        return tableView.getSelectionModel().selectedItemProperty().isNull();
+    }
+
+    private List<AudioFileData> selectedItems() {
+        return tableView.getSelectionModel().getSelectedItems();
     }
 
     private void doPreActionThen(Consumer<List<AudioFileData>> action) {
-        List<AudioFileData> selectedItems = tableView.getSelectionModel().getSelectedItems();
-        if (selectedItems.isEmpty()) {
+        if (selectedItems().isEmpty()) {
             // 没有选中项，弹出对话框询问是否全选
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("确认操作");
@@ -39,23 +48,39 @@ public class TableViewContextMenu {
             }
         } else {
             // 有选中项，直接执行对选中项的操作
-            action.accept(selectedItems);
+            action.accept(selectedItems());
         }
-        UiCoordinator.refreshTableView();
-        UiCoordinator.refreshAsideData();
     }
 
-    private BooleanBinding noSelectedItem() {
-        return tableView.getSelectionModel().selectedItemProperty().isNull();
-    }
-
-    public void addContextMenu() {
+    private void buildMenu() {
         MenuItem selectAll = new MenuItem("全选");
         selectAll.setOnAction(event -> tableView.getSelectionModel().selectAll());
 
+        // 重命名
+        MenuItem rename = new MenuItem("重命名");
+        rename.disableProperty().bind(
+                Bindings.size(tableView.getSelectionModel().getSelectedItems()).isNotEqualTo(1)
+        );
+        rename.setOnAction(event -> {
+            AudioFileData item = tableView.getSelectionModel().getSelectedItem();
+            String newName = Rename.show(item.getFilename());
+            if (!item.getFilename().equals(newName)) {
+                String message = Utils.rename(item.getAbsolutePath(), newName);
+                if (message == null) {
+                    String child = newName + "." + item.getFormat();
+                    File newFile = new File(new File(item.getAbsolutePath()).getParentFile(), child);
+                    item.setAbsolutePath(newFile.getAbsolutePath());
+                    item.setFilename(newName);
+                    UiCoordinator.showNotification("已重命名");
+                } else {
+                    UiCoordinator.showNotification(message);
+                }
+            }
+        });
+
         // 基于标签重命名菜单项
         MenuItem renameBaseOnTags = new MenuItem("根据标签重命名");
-        renameBaseOnTags.setOnAction(event -> doPreActionThen(Rename::show));
+        renameBaseOnTags.setOnAction(event -> doPreActionThen(RenameByTag::show));
 
         // 基于文件名添加标签菜单项
         MenuItem addTagsBaseOnFilename = new MenuItem("基于文件名添加标签");
@@ -64,10 +89,7 @@ public class TableViewContextMenu {
         // 从表格中移除菜单项
         MenuItem deleteFromTable = new MenuItem("从表格中移除");
         deleteFromTable.disableProperty().bind(noSelectedItem());
-        deleteFromTable.setOnAction(event -> {
-            List<AudioFileData> selectedItems = tableView.getSelectionModel().getSelectedItems();
-            tableView.getItems().removeAll(selectedItems);
-        });
+        deleteFromTable.setOnAction(event -> tableView.getItems().removeAll(selectedItems()));
 
         // 删除文件菜单项
         MenuItem deleteFile = new MenuItem("从磁盘中删除文件");
@@ -106,6 +128,7 @@ public class TableViewContextMenu {
         // 添加所有菜单项到上下文菜单
         contextMenu.getItems().addAll(
                 selectAll,
+                rename,
                 renameBaseOnTags,
                 addTagsBaseOnFilename,
                 deleteFromTable,
@@ -125,7 +148,7 @@ public class TableViewContextMenu {
     private Menu deleteSpecificTagMenu() {
         Menu deleteSpecificTag = new Menu("删除特定标签");
 
-// 创建各种标签删除菜单项
+        // 创建各种标签删除菜单项
         MenuItem deleteTitle = new MenuItem("删除标题");
         deleteTitle.setOnAction(e -> doPreActionThen(l -> deleteTag(l, EditableTag.TITLE)));
 
@@ -364,8 +387,7 @@ public class TableViewContextMenu {
     }
 
     private void openInFileBrowser() {
-        List<AudioFileData> dataList = tableView.getSelectionModel().getSelectedItems();
-        for (AudioFileData data : dataList) {
+        for (AudioFileData data : selectedItems()) {
             File file = new File(data.getAbsolutePath());
             FileBrowserUtil.Message message = FileBrowserUtil.highlightFile(file);
             if (!message.equals(FileBrowserUtil.Message.INFO_OPERATION_DONE)) {

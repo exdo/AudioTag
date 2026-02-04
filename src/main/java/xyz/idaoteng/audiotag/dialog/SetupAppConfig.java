@@ -18,15 +18,15 @@ import java.util.regex.Pattern;
 public class SetupAppConfig {
     private static AppConfiguration workingConfig;
     // 封面重绘设置
-    private static final CheckBox NEED_RETOUCH = new CheckBox("统一封面图片格式和大小？");
+    private static final CheckBox NEED_RETOUCH = new CheckBox("统一封面图片格式和大小");
     private static final ComboBox<String> FORMAT = new ComboBox<>();
     private static final TextField WIDTH = new TextField();
     private static final TextField HEIGHT = new TextField();
 
     // 歌词保存策略
-    private static final CheckBox WRITE_IN_TAG = new CheckBox("将歌词写入标签内？");
-    private static final CheckBox WRITE_IN_FILE = new CheckBox("将歌词写入 .lrc 文件？");
-    private static final CheckBox CREATE_LYRICS_FOLDER = new CheckBox("创建 lyrics 文件夹？");
+    private static final CheckBox WRITE_IN_TAG = new CheckBox("将歌词写入标签内");
+    private static final CheckBox WRITE_IN_FILE = new CheckBox("将歌词写入 .lrc 文件");
+    private static final CheckBox CREATE_LYRICS_FOLDER = new CheckBox("创建 lyrics 文件夹");
 
     private static final Stage STAGE = new Stage();
 
