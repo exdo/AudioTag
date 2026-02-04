@@ -1,0 +1,19 @@
+<dependency>
+    <groupId>net.jthink</groupId>
+    <artifactId>jaudiotagger</artifactId>
+    <version>0.0.1.local</version>
+</dependency>
+
+<dependency>
+    <groupId>net.coobird</groupId>
+    <artifactId>thumbnailator</artifactId>
+    <version>0.0.1.local</version>
+</dependency>
+
+<dependency>
+    <groupId>com.luciad.imageio</groupId>
+    <artifactId>webp-imageio</artifactId>
+    <version>0.0.1.local</version>
+ </dependency>
+
+ mvn install:install-file
